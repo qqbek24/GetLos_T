@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lotto Data Converter</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
+        textarea { width: 100%; height: 300px; font-family: monospace; }
+        .success { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Konwerter Danych Lotto</h1>
+    <p>Wklej dane z lotto_data.txt poniżej:</p>
+    <textarea id="input" placeholder="1. 27.01.1957 8,12,31,39,43,45
+2. 03.02.1957 5,10,11,22,25,27
+..."></textarea>
+    <br>
+    <button onclick="convert()">Konwertuj na CSV z datami</button>
+    <button onclick="convertNoDate()">Konwertuj bez dat (tylko liczby)</button>
+    <br>
+    <p id="result"></p>
+    <textarea id="output" readonly></textarea>
+    <br>
+    <button onclick="downloadCSV()">Pobierz jako lotto_import.csv</button>
+
+    <script>
+        let csvData = '';
+        
+        function convert() {
+            const input = document.getElementById('input').value;
+            const lines = input.split('\n');
+            const output = [];
+            
+            lines.forEach(line => {
+                const match = line.match(/^(\d+)\.\s+(\d{2})\.(\d{2})\.(\d{4})\s+(.+)$/);
+                if (match) {
+                    const day = match[2];
+                    const month = match[3];
+                    const year = match[4];
+                    const numbers = match[5];
+                    const date = `${year}-${month}-${day}`;
+                    output.push(`${date},${numbers}`);
+                }
+            });
+            
+            csvData = output.join('\n');
+            document.getElementById('output').value = csvData;
+            document.getElementById('result').innerHTML = `<span class="success">✓ Przetworzono ${output.length} losowań z datami</span>`;
+        }
+        
+        function convertNoDate() {
+            const input = document.getElementById('input').value;
+            const lines = input.split('\n');
+            const output = [];
+            
+            lines.forEach(line => {
+                const match = line.match(/^(\d+)\.\s+(\d{2})\.(\d{2})\.(\d{4})\s+(.+)$/);
+                if (match) {
+                    output.push(match[5]);
+                }
+            });
+            
+            csvData = output.join('\n');
+            document.getElementById('output').value = csvData;
+            document.getElementById('result').innerHTML = `<span class="success">✓ Przetworzono ${output.length} losowań (tylko liczby)</span>`;
+        }
+        
+        function downloadCSV() {
+            if (!csvData) {
+                alert('Najpierw przekonwertuj dane!');
+                return;
+            }
+            
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'lotto_import.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>
