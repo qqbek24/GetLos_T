@@ -63,7 +63,7 @@ class PickResponse(BaseModel):
 
 class GenerateRequest(BaseModel):
     """Request to generate new pick"""
-    strategy: Literal["random", "hot", "cold", "balanced", "combo_based"] = "random"
+    strategy: Literal["random", "hot", "cold", "balanced", "combo_based", "ai"] = "random"
     count: int = Field(default=1, ge=1, le=10)
 
 
@@ -125,4 +125,4 @@ class BackupResponse(BaseModel):
 
 
 # Strategy type
-Strategy = Literal["random", "hot", "cold", "balanced", "combo_based"]
+Strategy = Literal["random", "hot", "cold", "balanced", "combo_based", "ai"]

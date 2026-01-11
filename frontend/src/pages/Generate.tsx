@@ -52,6 +52,8 @@ export default function Generate() {
         return '#ff9800' // Pomarańczowy
       case 'combo_based':
         return '#9c27b0' // Fioletowy
+      case 'ai':
+        return '#00bcd4' // Cyjan (AI)
       default:
         return 'inherit'
     }

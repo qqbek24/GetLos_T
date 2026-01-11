@@ -12,6 +12,8 @@ import csv, io, random, math, os
 from collections import Counter
 from itertools import combinations
 from dotenv import load_dotenv
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 
 from db import get_db, init_db
 from models import HistoricalDraw, Pick, norm_key
@@ -129,6 +131,107 @@ def get_top_pairs_triples(rows: List[List[int]], top_n: int = 30):
     return top_pairs, top_triples
 
 
+def pick_with_ai(all_rows: List[List[int]], freq: List[int]) -> List[int]:
+    """
+    AI-based prediction using machine learning
+    Analyzes historical patterns, sequences, and statistical features
+    """
+    if not all_rows or len(all_rows) < 20:
+        # Not enough data for AI, fallback to balanced
+        return pick_with_strategy(freq, "balanced", all_rows)
+    
+    # Prepare features from historical data
+    features = []
+    labels = []
+    
+    # Create training data from sequences
+    for i in range(len(all_rows) - 1):
+        current = all_rows[i]
+        next_draw = all_rows[i + 1]
+        
+        # Features: frequency, sum, even/odd ratio, gaps
+        feature_vec = [
+            sum(current),  # Sum of numbers
+            len([n for n in current if n % 2 == 0]),  # Even count
+            max(current) - min(current),  # Range
+            freq[current[0] - 1] if current else 0,  # Freq of first number
+            freq[current[-1] - 1] if current else 0,  # Freq of last number
+        ]
+        
+        # Add gap features (differences between consecutive numbers)
+        gaps = [current[j+1] - current[j] for j in range(len(current)-1)]
+        feature_vec.extend(gaps + [0] * (5 - len(gaps)))  # Pad to 5 gaps
+        
+        features.append(feature_vec)
+        
+        # Label: binary vector indicating which numbers appeared
+        label = [1 if i in next_draw else 0 for i in range(1, 50)]
+        labels.append(label)
+    
+    # Train multiple binary classifiers (one per number)
+    X = np.array(features)
+    y = np.array(labels)
+    
+    # Predict probabilities for each number
+    predictions = []
+    for num_idx in range(49):
+        if len(np.unique(y[:, num_idx])) > 1:  # Only if we have both classes
+            clf = RandomForestClassifier(n_estimators=10, max_depth=5, random_state=42)
+            clf.fit(X, y[:, num_idx])
+            
+            # Use last draw as input for prediction
+            last_draw = all_rows[-1]
+            test_feature = [
+                sum(last_draw),
+                len([n for n in last_draw if n % 2 == 0]),
+                max(last_draw) - min(last_draw),
+                freq[last_draw[0] - 1],
+                freq[last_draw[-1] - 1],
+            ]
+            gaps = [last_draw[j+1] - last_draw[j] for j in range(len(last_draw)-1)]
+            test_feature.extend(gaps + [0] * (5 - len(gaps)))
+            
+            prob = clf.predict_proba([test_feature])[0][1]  # Probability of appearing
+        else:
+            prob = freq[num_idx] / (sum(freq) + 1)  # Fallback to frequency
+        
+        predictions.append((num_idx + 1, prob))
+    
+    # Sort by probability and select top numbers with some randomness
+    predictions.sort(key=lambda x: x[1], reverse=True)
+    
+    # Smart selection: mix high-probability numbers with some randomness
+    picks = set()
+    
+    # Take top 3 most probable
+    for num, _ in predictions[:8]:
+        picks.add(num)
+        if len(picks) >= 3:
+            break
+    
+    # Add 2-3 numbers from medium probability (weighted random)
+    mid_prob = predictions[8:25]
+    weights = [p[1] for p in mid_prob]
+    if sum(weights) > 0:
+        selected = np.random.choice(
+            [p[0] for p in mid_prob],
+            size=min(3, len(mid_prob)),
+            replace=False,
+            p=np.array(weights) / sum(weights)
+        )
+        # Convert numpy.int64 to Python int
+        picks.update([int(x) for x in selected])
+    
+    # Fill remaining if needed
+    while len(picks) < 6:
+        remaining = [n for n in range(1, 50) if n not in picks]
+        picks.add(random.choice(remaining))
+    
+    # Convert numpy.int64 to Python int (JSON serializable)
+    result = [int(x) for x in sorted(list(picks)[:6])]
+    return result
+
+
 def pick_with_strategy(
     freq: List[int], 
     strategy: Strategy, 
@@ -143,8 +246,17 @@ def pick_with_strategy(
     - cold: Favor rarely drawn numbers
     - balanced: Mix of hot (3) and cold (3) numbers
     - combo_based: Based on frequent pairs/triples
+    - ai: Machine learning prediction based on patterns
     """
     universe = list(range(1, 53))
+    
+    # AI strategy
+    if strategy == "ai":
+        if all_rows and len(all_rows) >= 20:
+            return pick_with_ai(all_rows, freq)
+        else:
+            # Not enough data, fallback to balanced
+            strategy = "balanced"
     
     # Random strategy
     if strategy == "random":
@@ -231,7 +343,7 @@ def ensure_new_combo(candidate: List[int], forbidden_keys: set[str]) -> List[int
     cand = candidate
     
     while norm_key(cand) in forbidden_keys:
-        cand = sorted(random.sample(range(1, 53), 6))
+        cand = sorted(random.sample(range(1, 50), 6))
         tries += 1
         
         if tries > 5000:

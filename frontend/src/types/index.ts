@@ -30,7 +30,7 @@ export interface Pick {
   created_at: string
 }
 
-export type Strategy = 'random' | 'hot' | 'cold' | 'balanced' | 'combo_based'
+export type Strategy = 'random' | 'hot' | 'cold' | 'balanced' | 'combo_based' | 'ai'
 
 export interface GenerateRequest {
   strategy: Strategy
