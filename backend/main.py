@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from datetime import datetime
 import csv, io, random, math, os
 from collections import Counter
 from itertools import combinations
@@ -16,8 +17,10 @@ from db import get_db, init_db
 from models import HistoricalDraw, Pick, norm_key
 from schema import (
     Numbers, Stats, Strategy, GenerateRequest, 
-    UploadResponse, DrawResponse, PickResponse
+    UploadResponse, DrawResponse, PickResponse, SyncLottoResponse,
+    ManualDrawRequest, BackupResponse
 )
+from lotto_api import get_last_results_for_lotto, parse_lotto_draw, LottoAPIError
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +28,7 @@ load_dotenv()
 # Initialize FastAPI app
 app = FastAPI(
     title="GetLos_T - Lotto Predictor",
-    description="Aplikacja do losowania prognozowanych układów 6 liczb (1-52)",
+    description="Aplikacja do losowania prognozowanych układów 6 liczb (1-49)",
     version="1.0.0"
 )
 
@@ -84,7 +87,7 @@ def parse_csv_bytes(b: bytes) -> List[tuple]:
                 token = token.strip()
                 if token.isdigit():
                     n = int(token)
-                    if 1 <= n <= 52 and n not in nums:
+                    if 1 <= n <= 49 and n not in nums:
                         nums.append(n)
                 if len(nums) >= 6:
                     break
@@ -97,9 +100,9 @@ def parse_csv_bytes(b: bytes) -> List[tuple]:
     return out
 
 
-def histogram_1_52(rows: List[List[int]]) -> List[int]:
-    """Calculate frequency of each number (1-52)"""
-    freq = [0] * 52
+def histogram_1_49(rows: List[List[int]]) -> List[int]:
+    """Calculate frequency of each number (1-49)"""
+    freq = [0] * 49
     for row in rows:
         for n in row:
             freq[n - 1] += 1
@@ -176,7 +179,7 @@ def pick_with_strategy(
     
     # Balanced strategy
     if strategy == "balanced":
-        idx_sorted = sorted(range(52), key=lambda i: freq[i], reverse=True)
+        idx_sorted = sorted(range(49), key=lambda i: freq[i], reverse=True)
         hot_pool = [i + 1 for i in idx_sorted[:13]]
         cold_pool = [i + 1 for i in idx_sorted[-13:]]
         
@@ -185,7 +188,7 @@ def pick_with_strategy(
         picks.update(random.sample(cold_pool, min(3, len(cold_pool))))
         
         while len(picks) < 6:
-            picks.add(random.randint(1, 52))
+            picks.add(random.randint(1, 49))
         
         return sorted(list(picks)[:6])
     
@@ -316,7 +319,7 @@ def get_stats(db: Session = Depends(get_db)):
             total_draws=0,
             total_picks=len(all_picks),
             coverage_pct=0.0,
-            freq=[0] * 52,
+            freq=[0] * 49,
             min_sum=0,
             max_sum=0,
             avg_sum=0.0,
@@ -324,8 +327,8 @@ def get_stats(db: Session = Depends(get_db)):
             least_frequent=[]
         )
     
-    freq = histogram_1_52(all_rows)
-    total_combinations = math.comb(52, 6)
+    freq = histogram_1_49(all_rows)
+    total_combinations = math.comb(49, 6)
     
     # Get most and least frequent numbers
     freq_with_nums = [(i + 1, f) for i, f in enumerate(freq)]
@@ -360,7 +363,7 @@ def generate_picks(
     
     # Get historical data for strategy
     all_rows = [h.numbers for h in db.query(HistoricalDraw).all()]
-    freq = histogram_1_52(all_rows) if all_rows else [0] * 52
+    freq = histogram_1_49(all_rows) if all_rows else [0] * 49
     
     results = []
     
@@ -508,6 +511,252 @@ def pairtriple_stats(limit: int = 20, db: Session = Depends(get_db)):
         "pairs": [{"numbers": list(p), "count": c} for p, c in top_pairs],
         "triples": [{"numbers": list(t), "count": c} for t, c in top_triples]
     }
+
+
+@app.post("/sync-lotto", response_model=SyncLottoResponse)
+async def sync_lotto_results(db: Session = Depends(get_db)):
+    """
+    Synchronize lottery results with Lotto.pl official API
+    
+    This endpoint:
+    1. Checks the latest draw date in your database
+    2. Fetches new results from Lotto.pl API
+    3. Adds missing draws to your history
+    
+    Requirements:
+    - LOTTO_API_SECRET_KEY must be configured in .env
+    - Get your API key from: kontakt@lotto.pl
+    - More info: https://developers.lotto.pl/
+    """
+    try:
+        # Fetch latest results from Lotto.pl API
+        api_results = await get_last_results_for_lotto()
+        
+        if not api_results:
+            return SyncLottoResponse(
+                success=True,
+                new_draws=0,
+                message="No new results available from Lotto.pl API"
+            )
+        
+        # Get the latest draw date from our database
+        latest_db_draw = db.query(HistoricalDraw).filter(
+            HistoricalDraw.source.isnot(None)
+        ).order_by(
+            HistoricalDraw.source.desc()
+        ).first()
+        
+        latest_db_date = latest_db_draw.source if latest_db_draw else None
+        
+        # Process and add new draws
+        new_draws_count = 0
+        latest_synced_date = None
+        
+        for draw_data in api_results:
+            parsed = parse_lotto_draw(draw_data)
+            
+            if not parsed or not parsed["numbers"]:
+                continue
+            
+            numbers = parsed["numbers"]
+            draw_date = parsed["draw_date"]
+            
+            # Skip if this draw is older or equal to what we have
+            if latest_db_date and draw_date and draw_date <= latest_db_date:
+                continue
+            
+            # Check if this draw already exists
+            key = norm_key(numbers)
+            existing = db.query(HistoricalDraw).filter_by(key=key).first()
+            
+            if existing:
+                continue
+            
+            # Add new draw
+            new_draw = HistoricalDraw(
+                numbers=numbers,
+                key=key,
+                source=draw_date  # Store date in source field
+            )
+            db.add(new_draw)
+            new_draws_count += 1
+            
+            if not latest_synced_date or (draw_date and draw_date > latest_synced_date):
+                latest_synced_date = draw_date
+        
+        db.commit()
+        
+        message = f"Successfully synced {new_draws_count} new draw(s) from Lotto.pl"
+        if new_draws_count == 0:
+            message = "Database is up to date. No new draws found."
+        
+        return SyncLottoResponse(
+            success=True,
+            new_draws=new_draws_count,
+            latest_draw_date=latest_synced_date,
+            message=message
+        )
+        
+    except LottoAPIError as e:
+        return SyncLottoResponse(
+            success=False,
+            new_draws=0,
+            message="Failed to sync with Lotto.pl API",
+            error=str(e)
+        )
+    except Exception as e:
+        return SyncLottoResponse(
+            success=False,
+            new_draws=0,
+            message="Unexpected error during sync",
+            error=str(e)
+        )
+
+
+@app.post("/manual-draw", response_model=UploadResponse)
+def add_manual_draw(request: ManualDrawRequest, db: Session = Depends(get_db)):
+    """
+    Manually add one or more lottery draws
+    
+    Use this when:
+    - Sync with Lotto.pl is not working
+    - You have results from other sources
+    - You want to add historical data manually
+    
+    Example request:
+    {
+        "draws": [
+            {"numbers": [5, 12, 23, 34, 45, 49], "date": "2024-01-15"},
+            {"numbers": [3, 17, 28, 31, 42, 50], "date": "2024-01-12"}
+        ]
+    }
+    """
+    inserted = 0
+    duplicates = 0
+    
+    for draw in request.draws:
+        numbers = sorted(draw["numbers"])
+        date_str = draw.get("date", None)
+        
+        # Create key
+        key = norm_key(numbers)
+        
+        # Check if already exists
+        existing = db.query(HistoricalDraw).filter_by(key=key).first()
+        
+        if existing:
+            duplicates += 1
+            continue
+        
+        # Add new draw
+        new_draw = HistoricalDraw(
+            numbers=numbers,
+            key=key,
+            source=date_str if date_str else "manual_entry"
+        )
+        db.add(new_draw)
+        inserted += 1
+    
+    db.commit()
+    
+    return UploadResponse(
+        success=True,
+        total_processed=len(request.draws),
+        new_draws=inserted,
+        duplicates=duplicates,
+        message=f"Successfully added {inserted} new draw(s), {duplicates} duplicate(s) skipped"
+    )
+
+
+@app.get("/export-draws")
+def export_draws_to_json(db: Session = Depends(get_db)):
+    """
+    Export all historical draws to JSON format
+    Use this to backup your database
+    """
+    draws = db.query(HistoricalDraw).order_by(HistoricalDraw.source.desc()).all()
+    
+    export_data = [
+        {
+            "numbers": draw.numbers,
+            "date": draw.source,
+            "created_at": draw.created_at.isoformat() if draw.created_at else None
+        }
+        for draw in draws
+    ]
+    
+    return {
+        "success": True,
+        "count": len(export_data),
+        "draws": export_data,
+        "exported_at": datetime.now().isoformat()
+    }
+
+
+@app.post("/import-draws", response_model=BackupResponse)
+def import_draws_from_json(draws_data: dict, db: Session = Depends(get_db)):
+    """
+    Import draws from JSON backup
+    
+    Example request:
+    {
+        "draws": [
+            {"numbers": [5,12,23,34,45,49], "date": "2024-01-15"},
+            {"numbers": [3,17,28,31,42,50], "date": "2024-01-12"}
+        ]
+    }
+    """
+    try:
+        if "draws" not in draws_data:
+            return BackupResponse(
+                success=False,
+                count=0,
+                message="Invalid format: 'draws' field required",
+                error="Missing 'draws' array"
+            )
+        
+        draws = draws_data["draws"]
+        inserted = 0
+        
+        for draw in draws:
+            if "numbers" not in draw:
+                continue
+            
+            numbers = sorted(draw["numbers"])
+            date_str = draw.get("date")
+            
+            # Create key
+            key = norm_key(numbers)
+            
+            # Check if already exists
+            existing = db.query(HistoricalDraw).filter_by(key=key).first()
+            if existing:
+                continue
+            
+            # Add new draw
+            new_draw = HistoricalDraw(
+                numbers=numbers,
+                key=key,
+                source=date_str if date_str else "import"
+            )
+            db.add(new_draw)
+            inserted += 1
+        
+        db.commit()
+        
+        return BackupResponse(
+            success=True,
+            count=inserted,
+            message=f"Successfully imported {inserted} draw(s)"
+        )
+        
+    except Exception as e:
+        return BackupResponse(
+            success=False,
+            count=0,
+            message="Import failed",
+            error=str(e)
+        )
 
 
 if __name__ == "__main__":

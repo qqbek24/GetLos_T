@@ -1,26 +1,30 @@
-# GetLos_T 🎲
+# GetLos_T
 
 Inteligentny system do przewidywania i analizy wyników losowań Lotto oparty na historycznych danych.
 
-> 🚀 **[Quick Start → Quick_start_dev/](Quick_start_dev/)** | 📖 **[Backend Docs](backend/docs/)** | 📖 **[Frontend Docs](frontend/docs/)**
+> **[Pełna Dokumentacja → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)**
 
-## 🚀 Stack Technologiczny
+## Stack Technologiczny
 
 - **Backend**: FastAPI + SQLAlchemy + SQLite
 - **Frontend**: React 18 + TypeScript + Material UI + Vite
 - **Docker**: Docker Compose dla łatwego wdrożenia
 - **Style**: Material UI z custom gradient theme
 
-## 📋 Funkcjonalności
+## Funkcjonalności
 
-### ✨ Główne Funkcje
+### Główne Funkcje
 - **5 Strategii Generowania**: Random, Hot Numbers, Cold Numbers, Balanced, Combo Based
 - **Analiza Historyczna**: Częstotliwość liczb, najczęstsze pary i trójki
 - **Import CSV**: Wgrywanie historycznych wyników losowań
+- **Synchronizacja z Lotto.pl**: Automatyczne pobieranie najnowszych wyników z oficjalnego API
+- **Ręczne dodawanie losowań**: Backup gdy API nie działa
+- **Backup/Restore**: Export i import danych do JSON
+- **Persistence**: Automatyczne zachowanie danych między rebuildami
 - **Statystyki**: Wizualizacja częstotliwości, hot/cold numbers
 - **Historia**: Przegląd wygenerowanych układów i historycznych losowań
 
-### 🎯 Strategie
+### Strategie
 
 1. **Random** - Całkowicie losowy wybór liczb
 2. **Hot Numbers** - Preferuje często występujące liczby w historii
@@ -28,9 +32,23 @@ Inteligentny system do przewidywania i analizy wyników losowań Lotto oparty na
 4. **Balanced** - Mieszanka częstych i rzadkich liczb
 5. **Combo Based** - Oparte na najczęstszych parach i trójkach z historii
 
-## 🏃 Quick Start
+### Synchronizacja z API Lotto.pl
 
-📚 **[Szczegółowy przewodnik uruchomienia → Quick_start_dev/FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md)**
+Aplikacja posiada integrację z oficjalnym API Totalizatora Sportowego:
+- Automatyczne pobieranie najnowszych wyników Lotto
+- Wykrywanie brakujących losowań
+- Jeden przycisk do synchronizacji
+- Ręczne dodawanie losowań (fallback)
+- Backup/Restore do JSON
+- Pełna dokumentacja integracji
+
+**[Instrukcja konfiguracji API → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
+**[Zarządzanie danymi → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
+**[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
+
+## Quick Start
+
+**[Szczegółowy przewodnik uruchomienia → Quick_start_dev/FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md)**
 
 ### Metoda 1: Docker (Zalecana)
 
@@ -79,14 +97,14 @@ npm install
 npm run dev
 ```
 
-## 🌐 Dostęp do Aplikacji
+## Dostęp do Aplikacji
 
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 📁 Struktura Projektu
+## Struktura Projektu
 
 ```
 GetLos_T/
@@ -337,17 +355,29 @@ Po uruchomieniu backendu dostępna jest interaktywna dokumentacja:
 
 ## � Dokumentacja
 
-### Quick Start & Skrypty
+> 📖 **[🔍 Pełny Spis Treści Dokumentacji → docs/INDEX.md](docs/INDEX.md)**
+
+### 🚀 Quick Start & Skrypty
 - **[Quick_start_dev/](Quick_start_dev/)** - Wszystkie skrypty zarządzające i quick start guides
   - [FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md) - Pierwsze uruchomienie
   - [QUICK_START.md](Quick_start_dev/QUICK_START.md) - Szybki start w 5 minut
-  - [MIGRATION_SUMMARY.md](Quick_start_dev/MIGRATION_SUMMARY.md) - Detale migracji
+  - [LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md) - Konfiguracja API w 6 krokach
 
-### Dokumentacja Techniczna
+### 🔄 Integracje i Funkcjonalności
+- **[docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)** - Pełna dokumentacja synchronizacji z Lotto.pl API
+- **[docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)** - Zarządzanie danymi, backup, restore, persistence
+- **[docs/INSTALLATION_GUIDE.md](docs/INSTALLATION_GUIDE.md)** - Szczegółowy przewodnik instalacji
+- **[docs/VISUALIZATION.md](docs/VISUALIZATION.md)** - Diagramy architektury i flow
+
+### 💻 Dokumentacja Techniczna
 - **[backend/docs/](backend/docs/)** - Dokumentacja Backend
   - API endpoints, modele, strategie, konfiguracja
 - **[frontend/docs/](frontend/docs/)** - Dokumentacja Frontend
   - Komponenty React, strony, architektury, Material UI
+
+### 📦 Wdrożenie
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Wdrożenie produkcyjne
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Jak kontrybuować do projektu
 
 ## �📄 License
 

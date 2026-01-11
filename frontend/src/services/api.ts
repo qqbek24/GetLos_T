@@ -5,6 +5,9 @@ import type {
   Draw,
   GenerateRequest,
   UploadResponse,
+  SyncLottoResponse,
+  ManualDrawRequest,
+  BackupResponse,
   ValidateResponse,
   PairTripleStats,
 } from '../types'
@@ -88,6 +91,30 @@ export const api = {
   // Clear all picks
   async clearAllPicks(): Promise<{ success: boolean; deleted: number }> {
     const response = await apiClient.delete('/picks/all')
+    return response.data
+  },
+
+  // Sync with Lotto.pl API
+  async syncLottoResults(): Promise<SyncLottoResponse> {
+    const response = await apiClient.post<SyncLottoResponse>('/sync-lotto')
+    return response.data
+  },
+
+  // Manually add draw(s)
+  async addManualDraw(request: ManualDrawRequest): Promise<UploadResponse> {
+    const response = await apiClient.post<UploadResponse>('/manual-draw', request)
+    return response.data
+  },
+
+  // Export draws to JSON
+  async exportDraws(): Promise<any> {
+    const response = await apiClient.get('/export-draws')
+    return response.data
+  },
+
+  // Import draws from JSON
+  async importDraws(data: any): Promise<BackupResponse> {
+    const response = await apiClient.post<BackupResponse>('/import-draws', data)
     return response.data
   },
 }

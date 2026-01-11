@@ -14,8 +14,8 @@ class Numbers(BaseModel):
     @classmethod
     def validate_numbers(cls, v):
         # Check range
-        if any(n < 1 or n > 52 for n in v):
-            raise ValueError("All numbers must be in range 1-52")
+        if any(n < 1 or n > 49 for n in v):
+            raise ValueError("All numbers must be in range 1-49")
         
         # Check uniqueness
         if len(set(v)) != 6:
@@ -74,6 +74,54 @@ class UploadResponse(BaseModel):
     new_draws: int
     duplicates: int
     message: str
+
+
+class SyncLottoResponse(BaseModel):
+    """Response after syncing with Lotto.pl API"""
+    success: bool
+    new_draws: int
+    latest_draw_date: Optional[str] = None
+    message: str
+    error: Optional[str] = None
+
+
+class ManualDrawRequest(BaseModel):
+    """Request to manually add draw(s)"""
+    draws: List[dict] = Field(..., min_length=1)  # [{"numbers": [1,2,3,4,5,6], "date": "2024-01-15"}]
+    
+    @field_validator("draws")
+    @classmethod
+    def validate_draws(cls, v):
+        for draw in v:
+            # Validate numbers
+            if "numbers" not in draw:
+                raise ValueError("Each draw must have 'numbers' field")
+            
+            numbers = draw["numbers"]
+            if not isinstance(numbers, list) or len(numbers) != 6:
+                raise ValueError("Each draw must have exactly 6 numbers")
+            
+            if any(n < 1 or n > 49 for n in numbers):
+                raise ValueError("All numbers must be in range 1-49")
+            
+            if len(set(numbers)) != 6:
+                raise ValueError("All numbers must be unique")
+            
+            # Date is optional but must be valid format if provided
+            if "date" in draw and draw["date"]:
+                date_str = draw["date"]
+                if not isinstance(date_str, str):
+                    raise ValueError("Date must be a string")
+        
+        return v
+
+
+class BackupResponse(BaseModel):
+    """Response after backup/restore operation"""
+    success: bool
+    count: int
+    message: str
+    error: Optional[str] = None
 
 
 # Strategy type

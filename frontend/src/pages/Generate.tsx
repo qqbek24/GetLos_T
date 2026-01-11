@@ -14,7 +14,8 @@ import {
   Alert,
   Chip,
 } from '@mui/material'
-import { Casino, ContentCopy, Delete } from '@mui/icons-material'
+import { ContentCopy, Delete } from '@mui/icons-material'
+import { ICONS, STRATEGY_CONFIG } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import type { Strategy, Pick } from '../types'
@@ -31,13 +32,30 @@ export default function Generate() {
     },
   })
 
-  const strategies: { value: Strategy; label: string; description: string }[] = [
-    { value: 'random', label: '🎲 Random', description: 'Całkowicie losowy wybór liczb' },
-    { value: 'hot', label: '🔥 Hot', description: 'Preferuje liczby często występujące w historii' },
-    { value: 'cold', label: '❄️ Cold', description: 'Preferuje liczby rzadko występujące w historii' },
-    { value: 'balanced', label: '⚖️ Balanced', description: 'Mieszanka częstych i rzadkich liczb' },
-    { value: 'combo_based', label: '🎯 Combo Based', description: 'Oparte na najczęstszych parach i trójkach' },
-  ]
+  // Pobierz strategie z konfiguracji
+  const strategies = Object.entries(STRATEGY_CONFIG).map(([key, config]) => ({
+    value: key as Strategy,
+    label: config.label,
+    description: config.description,
+    icon: config.icon,
+  }))
+
+  // Kolory dla ikon strategii
+  const getStrategyColor = (strategyValue: string) => {
+    switch (strategyValue) {
+      case 'hot':
+        return '#f44336' // Czerwony
+      case 'cold':
+      case 'balanced':
+        return '#2196f3' // Niebieski
+      case 'random':
+        return '#ff9800' // Pomarańczowy
+      case 'combo_based':
+        return '#9c27b0' // Fioletowy
+      default:
+        return 'inherit'
+    }
+  }
 
   const selectedStrategy = strategies.find(s => s.value === strategy)
 
@@ -58,7 +76,7 @@ export default function Generate() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700}>
-        🎲 Generuj Nowe Układy
+        <ICONS.GenerateTitleIcon color="primary" fontSize="large" /> Generuj Nowe Układy
       </Typography>
 
       {/* Settings Card */}
@@ -74,12 +92,29 @@ export default function Generate() {
               value={strategy}
               label="Strategia"
               onChange={(e) => setStrategy(e.target.value as Strategy)}
+              renderValue={(value) => {
+                const selected = strategies.find(s => s.value === value)
+                if (!selected) return value
+                const IconComponent = selected.icon
+                const iconColor = getStrategyColor(selected.value)
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <IconComponent fontSize="small" sx={{ color: iconColor }} />
+                    {selected.label}
+                  </Box>
+                )
+              }}
             >
-              {strategies.map((s) => (
-                <MenuItem key={s.value} value={s.value}>
-                  {s.label}
-                </MenuItem>
-              ))}
+              {strategies.map((s) => {
+                const IconComponent = s.icon
+                const iconColor = getStrategyColor(s.value)
+                return (
+                  <MenuItem key={s.value} value={s.value} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <IconComponent fontSize="small" sx={{ color: iconColor }} />
+                    {s.label}
+                  </MenuItem>
+                )
+              })}
             </Select>
             {selectedStrategy && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
@@ -102,7 +137,7 @@ export default function Generate() {
             variant="contained"
             size="large"
             fullWidth
-            startIcon={<Casino />}
+            startIcon={<ICONS.Generate />}
             onClick={handleGenerate}
             disabled={generateMutation.isPending}
           >
@@ -122,7 +157,7 @@ export default function Generate() {
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600}>
-              ✨ Wygenerowane Układy
+              <ICONS.StarsGeneratedNumbers color="info" fontSize="medium" /> Wygenerowane Układy
             </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
@@ -183,7 +218,7 @@ export default function Generate() {
       <Card sx={{ bgcolor: 'info.lighter' }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600}>
-            ℹ️ Informacje o Strategiach
+            <ICONS.InfoIcon fontSize="medium" color="info" /> Informacje o Strategiach
           </Typography>
           <Box component="ul" sx={{ pl: 2 }}>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
