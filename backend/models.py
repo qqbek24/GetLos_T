@@ -10,7 +10,7 @@ from db import Base
 def norm_key(nums: list[int]) -> str:
     """
     Create normalized key from numbers (sorted, zero-padded)
-    Example: [5, 12, 23, 34, 45, 52] -> "05-12-23-34-45-52"
+    Example: [5, 12, 23, 34, 45, 49] -> "05-12-23-34-45-49"
     """
     sorted_nums = sorted(nums)
     return "-".join(f"{n:02d}" for n in sorted_nums)
@@ -19,7 +19,7 @@ def norm_key(nums: list[int]) -> str:
 class HistoricalDraw(Base):
     """
     Historical lottery draws
-    Stores 6 numbers (1-52) from past lottery results
+    Stores 6 numbers (1-49) from past lottery results
     """
     __tablename__ = "historical_draws"
     

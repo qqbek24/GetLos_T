@@ -45,6 +45,28 @@ export interface UploadResponse {
   message: string
 }
 
+export interface SyncLottoResponse {
+  success: boolean
+  new_draws: number
+  latest_draw_date?: string
+  message: string
+  error?: string
+}
+
+export interface ManualDrawRequest {
+  draws: {
+    numbers: number[]
+    date?: string
+  }[]
+}
+
+export interface BackupResponse {
+  success: boolean
+  count: number
+  message: string
+  error?: string
+}
+
 export interface ValidateResponse {
   numbers: number[]
   key: string

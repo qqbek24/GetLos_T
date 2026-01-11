@@ -2,7 +2,7 @@
 
 Przykłady wywołań API dla różnych operacji.
 
-## 🌐 Base URL
+## Base URL
 
 ```
 Development: http://localhost:8000
@@ -11,7 +11,7 @@ Production: https://your-domain.com
 
 ---
 
-## 📊 GET /stats - Pobierz Statystyki
+## GET /stats - Pobierz Statystyki
 
 ```bash
 curl http://localhost:8000/stats
@@ -34,7 +34,7 @@ curl http://localhost:8000/stats
 
 ---
 
-## 📁 POST /upload-csv - Wgraj Plik CSV
+## POST /upload-csv - Wgraj Plik CSV
 
 ```bash
 curl -X POST http://localhost:8000/upload-csv \
@@ -54,7 +54,7 @@ curl -X POST http://localhost:8000/upload-csv \
 
 ---
 
-## 🎲 POST /generate - Generuj Nowe Układy
+## POST /generate - Generuj Nowe Układy
 
 ### Random Strategy
 ```bash
@@ -108,7 +108,7 @@ curl -X POST http://localhost:8000/generate \
 
 ---
 
-## 🎯 GET /picks - Lista Wygenerowanych Typów
+## GET /picks - Lista Wygenerowanych Typów
 
 ```bash
 # Ostatnich 50 (domyślnie)
@@ -134,7 +134,7 @@ curl http://localhost:8000/picks?limit=100
 
 ---
 
-## 📊 GET /draws - Lista Historycznych Losowań
+## GET /draws - Lista Historycznych Losowań
 
 ```bash
 curl http://localhost:8000/draws?limit=50
@@ -179,7 +179,7 @@ curl -X POST http://localhost:8000/validate \
 
 ---
 
-## 🔢 GET /pairtriple-stats - Statystyki Par i Trójek
+## GET /pairtriple-stats - Statystyki Par i Trójek
 
 ```bash
 curl http://localhost:8000/pairtriple-stats?limit=10
@@ -203,7 +203,7 @@ curl http://localhost:8000/pairtriple-stats?limit=10
 
 ---
 
-## 🗑️ DELETE /picks/{id} - Usuń Pick
+## DELETE /picks/{id} - Usuń Pick
 
 ```bash
 curl -X DELETE http://localhost:8000/picks/25
@@ -219,7 +219,7 @@ curl -X DELETE http://localhost:8000/picks/25
 
 ---
 
-## 🧹 DELETE /picks/all - Wyczyść Wszystkie Picks
+## DELETE /picks/all - Wyczyść Wszystkie Picks
 
 ```bash
 curl -X DELETE http://localhost:8000/picks/all
@@ -253,7 +253,7 @@ curl -X DELETE http://localhost:8000/draws/all
 
 ---
 
-## 🐍 Python Examples
+## Python Examples
 
 ```python
 import requests
@@ -282,7 +282,7 @@ with open("losowania.csv", "rb") as f:
 
 ---
 
-## 🟢 JavaScript/Node.js Examples
+## JavaScript/Node.js Examples
 
 ```javascript
 const axios = require('axios');
@@ -324,7 +324,7 @@ getStats();
 
 ---
 
-## 🔍 Vue.js/Frontend Example
+## Vue.js/Frontend Example
 
 ```javascript
 import api from '@/services/api'
@@ -345,7 +345,7 @@ console.log(result)
 
 ---
 
-## 📝 Error Responses
+## Error Responses
 
 ### 400 Bad Request
 ```json
@@ -376,7 +376,7 @@ console.log(result)
 
 ---
 
-## 🔧 Testing API
+## Testing API
 
 ### Postman
 Import collection: `docs/GetLos_T.postman_collection.json` (TODO)
@@ -389,15 +389,7 @@ Najłatwiej: http://localhost:8000/docs
 
 ---
 
-## 🎯 Rate Limiting (TODO)
-
-W przyszłości:
-- Max 100 requests/minute per IP
-- Max 10 generate requests/minute
-
----
-
-## 📚 More Examples
+## More Examples
 
 Zobacz również:
 - Backend test: `backend/test_backend.py`

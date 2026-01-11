@@ -11,20 +11,20 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import {
-  Assessment,
-  Casino,
-  Upload,
-  History as HistoryIcon,
-} from '@mui/icons-material'
+import { FolderOpen, Bolt, Stars } from '@mui/icons-material'
+import { ICONS } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
+import FileUpload, { type UploadedFile } from '../components/FileUpload'
+import useLabels from '../hooks/useLabels'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const { labels, getLabel } = useLabels()
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [clearFiles, setClearFiles] = useState(false)
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['stats'],
@@ -36,20 +36,26 @@ export default function Dashboard() {
     queryFn: () => api.getPicks(5),
   })
 
+  const handleFilesChange = (files: UploadedFile[]) => {
+    setUploadedFiles(files)
+  }
+
   const handleFileUpload = async () => {
-    if (!selectedFile) return
+    if (uploadedFiles.length === 0) return
 
     setUploading(true)
     setUploadMessage(null)
 
     try {
-      const result = await api.uploadCSV(selectedFile)
+      const file = uploadedFiles[0].file // Bierzemy pierwszy plik
+      const result = await api.uploadCSV(file)
       setUploadMessage({ type: 'success', text: result.message })
-      setSelectedFile(null)
+      setClearFiles(true)
+      setTimeout(() => setClearFiles(false), 100)
     } catch (error: any) {
       setUploadMessage({
         type: 'error',
-        text: error.response?.data?.detail || 'Błąd podczas przesyłania pliku',
+        text: error.response?.data?.detail || getLabel('fileUpload.uploadError', 'Błąd podczas przesyłania pliku'),
       })
     } finally {
       setUploading(false)
@@ -72,7 +78,7 @@ export default function Dashboard() {
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
-                <Assessment sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+                <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} color="secondary">
                   {stats?.total_draws || 0}
                 </Typography>
@@ -89,7 +95,7 @@ export default function Dashboard() {
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
-                <Casino sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+                <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} color="secondary">
                   {stats?.total_picks || 0}
                 </Typography>
@@ -103,7 +109,7 @@ export default function Dashboard() {
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
-                <Assessment sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+                <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} color="secondary">
                   {stats?.avg_sum.toFixed(1) || 0}
                 </Typography>
@@ -122,36 +128,33 @@ export default function Dashboard() {
       {/* Upload CSV */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom fontWeight={600}>
-            📁 Wgraj Historię Losowań
+          <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <FolderOpen fontSize="small" /> {getLabel('dashboard.uploadSection.title', 'Wgraj Historię Losowań')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 52)
+            {getLabel('dashboard.uploadSection.description', 'Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49)')}
           </Typography>
 
-          <Box sx={{ mb: 2 }}>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              aria-label="Upload CSV file"
-              style={{
-                padding: '0.5rem',
-                border: '2px dashed #667eea',
-                borderRadius: '5px',
-                width: '100%',
-                cursor: 'pointer',
-              }}
-            />
-          </Box>
+          <FileUpload
+            onFilesChange={handleFilesChange}
+            maxFiles={1}
+            maxSize={10 * 1024 * 1024}
+            clearFiles={clearFiles}
+            labels={labels.fileUpload || {}}
+          />
+
           <Button
             variant="contained"
-            startIcon={<Upload />}
+            startIcon={<ICONS.Upload />}
             onClick={handleFileUpload}
-            disabled={!selectedFile || uploading}
+            disabled={uploadedFiles.length === 0 || uploading}
             fullWidth
+            sx={{ mt: 2 }}
           >
-            {uploading ? 'Przesyłanie...' : 'Wgraj Plik'}
+            {uploading 
+              ? getLabel('dashboard.uploadSection.uploading', 'Przesyłanie...') 
+              : getLabel('dashboard.uploadSection.uploadButton', 'Wgraj Plik')
+            }
           </Button>
 
           {uploadMessage && (
@@ -165,18 +168,18 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom fontWeight={600}>
-            ⚡ Szybkie Akcje
+          <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Bolt fontSize="small" /> {getLabel('dashboard.quickActions.title', 'Szybkie Akcje')}
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button variant="contained" startIcon={<Casino />} onClick={() => navigate('/generate')}>
-              Generuj Nowe Liczby
+            <Button variant="contained" startIcon={<ICONS.Generate />} onClick={() => navigate('/generate')}>
+              {getLabel('dashboard.quickActions.generateNew', 'Generuj Nowe Liczby')}
             </Button>
-            <Button variant="outlined" startIcon={<HistoryIcon />} onClick={() => navigate('/history')}>
-              Zobacz Historię
+            <Button variant="outlined" startIcon={<ICONS.History />} onClick={() => navigate('/history')}>
+              {getLabel('dashboard.quickActions.viewHistory', 'Zobacz Historię')}
             </Button>
-            <Button variant="outlined" startIcon={<Assessment />} onClick={() => navigate('/stats')}>
-              Statystyki Szczegółowe
+            <Button variant="outlined" startIcon={<ICONS.Stats />} onClick={() => navigate('/stats')}>
+              {getLabel('dashboard.quickActions.viewStats', 'Statystyki Szczegółowe')}
             </Button>
           </Box>
         </CardContent>
@@ -186,8 +189,8 @@ export default function Dashboard() {
       {recentPicks && recentPicks.length > 0 && (
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom fontWeight={600}>
-              🎯 Ostatnie Wygenerowane
+            <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Stars fontSize="small" /> {getLabel('dashboard.recentPicks.title', 'Ostatnie Wygenerowane')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {recentPicks.map((pick) => (

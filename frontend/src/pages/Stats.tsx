@@ -9,7 +9,7 @@ import {
   Paper,
   LinearProgress,
 } from '@mui/material'
-import { TrendingUp, TrendingDown, Star } from '@mui/icons-material'
+import { ICONS } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import type { Stats, PairTripleStats } from '../types'
@@ -30,7 +30,7 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700}>
-          📊 Statystyki
+          <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
         </Typography>
         <LinearProgress />
       </Box>
@@ -41,7 +41,7 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700}>
-          📊 Statystyki
+          <ICONS.Stats_chart color="error" fontSize='large' /> Statystyki
         </Typography>
         <Alert severity="error">
           Nie udało się pobrać statystyk. Upewnij się, że wgrałeś dane historyczne.
@@ -54,7 +54,7 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700}>
-          📊 Statystyki
+          <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
         </Typography>
         <Alert severity="info">
           Brak danych historycznych. Wgraj plik CSV z wynikami losowań w zakładce "Dashboard".
@@ -78,7 +78,7 @@ export default function StatsPage() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700}>
-        📊 Statystyki
+        <ICONS.Stats_chart color="primary" fontSize='large'/> Statystyki
       </Typography>
 
       {/* Overview Stats */}
@@ -87,7 +87,7 @@ export default function StatsPage() {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <Star color="primary" />
+                <ICONS.Favorite color="primary" />
                 <Typography variant="h6" fontWeight={600}>
                   Losowania
                 </Typography>
@@ -106,7 +106,7 @@ export default function StatsPage() {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <TrendingUp color="error" />
+                <ICONS.Hot color="error" />
                 <Typography variant="h6" fontWeight={600}>
                   Najczęstsza
                 </Typography>
@@ -125,7 +125,7 @@ export default function StatsPage() {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <TrendingDown color="info" />
+                <ICONS.Cold color="info" />
                 <Typography variant="h6" fontWeight={600}>
                   Najrzadsza
                 </Typography>
@@ -145,7 +145,7 @@ export default function StatsPage() {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600}>
-            🔢 Częstotliwość Liczb (1-49)
+            <ICONS.CalculateIcon color="info" fontSize='medium' /> Częstotliwość Liczb (1-49)
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Im cieplejszy kolor, tym częściej liczba wystąpiła w losowaniach
@@ -200,9 +200,9 @@ export default function StatsPage() {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <TrendingUp color="error" />
+            <ICONS.Hot color="error" />
             <Typography variant="h6" fontWeight={600}>
-              🔥 TOP 10 Najczęstszych Liczb
+              TOP 10 Najczęstszych Liczb
             </Typography>
           </Box>
           <NumbersBall numbers={hotNumbers} gradient="hot" />
@@ -216,9 +216,9 @@ export default function StatsPage() {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <TrendingDown color="info" />
+            <ICONS.Cold color="info" />
             <Typography variant="h6" fontWeight={600}>
-              ❄️ TOP 10 Najrzadszych Liczb
+              TOP 10 Najrzadszych Liczb
             </Typography>
           </Box>
           <NumbersBall numbers={coldNumbers} gradient="cold" />
@@ -233,7 +233,7 @@ export default function StatsPage() {
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600}>
-              👥 TOP 5 Najczęstszych Par
+              <ICONS.Top2 color="info" /> TOP 5 Najczęstszych Par
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {pairTripleStats.pairs.slice(0, 5).map((pair, index) => (
@@ -272,7 +272,7 @@ export default function StatsPage() {
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600}>
-              👨‍👩‍👦 TOP 5 Najczęstszych Trójek
+              <ICONS.Top3 color="info" /> TOP 5 Najczęstszych Trójek
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {pairTripleStats.triples.slice(0, 5).map((triple, index) => (

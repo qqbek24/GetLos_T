@@ -14,9 +14,9 @@ services:
       - "8001:8000"
     volumes:
       - ./backend:/app
-      - backend_data:/app/data
+      - ./backend/data:/app/data
     environment:
-      DATABASE_URL: sqlite:///./data/getlos.db
+      DATABASE_URL: sqlite:///./data/app.db
     networks:
       - getlos_network
     command: uvicorn main:app --host 0.0.0.0 --port 8000
@@ -40,9 +40,6 @@ services:
     depends_on:
       - backend
     command: npm run dev -- --host
-
-volumes:
-  backend_data:
 
 networks:
   getlos_network:

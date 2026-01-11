@@ -20,8 +20,10 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
+  TextField,
 } from '@mui/material'
-import { Delete, DeleteSweep, ContentCopy } from '@mui/icons-material'
+import { ICONS } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import type { Pick, Draw } from '../types'
@@ -32,6 +34,10 @@ export default function History() {
   const [itemToDelete, setItemToDelete] = useState<number | null>(null)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(50)
+  const [syncResult, setSyncResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [manualDialogOpen, setManualDialogOpen] = useState(false)
+  const [manualNumbers, setManualNumbers] = useState<string>('')
+  const [manualDate, setManualDate] = useState<string>('')
   const queryClient = useQueryClient()
 
   const { data: picks = [], isLoading: picksLoading } = useQuery({
@@ -80,6 +86,77 @@ export default function History() {
     },
   })
 
+  const syncLottoMutation = useMutation({
+    mutationFn: () => api.syncLottoResults(),
+    onSuccess: (data) => {
+      if (data.success) {
+        setSyncResult({
+          type: 'success',
+          message: data.message + (data.new_draws > 0 ? ` (${data.new_draws} nowych losowań)` : ''),
+        })
+        queryClient.invalidateQueries({ queryKey: ['draws'] })
+        queryClient.invalidateQueries({ queryKey: ['stats'] })
+      } else {
+        setSyncResult({
+          type: 'error',
+          message: data.error || data.message,
+        })
+      }
+      // Auto-hide after 5 seconds
+      setTimeout(() => setSyncResult(null), 5000)
+    },
+    onError: (error: any) => {
+      setSyncResult({
+        type: 'error',
+        message: error.message || 'Błąd połączenia z API',
+      })
+      setTimeout(() => setSyncResult(null), 5000)
+    },
+  })
+
+  const manualDrawMutation = useMutation({
+    mutationFn: (data: { draws: { numbers: number[]; date?: string }[] }) => api.addManualDraw(data),
+    onSuccess: (data) => {
+      setSyncResult({
+        type: 'success',
+        message: data.message,
+      })
+      queryClient.invalidateQueries({ queryKey: ['draws'] })
+      queryClient.invalidateQueries({ queryKey: ['stats'] })
+      setManualDialogOpen(false)
+      setManualNumbers('')
+      setManualDate('')
+      setTimeout(() => setSyncResult(null), 5000)
+    },
+    onError: (error: any) => {
+      setSyncResult({
+        type: 'error',
+        message: error.message || 'Błąd dodawania losowania',
+      })
+      setTimeout(() => setSyncResult(null), 5000)
+    },
+  })
+
+  const exportMutation = useMutation({
+    mutationFn: () => api.exportDraws(),
+    onSuccess: (data) => {
+      // Download as JSON file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `lotto-backup-${new Date().toISOString().split('T')[0]}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      
+      setSyncResult({
+        type: 'success',
+        message: `Wyeksportowano ${data.count} losowań`,
+      })
+      setTimeout(() => setSyncResult(null), 3000)
+    },
+  })
+
   const handleDelete = (id: number) => {
     setItemToDelete(id)
     setDeleteDialogOpen(true)
@@ -94,6 +171,42 @@ export default function History() {
   const handleCopyNumbers = (numbers: number[]) => {
     navigator.clipboard.writeText(numbers.join(', '))
     alert('Liczby skopiowane do schowka!')
+  }
+
+  const handleManualAdd = () => {
+    // Parse numbers from input
+    const numbersArray = manualNumbers
+      .split(/[\s,;]+/)
+      .map((n) => parseInt(n.trim()))
+      .filter((n) => !isNaN(n) && n >= 1 && n <= 49)
+
+    if (numbersArray.length !== 6) {
+      setSyncResult({
+        type: 'error',
+        message: 'Wprowadź dokładnie 6 liczb od 1 do 49',
+      })
+      setTimeout(() => setSyncResult(null), 3000)
+      return
+    }
+
+    if (new Set(numbersArray).size !== 6) {
+      setSyncResult({
+        type: 'error',
+        message: 'Wszystkie liczby muszą być unikalne',
+      })
+      setTimeout(() => setSyncResult(null), 3000)
+      return
+    }
+
+    const draw: { numbers: number[]; date?: string } = {
+      numbers: numbersArray.sort((a, b) => a - b),
+    }
+
+    if (manualDate) {
+      draw.date = manualDate
+    }
+
+    manualDrawMutation.mutate({ draws: [draw] })
   }
 
   const getSum = (numbers: number[]) => numbers.reduce((sum, num) => sum + num, 0)
@@ -140,10 +253,10 @@ export default function History() {
             </Box>
             <Box>
               <IconButton size="small" onClick={() => handleCopyNumbers(pick.numbers)} color="primary">
-                <ContentCopy fontSize="small" />
+                <ICONS.Copy fontSize="small" />
               </IconButton>
               <IconButton size="small" onClick={() => handleDelete(pick.id)} color="error">
-                <Delete fontSize="small" />
+                <ICONS.Delete fontSize="small" />
               </IconButton>
             </Box>
           </Box>
@@ -200,10 +313,10 @@ export default function History() {
               </Box>
               <Box>
                 <IconButton size="small" onClick={() => handleCopyNumbers(draw.numbers)} color="primary">
-                  <ContentCopy fontSize="small" />
+                  <ICONS.Copy fontSize="small" />
                 </IconButton>
                 <IconButton size="small" onClick={() => handleDelete(draw.id)} color="error">
-                  <Delete fontSize="small" />
+                  <ICONS.Delete fontSize="small" />
                 </IconButton>
               </Box>
             </Box>
@@ -218,8 +331,8 @@ export default function History() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom fontWeight={700}>
-        📚 Historia
+      <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <ICONS.LibraryBooks color="primary" fontSize="large" /> Historia
       </Typography>
 
       <Card>
@@ -236,17 +349,59 @@ export default function History() {
               <Typography variant="body2" color="text.secondary">
                 Łącznie: {currentCount} {currentLabel}
               </Typography>
-              <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                startIcon={<DeleteSweep />}
-                onClick={() => clearAllMutation.mutate()}
-                disabled={clearAllMutation.isPending}
-              >
-                Usuń Wszystkie
-              </Button>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {tab === 'draws' && (
+                  <>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={syncLottoMutation.isPending ? <CircularProgress size={16} color="inherit" /> : <ICONS.Sync />}
+                      onClick={() => syncLottoMutation.mutate()}
+                      disabled={syncLottoMutation.isPending}
+                    >
+                      {syncLottoMutation.isPending ? 'Synchronizacja...' : 'Synchronizuj z Lotto.pl'}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<ICONS.Add />}
+                      onClick={() => setManualDialogOpen(true)}
+                    >
+                      Dodaj ręcznie
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      startIcon={<ICONS.Download />}
+                      onClick={() => exportMutation.mutate()}
+                      disabled={exportMutation.isPending}
+                    >
+                      Backup
+                    </Button>
+                  </>
+                )}
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<ICONS.DeleteAll />}
+                  onClick={() => clearAllMutation.mutate()}
+                  disabled={clearAllMutation.isPending}
+                >
+                  Usuń Wszystkie
+                </Button>
+              </Box>
             </Box>
+          )}
+
+          {/* Sync Result Alert */}
+          {syncResult && (
+            <Alert severity={syncResult.type} sx={{ mb: 2 }} onClose={() => setSyncResult(null)}>
+              {syncResult.message}
+            </Alert>
           )}
 
           {tab === 'picks' ? renderPicks() : renderDraws()}
@@ -303,6 +458,50 @@ export default function History() {
             disabled={deleteMutation.isPending}
           >
             {deleteMutation.isPending ? 'Usuwanie...' : 'Usuń'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manual Draw Dialog */}
+      <Dialog open={manualDialogOpen} onClose={() => setManualDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Dodaj losowanie ręcznie</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Alert severity="info" sx={{ mb: 1 }}>
+              Użyj tej opcji gdy synchronizacja z API nie działa lub chcesz dodać starsze wyniki.
+            </Alert>
+            
+            <TextField
+              fullWidth
+              label="Liczby (6 liczb od 1 do 49)"
+              placeholder="np. 5, 12, 23, 34, 39, 45, 49"
+              value={manualNumbers}
+              onChange={(e) => setManualNumbers(e.target.value)}
+              helperText="Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami"
+            />
+            
+            <TextField
+              fullWidth
+              label="Data losowania (opcjonalnie)"
+              type="date"
+              value={manualDate}
+              onChange={(e) => setManualDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              helperText="Format: RRRR-MM-DD"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setManualDialogOpen(false)}>Anuluj</Button>
+          <Button
+            onClick={handleManualAdd}
+            color="primary"
+            variant="contained"
+            disabled={manualDrawMutation.isPending || !manualNumbers}
+          >
+            {manualDrawMutation.isPending ? 'Dodawanie...' : 'Dodaj'}
           </Button>
         </DialogActions>
       </Dialog>
