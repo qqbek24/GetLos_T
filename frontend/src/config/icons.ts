@@ -41,6 +41,7 @@ import {
   Star,
   Shuffle,
   GpsFixed,
+  Psychology,
   Filter2Outlined,
   Filter3Outlined,
     
@@ -126,6 +127,11 @@ export const STRATEGY_CONFIG = {
     icon: GpsFixed,
     label: 'Combo Based',
     description: 'Oparte na najczęstszych parach i trójkach',
+  },
+  ai: {
+    icon: Psychology,
+    label: 'AI Prediction',
+    description: 'Predykcja AI na podstawie analizy wzorców i danych historycznych',
   },
 } as const
 
