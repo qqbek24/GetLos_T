@@ -46,6 +46,19 @@
 - Detekcja duplikatów
 - Endpoint: `POST /sync-lotto`
 
+### AI Prediction Strategy 🧠
+| Dokument | Opis | Status |
+|----------|------|--------|
+| [AI_STRATEGY.md](AI_STRATEGY.md) | Full ML strategy documentation | ✅ Complete (200+ lines) |
+| [backend/main.py](../backend/main.py) | pick_with_ai() implementation | 💻 Implemented |
+
+**Key Features:**
+- Machine Learning with RandomForestClassifier
+- Analyzes 10 features per draw
+- Requires minimum 20 historical draws
+- Smart probability-based selection
+- Dependencies: scikit-learn, numpy
+
 ### Zarządzanie Danymi
 | Dokument | Opis | Funkcje |
 |----------|------|---------|
@@ -73,27 +86,24 @@
 ## Docker
 
 ### Docker Compose Files
-| Plik | Tryb | Opis |
-|------|------|------|
-| [docker-compose.yml](../docker-compose.yml) | **Production** | Stabilna wersja produkcyjna |
+| File | Mode | Description |
+|------|------|-------------|
+| [docker-compose.yml](../docker-compose.yml) | **Production** | Stable production version |
 | [docker-compose.dev.yml](../docker-compose.dev.yml) | **Development** | Hot reload, debugging |
 
-### Skrypty Zarządzające (Quick_start_dev/)
-| Skrypt | Funkcja |
-|--------|---------|
-| `start-prod.bat` | Start produkcyjny (docker-compose.yml) |
-| `start-backend.bat` | Start tylko backendu (dev) |
-| `start-frontend.bat` | Start tylko frontendu (dev) |
-| `restart-all.bat` | Restart wszystkich kontenerów |
-| `stop-all.bat` | Stop wszystkich kontenerów |
-| `logs.bat` | Wyświetl logi wszystkich serwisów |
-| `logs-backend.bat` | Wyświetl logi backendu |
-| `logs-frontend.bat` | Wyświetl logi frontendu |
+### Management Scripts (Quick_start_dev/)
+| Script | Function |
+|--------|----------|
+| `start-prod.bat` | Start production (docker-compose.yml) |
+| `start-backend.bat` | Start backend only (dev) |
+| `start-frontend.bat` | Start frontend only (dev) |
+| `restart-all.bat` | Restart all containers |
+| `stop-all.bat` | Stop all containers |
+| `logs.bat` | Display logs of all services |
+| `logs-backend.bat` | Display backend logs |
+| `logs-frontend.bat` | Display frontend logs |
 
-**Dokumentacja skryptów:**
-- [Quick_start_dev/INDEX.md](../Quick_start_dev/INDEX.md)
-
----
+**Scripts documentation:**
 
 ## Migracje i Historie Zmian
 

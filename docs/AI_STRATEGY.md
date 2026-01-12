@@ -1,99 +1,99 @@
 # AI Prediction Strategy
 
 ## Overview
-Strategia AI wykorzystuje uczenie maszynowe (Machine Learning) do predykcji liczb na podstawie analizy danych historycznych i wzorców.
+The AI strategy uses machine learning (ML) to predict numbers based on analysis of historical data and patterns.
 
-## Technologia
-- **Biblioteka**: scikit-learn (RandomForestClassifier)
-- **Model**: Random Forest - zespół drzew decyzyjnych
-- **Typ**: Klasyfikacja binarna (dla każdej liczby 1-49)
+## Technology
+- **Library**: scikit-learn (RandomForestClassifier)
+- **Model**: Random Forest - ensemble of decision trees
+- **Type**: Binary classification (for each number 1-49)
 
-## Jak działa?
+## How It Works
 
-### 1. Przygotowanie danych treningowych
-- Analizuje sekwencje historycznych losowań
-- Dla każdego losowania tworzy wektor cech (features):
-  - Suma liczb w poprzednim losowaniu
-  - Liczba parzystych liczb
-  - Zakres (max - min)
-  - Częstotliwość pierwszej i ostatniej liczby
-  - Luki między kolejnymi liczbami (gaps)
+### 1. Training Data Preparation
+- Analyzes sequences of historical draws
+- Creates a feature vector for each draw:
+  - Sum of numbers in previous draw
+  - Count of even numbers
+  - Range (max - min)
+  - Frequency of first and last numbers
+  - Gaps between consecutive numbers
 
-### 2. Trening modelu
-- Dla każdej liczby (1-49) trenuje osobny klasyfikator
-- Uczy się wzorców: "Jeśli w poprzednim losowaniu było X, to liczba Y ma szansę pojawić się"
-- Wykorzystuje 10 drzew decyzyjnych (n_estimators=10)
+### 2. Model Training
+- Trains a separate classifier for each number (1-49)
+- Learns patterns: "If previous draw had X, then number Y has a chance to appear"
+- Uses 10 decision trees (n_estimators=10)
 
-### 3. Predykcja
-- Na podstawie ostatniego losowania przewiduje prawdopodobieństwo dla każdej liczby
-- Sortuje liczby według prawdopodobieństwa
-- **Strategia selekcji**:
-  - 3 liczby z najwyższym prawdopodobieństwem (top 8)
-  - 2-3 liczby ze średniego prawdopodobieństwa (ważony losowy wybór)
-  - Pozostałe losowo z pozostałych liczb
+### 3. Prediction
+- Predicts probability for each number based on the last draw
+- Sorts numbers by probability
+- **Selection Strategy**:
+  - 3 numbers with highest probability (top 8)
+  - 2-3 numbers with medium probability (weighted random choice)
+  - Remaining randomly from other numbers
 
 ### 4. Fallback
-Jeśli jest za mało danych (< 20 losowań):
-- Automatycznie przełącza się na strategię "balanced"
-- Gwarantuje zawsze poprawny wynik
+If there's insufficient data (< 20 draws):
+- Automatically switches to "balanced" strategy
+- Guarantees a valid result always
 
-## Cechy (Features) używane w modelu
+## Features Used in the Model
 
-| Cecha | Opis | Przykład |
-|-------|------|----------|
-| Sum | Suma wszystkich liczb | 150 |
-| Even Count | Ile liczb parzystych | 3 |
+| Feature | Description | Example |
+|---------|-------------|---------|
+| Sum | Sum of all numbers | 150 |
+| Even Count | How many even numbers | 3 |
 | Range | Max - Min | 42 |
-| First Freq | Częstotliwość 1. liczby | 25 |
-| Last Freq | Częstotliwość ostatniej liczby | 18 |
-| Gaps (5x) | Różnice między kolejnymi liczbami | [2, 5, 8, 3, 15] |
+| First Freq | Frequency of 1st number | 25 |
+| Last Freq | Frequency of last number | 18 |
+| Gaps (5x) | Differences between consecutive numbers | [2, 5, 8, 3, 15] |
 
-## Zalety strategii AI
+## Advantages of AI Strategy
 
-✅ **Uczenie się wzorców** - Wykrywa ukryte zależności w danych  
-✅ **Adaptacja** - Im więcej danych, tym lepsze predykcje  
-✅ **Probabilistyczne podejście** - Nie tylko top liczby, ale inteligentna mieszanka  
-✅ **Niepowtarzalność** - Każde wywołanie daje inne wyniki (element losowości)  
+✅ **Pattern Learning** - Detects hidden dependencies in data  
+✅ **Adaptation** - More data = better predictions  
+✅ **Probabilistic Approach** - Not just top numbers, but intelligent mix  
+✅ **Uniqueness** - Each invocation gives different results (element of randomness)  
 
-## Ograniczenia
+## Limitations
 
-⚠️ **Wymaga danych** - Minimum 20 losowań historycznych  
-⚠️ **Nie gwarantuje wygranej** - To tylko analiza statystyczna  
-⚠️ **Obliczeniowo** - Wolniejsze niż proste strategie  
+⚠️ **Requires Data** - Minimum 20 historical draws  
+⚠️ **No Win Guarantee** - It's just statistical analysis  
+⚠️ **Computationally Intensive** - Slower than simple strategies  
 
-## Kiedy używać?
+## When to Use
 
-- ✅ Gdy masz bogatą historię losowań (50+ wyników)
-- ✅ Gdy chcesz eksperymentować z ML
-- ✅ Gdy szukasz "inteligentniejszej" strategii niż losowa
-- ❌ Gdy masz mało danych (< 20 losowań)
-- ❌ Gdy potrzebujesz szybkiego wyniku
+- ✅ When you have rich draw history (50+ results)
+- ✅ When you want to experiment with ML
+- ✅ When looking for a "smarter" strategy than random
+- ❌ When you have little data (< 20 draws)
+- ❌ When you need quick results
 
-## Porównanie ze standardowymi strategiami
+## Comparison with Standard Strategies
 
-| Strategia | Podstawa | Złożoność | Wymagania |
-|-----------|----------|-----------|-----------|
-| Random | Losowość | Niska | Brak |
-| Hot | Częstotliwość | Niska | Historia |
-| Cold | Rzadkość | Niska | Historia |
-| Balanced | Hot + Cold | Średnia | Historia |
-| Combo Based | Pary/Trójki | Średnia | Historia |
-| **AI** | **ML Pattern** | **Wysoka** | **20+ losowań** |
+| Strategy | Basis | Complexity | Requirements |
+|----------|-------|------------|--------------|
+| Random | Randomness | Low | None |
+| Hot | Frequency | Low | History |
+| Cold | Rarity | Low | History |
+| Balanced | Hot + Cold | Medium | History |
+| Combo Based | Pairs/Triples | Medium | History |
+| **AI** | **ML Pattern** | **High** | **20+ draws** |
 
-## Przykład użycia
+## Usage Example
 
 ### Frontend
 ```typescript
-// Wybór strategii AI
+// Select AI strategy
 setStrategy('ai')
 
-// Wywołanie generowania
+// Call generation
 const result = await api.generatePicks({ strategy: 'ai', count: 1 })
 ```
 
 ### Backend API
 ```python
-POST /api/picks/generate
+POST /generate
 {
   "strategy": "ai",
   "count": 1
@@ -108,52 +108,52 @@ Response:
 ]
 ```
 
-## Potencjalne ulepszenia (TODO)
+## Potential Improvements (TODO)
 
-- [ ] Dodanie więcej cech (parzystość/nieparzystość całego zestawu)
-- [ ] Analiza długoterminowych trendów (miesiące/lata)
-- [ ] Użycie sieci neuronowych (TensorFlow/PyTorch)
-- [ ] Cache'owanie wytrenowanego modelu
-- [ ] A/B testing z innymi strategiami
-- [ ] Walidacja krzyżowa (cross-validation)
+- [ ] Add more features (even/odd ratio of entire set)
+- [ ] Long-term trend analysis (months/years)
+- [ ] Use neural networks (TensorFlow/PyTorch)
+- [ ] Trained model caching
+- [ ] A/B testing with other strategies
+- [ ] Cross-validation
 
-## Kod
+## Code
 
-Implementacja znajduje się w:
-- **Backend**: `backend/main.py` → funkcja `pick_with_ai()`
+Implementation located in:
+- **Backend**: `backend/main.py` → `pick_with_ai()` function
 - **Frontend**: `frontend/src/config/icons.ts` → `STRATEGY_CONFIG.ai`
-- **Types**: `frontend/src/types/index.ts` → dodano 'ai' do typu Strategy
+- **Types**: `frontend/src/types/index.ts` → added 'ai' to Strategy type
 
-## Instalacja zależności
+## Dependency Installation
 
 ```bash
 # Backend
 pip install scikit-learn==1.3.2 numpy==1.26.2
 
-# Lub rebuild Docker
+# Or rebuild Docker
 docker-compose up -d --build
 ```
 
-## Testowanie
+## Testing
 
 ```bash
-# Test manualny przez API
-curl -X POST http://localhost:8000/api/picks/generate \
+# Manual API test
+curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
   -d '{"strategy": "ai", "count": 3}'
 
-# Wynik powinien zawierać 3 układy wygenerowane przez AI
+# Result should contain 3 sets generated by AI
 ```
 
-## Uwagi techniczne
+## Technical Notes
 
-- Model **nie jest persystowany** między wywołaniami (trenuje się każdorazowo)
-- Trening zajmuje ~100-500ms dla 100-500 losowań
-- Dla bardzo dużej ilości danych (1000+) można rozważyć cache'owanie
-- RandomForest jest deterministyczny (random_state=42), ale końcowy wybór ma element losowości
+- Model is **not persisted** between calls (trains each time)
+- Training takes ~100-500ms for 100-500 draws
+- For very large datasets (1000+) consider caching
+- RandomForest is deterministic (random_state=42), but final selection has randomness element
 
-## Autor
+## Author
 
-Implementacja: AI Strategy dla GetLos_T  
-Data: 2026-01-11  
-Wersja: 1.0
+Implementation: AI Strategy for GetLos_T  
+Date: January 11, 2026  
+Version: 1.0
