@@ -79,3 +79,19 @@ export interface PairTripleStats {
   pairs: { numbers: number[]; count: number }[]
   triples: { numbers: number[]; count: number }[]
 }
+
+export interface PaginatedPicksResponse {
+  items: Pick[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
+
+export interface PaginatedDrawsResponse {
+  items: Draw[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}

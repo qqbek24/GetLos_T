@@ -10,6 +10,8 @@ import type {
   BackupResponse,
   ValidateResponse,
   PairTripleStats,
+  PaginatedPicksResponse,
+  PaginatedDrawsResponse,
 } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
@@ -47,14 +49,14 @@ export const api = {
   },
 
   // Get all picks
-  async getPicks(limit: number = 50, offset: number = 0): Promise<Pick[]> {
-    const response = await apiClient.get<Pick[]>(`/picks?limit=${limit}&offset=${offset}`)
+  async getPicks(limit: number = 50, offset: number = 0): Promise<PaginatedPicksResponse> {
+    const response = await apiClient.get<PaginatedPicksResponse>(`/picks?limit=${limit}&offset=${offset}`)
     return response.data
   },
 
   // Get all draws
-  async getDraws(limit: number = 50, offset: number = 0): Promise<Draw[]> {
-    const response = await apiClient.get<Draw[]>(`/draws?limit=${limit}&offset=${offset}`)
+  async getDraws(limit: number = 50, offset: number = 0): Promise<PaginatedDrawsResponse> {
+    const response = await apiClient.get<PaginatedDrawsResponse>(`/draws?limit=${limit}&offset=${offset}`)
     return response.data
   },
 

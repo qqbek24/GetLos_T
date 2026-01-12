@@ -238,6 +238,9 @@ export default function Generate() {
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
               <strong>Combo Based:</strong> Oparte na najczęstszych parach i trójkach z historii
             </Typography>
+            <Typography component="li" variant="body2" sx={{ mb: 1 }}>
+              <strong>AI:</strong> Predykcja oparta na uczeniu maszynowym i analizie wzorców historycznych
+            </Typography>
           </Box>
           <Alert severity="info" sx={{ mt: 2 }}>
             Wszystkie wygenerowane układy są unikalne i nie powtarzają się z historią!

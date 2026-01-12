@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Box,
@@ -40,20 +40,51 @@ export default function History() {
   const [manualDate, setManualDate] = useState<string>('')
   const queryClient = useQueryClient()
 
-  const { data: picks = [], isLoading: picksLoading } = useQuery({
+  const { data: picksData, isLoading: picksLoading, isFetching: picksFetching } = useQuery({
     queryKey: ['picks', page, rowsPerPage],
     queryFn: () => api.getPicks(rowsPerPage, page * rowsPerPage),
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching
   })
 
-  const { data: draws = [], isLoading: drawsLoading } = useQuery({
+  const { data: drawsData, isLoading: drawsLoading, isFetching: drawsFetching } = useQuery({
     queryKey: ['draws', page, rowsPerPage],
     queryFn: () => api.getDraws(rowsPerPage, page * rowsPerPage),
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching
   })
+
+  const picks = picksData?.items || []
+  const draws = drawsData?.items || []
+  const picksTotal = picksData?.total || 0
+  const drawsTotal = drawsData?.total || 0
+  const picksTotalPages = picksData?.total_pages || 1
+  const drawsTotalPages = drawsData?.total_pages || 1
+
+  // Prefetch next page for better UX
+  const prefetchNextPage = () => {
+    if (tab === 'picks' && page + 1 < picksTotalPages) {
+      queryClient.prefetchQuery({
+        queryKey: ['picks', page + 1, rowsPerPage],
+        queryFn: () => api.getPicks(rowsPerPage, (page + 1) * rowsPerPage),
+      })
+    } else if (tab === 'draws' && page + 1 < drawsTotalPages) {
+      queryClient.prefetchQuery({
+        queryKey: ['draws', page + 1, rowsPerPage],
+        queryFn: () => api.getDraws(rowsPerPage, (page + 1) * rowsPerPage),
+      })
+    }
+  }
+
+  // Prefetch on mount and when page/tab changes
+  useEffect(() => {
+    prefetchNextPage()
+  }, [page, tab, picksTotalPages, drawsTotalPages])
   
   // Reset page when switching tabs
   const handleTabChange = (_: React.SyntheticEvent, newValue: 'picks' | 'draws') => {
     setTab(newValue)
     setPage(0)
+    // Prefetch first page of new tab
+    setTimeout(prefetchNextPage, 100)
   }
 
   const deleteMutation = useMutation({
@@ -326,7 +357,9 @@ export default function History() {
     )
   }
 
-  const currentCount = tab === 'picks' ? picks.length : draws.length
+  const currentCount = tab === 'picks' ? picksTotal : drawsTotal
+  const currentTotalPages = tab === 'picks' ? picksTotalPages : drawsTotalPages
+  const isFetching = tab === 'picks' ? picksFetching : drawsFetching
   const currentLabel = tab === 'picks' ? 'układów' : 'losowań'
 
   return (
@@ -339,8 +372,8 @@ export default function History() {
         <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
             <Tabs value={tab} onChange={handleTabChange}>
-              <Tab label={`Wygenerowane Układy (${picks.length})`} value="picks" />
-              <Tab label={`Historyczne Losowania (${draws.length})`} value="draws" />
+              <Tab label={`Wygenerowane Układy (${picksTotal})`} value="picks" />
+              <Tab label={`Historyczne Losowania (${drawsTotal})`} value="draws" />
             </Tabs>
           </Box>
 
@@ -426,16 +459,20 @@ export default function History() {
                 </Select>
               </FormControl>
               <Typography variant="body2" color="text.secondary">
-                Strona {page + 1}
+                Strona {page + 1} z {currentTotalPages} {isFetching && <CircularProgress size={12} sx={{ ml: 1 }} />}
               </Typography>
             </Box>
             <Pagination 
-              count={10} 
+              count={currentTotalPages}
               page={page + 1} 
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={(_, value) => {
+                setPage(value - 1)
+                setTimeout(prefetchNextPage, 100)
+              }}
               color="primary"
               showFirstButton
               showLastButton
+              disabled={isFetching}
             />
           </Box>
         </CardContent>
