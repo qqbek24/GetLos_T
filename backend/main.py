@@ -506,7 +506,7 @@ def generate_picks(
     return results
 
 
-@app.get("/picks", response_model=List[PickResponse])
+@app.get("/picks")
 def list_picks(
     limit: int = 50,
     offset: int = 0,
@@ -514,12 +514,23 @@ def list_picks(
 ):
     """
     List generated picks with pagination (most recent first)
+    Returns paginated response with total count
     """
+    total = db.query(Pick).count()
     picks = db.query(Pick).order_by(Pick.created_at.desc()).offset(offset).limit(limit).all()
-    return picks
+    page = (offset // limit) + 1 if limit > 0 else 1
+    total_pages = (total + limit - 1) // limit if limit > 0 else 1
+    
+    return {
+        "items": picks,
+        "total": total,
+        "page": page,
+        "per_page": limit,
+        "total_pages": total_pages
+    }
 
 
-@app.get("/draws", response_model=List[DrawResponse])
+@app.get("/draws")
 def list_draws(
     limit: int = 50,
     offset: int = 0,
@@ -528,12 +539,23 @@ def list_draws(
     """
     List historical draws with pagination (most recent draws first)
     Sorts by source field (YYYY-MM-DD date) if available, otherwise by created_at
+    Returns paginated response with total count
     """
+    total = db.query(HistoricalDraw).count()
     draws = db.query(HistoricalDraw).order_by(
         HistoricalDraw.source.desc().nullslast(),
         HistoricalDraw.created_at.desc()
     ).offset(offset).limit(limit).all()
-    return draws
+    page = (offset // limit) + 1 if limit > 0 else 1
+    total_pages = (total + limit - 1) // limit if limit > 0 else 1
+    
+    return {
+        "items": draws,
+        "total": total,
+        "page": page,
+        "per_page": limit,
+        "total_pages": total_pages
+    }
 
 
 # ========== DELETE Endpoints - /all MUST come before /{id} ==========

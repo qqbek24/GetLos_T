@@ -49,6 +49,24 @@ class DrawResponse(BaseModel):
         from_attributes = True
 
 
+class PaginatedPicksResponse(BaseModel):
+    """Paginated response for picks"""
+    items: List['PickResponse']
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
+class PaginatedDrawsResponse(BaseModel):
+    """Paginated response for draws"""
+    items: List[DrawResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
 class PickResponse(BaseModel):
     """Response for single pick"""
     id: int
