@@ -248,7 +248,7 @@ def pick_with_strategy(
     - combo_based: Based on frequent pairs/triples
     - ai: Machine learning prediction based on patterns
     """
-    universe = list(range(1, 53))
+    universe = list(range(1, 50))
     
     # AI strategy
     if strategy == "ai":
