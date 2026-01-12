@@ -31,10 +31,12 @@ export default function Dashboard() {
     queryFn: api.getStats,
   })
 
-  const { data: recentPicks } = useQuery({
+  const { data: recentPicksResponse } = useQuery({
     queryKey: ['recentPicks'],
     queryFn: () => api.getPicks(5),
   })
+
+  const recentPicks = recentPicksResponse?.items || []
 
   const handleFilesChange = (files: UploadedFile[]) => {
     setUploadedFiles(files)
