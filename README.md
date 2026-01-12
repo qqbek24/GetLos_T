@@ -1,87 +1,95 @@
 # GetLos_T
 
-Inteligentny system do przewidywania i analizy wyników losowań Lotto oparty na historycznych danych.
+Intelligent system for predicting and analyzing Lotto results based on historical data.
 
-> **[Pełna Dokumentacja → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)**
+> **[Full Documentation → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)**
 
-## Stack Technologiczny
+## Technology Stack
 
 - **Backend**: FastAPI + SQLAlchemy + SQLite
 - **Frontend**: React 18 + TypeScript + Material UI + Vite
-- **Docker**: Docker Compose dla łatwego wdrożenia
-- **Style**: Material UI z custom gradient theme
+- **Docker**: Docker Compose for easy deployment
+- **Styles**: Material UI with custom gradient theme
+- **Machine Learning**: scikit-learn for AI predictions
 
-## Funkcjonalności
+## Features
 
-### Główne Funkcje
-- **5 Strategii Generowania**: Random, Hot Numbers, Cold Numbers, Balanced, Combo Based
-- **Analiza Historyczna**: Częstotliwość liczb, najczęstsze pary i trójki
-- **Import CSV**: Wgrywanie historycznych wyników losowań
-- **Synchronizacja z Lotto.pl**: Automatyczne pobieranie najnowszych wyników z oficjalnego API
-- **Ręczne dodawanie losowań**: Backup gdy API nie działa
-- **Backup/Restore**: Export i import danych do JSON
-- **Persistence**: Automatyczne zachowanie danych między rebuildami
-- **Statystyki**: Wizualizacja częstotliwości, hot/cold numbers
-- **Historia**: Przegląd wygenerowanych układów i historycznych losowań
+### Main Functions
+- **6 Generation Strategies**: Random, Hot Numbers, Cold Numbers, Balanced, Combo Based, **AI Prediction**
+- **Historical Analysis**: Number frequency, most common pairs and triples
+- **CSV Import**: Upload historical lottery results
+- **Lotto.pl Synchronization**: Automatic fetching of latest results from official API
+- **Manual Draw Addition**: Backup when API is unavailable
+- **Backup/Restore**: Export and import data to JSON
+- **Persistence**: Automatic data retention between rebuilds
+- **Statistics**: Frequency visualization, hot/cold numbers
+- **History**: Review generated picks and historical draws
 
-### Strategie
+### Strategies
 
-1. **Random** - Całkowicie losowy wybór liczb
-2. **Hot Numbers** - Preferuje często występujące liczby w historii
-3. **Cold Numbers** - Preferuje rzadko występujące liczby
-4. **Balanced** - Mieszanka częstych i rzadkich liczb
-5. **Combo Based** - Oparte na najczęstszych parach i trójkach z historii
+1. **Random** - Completely random number selection
+2. **Hot Numbers** - Prefers frequently occurring numbers in history
+3. **Cold Numbers** - Prefers rarely occurring numbers
+4. **Balanced** - Mix of frequent and rare numbers
+5. **Combo Based** - Based on most common pairs and triples from history
+6. **AI Prediction** 🧠 ✨ **NEW!** - Machine learning prediction using RandomForest
+   - Analyzes historical patterns and sequences
+   - Extracts 10 features per draw (sum, even count, range, frequency, gaps)
+   - Trains 49 binary classifiers (one per number)
+   - Smart selection: top 3 high-probability + 2-3 medium-probability + weighted random
+   - Requires minimum 20 historical draws
+   - **[Full AI Documentation → docs/AI_STRATEGY.md](docs/AI_STRATEGY.md)**
 
-### Synchronizacja z API Lotto.pl
+### Lotto.pl API Synchronization
 
-Aplikacja posiada integrację z oficjalnym API Totalizatora Sportowego:
-- Automatyczne pobieranie najnowszych wyników Lotto
-- Wykrywanie brakujących losowań
-- Jeden przycisk do synchronizacji
-- Ręczne dodawanie losowań (fallback)
-- Backup/Restore do JSON
-- Pełna dokumentacja integracji
+The application has integration with the official Totalizator Sportowy API:
+- Automatic fetching of latest Lotto results
+- Detection of missing draws
+- One-click synchronization
+- Manual draw addition (fallback)
+- Backup/Restore to JSON
+- Full integration documentation
 
-**[Instrukcja konfiguracji API → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
-**[Zarządzanie danymi → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
+**[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
+**[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
 **[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
 
 ## Quick Start
 
-**[Szczegółowy przewodnik uruchomienia → Quick_start_dev/FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md)**
+**[Detailed startup guide → Quick_start_dev/FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md)**
 
-### Metoda 1: Docker (Zalecana)
+### Method 1: Docker (Recommended)
 
 #### Development Mode
 ```bash
-# Uruchom wszystko
+# Start everything
 Quick_start_dev\start-dev.bat
 
-# Lub osobno:
+# Or separately:
 Quick_start_dev\start-backend.bat
 Quick_start_dev\start-frontend.bat
 
-# Zatrzymaj wszystko
+# Stop everything
 Quick_start_dev\stop-all.bat
 
 # Restart
 Quick_start_dev\restart-all.bat
 
-# Logi
+# View logs
 Quick_start_dev\logs.bat
 ```
 
-> 💡 Wszystkie skrypty zarządzające znajdują się w folderze [`Quick_start_dev/`](Quick_start_dev/)
+> 💡 All management scripts are located in [`Quick_start_dev/`](Quick_start_dev/) folder
 
 #### Production Mode
 ```bash
 Quick_start_dev\start-prod.bat
 ```
 
-### Metoda 2: Ręcznie (bez Docker)
+### Method 2: Manual (without Docker)
 
-📖 **[Dokumentacja Backend → backend/docs/README.md](backend/docs/README.md)**
-📖 **[Dokumentacja Frontend → frontend/docs/README.md](frontend/docs/README.md)**
+📖 **[Backend Documentation → backend/docs/README.md](backend/docs/README.md)**
+📖 **[Frontend Documentation → frontend/docs/README.md](frontend/docs/README.md)**
 
 #### Backend
 ```bash
@@ -97,34 +105,34 @@ npm install
 npm run dev
 ```
 
-## Dostęp do Aplikacji
+## Application Access
 
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## Struktura Projektu
+## Project Structure
 
 ```
 GetLos_T/
 ├── backend/                 # FastAPI Backend
 │   ├── docs/               # 📖 Backend Documentation
 │   │   └── README.md       # API docs, endpoints, models
-│   ├── main.py             # Główna aplikacja FastAPI
-│   ├── models.py           # SQLAlchemy modele
-│   ├── schema.py           # Pydantic schematy
-│   ├── db.py               # Konfiguracja bazy danych
-│   ├── requirements.txt    # Zależności Pythona
-│   └── Dockerfile          # Dockerfile backendu
+│   ├── main.py             # Main FastAPI application
+│   ├── models.py           # SQLAlchemy models
+│   ├── schema.py           # Pydantic schemas
+│   ├── db.py               # Database configuration
+│   ├── requirements.txt    # Python dependencies
+│   └── Dockerfile          # Backend Dockerfile
 ├── frontend/               # React Frontend
 │   ├── docs/               # 📖 Frontend Documentation
 │   │   └── README.md       # Components, pages, architecture
 │   ├── src/
-│   │   ├── components/    # Komponenty React
+│   │   ├── components/    # React components
 │   │   │   ├── Layout.tsx
 │   │   │   └── NumbersBall.tsx
-│   │   ├── pages/         # Strony aplikacji
+│   │   ├── pages/         # Application pages
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── Generate.tsx
 │   │   │   ├── History.tsx
@@ -133,7 +141,7 @@ GetLos_T/
 │   │   │   └── api.ts
 │   │   ├── types/         # TypeScript types
 │   │   │   └── index.ts
-│   │   ├── App.tsx        # Główny komponent
+│   │   ├── App.tsx        # Main component
 │   │   ├── main.tsx       # Entry point
 │   │   └── theme.ts       # Material UI theme
 │   ├── package.json
@@ -165,50 +173,50 @@ GetLos_T/
 └── README.md              # This file
 ```
 
-## 🛠️ Pliki Zarządzania
+## 🛠️ Management Files
 
-📂 **Wszystkie pliki zarządzające znajdują się w [`Quick_start_dev/`](Quick_start_dev/)**
+📂 **All management files are located in [`Quick_start_dev/`](Quick_start_dev/)**
 
 ### Start
-- `start-dev.bat` - Uruchom tryb deweloperski (hot reload)
-- `start-prod.bat` - Uruchom tryb produkcyjny
-- `start-backend.bat` - Tylko backend
-- `start-frontend.bat` - Tylko frontend
+- `start-dev.bat` - Start development mode (hot reload)
+- `start-prod.bat` - Start production mode
+- `start-backend.bat` - Backend only
+- `start-frontend.bat` - Frontend only
 
 ### Stop & Restart
-- `stop-all.bat` - Zatrzymaj wszystkie serwisy
-- `restart-all.bat` - Restart wszystkich serwisów
-- `restart-backend.bat` - Restart backendu
-- `restart-frontend.bat` - Restart frontendu
+- `stop-all.bat` - Stop all services
+- `restart-all.bat` - Restart all services
+- `restart-backend.bat` - Restart backend
+- `restart-frontend.bat` - Restart frontend
 
 ### Logs
-- `logs.bat` - Zobacz logi wszystkich serwisów
-- `logs-backend.bat` - Logi backendu
-- `logs-frontend.bat` - Logi frontendu
+- `logs.bat` - View logs of all services
+- `logs-backend.bat` - Backend logs
+- `logs-frontend.bat` - Frontend logs
 
-📖 **[Pełna instrukcja → Quick_start_dev/QUICK_START.md](Quick_start_dev/QUICK_START.md)**
+📖 **[Full instructions → Quick_start_dev/QUICK_START.md](Quick_start_dev/QUICK_START.md)**
 
 ## 📊 API Endpoints
 
-📖 **[Szczegółowa dokumentacja API → backend/docs/README.md](backend/docs/README.md)**
+📖 **[Detailed API documentation → backend/docs/README.md](backend/docs/README.md)**
 
-### Draws (Historyczne Losowania)
-- `POST /draws/upload-csv` - Wgraj plik CSV z historią
-- `GET /draws/` - Pobierz wszystkie losowania
-- `GET /draws/{id}` - Pobierz konkretne losowanie
-- `DELETE /draws/{id}` - Usuń losowanie
-- `DELETE /draws/clear` - Usuń wszystkie losowania
+### Draws (Historical Lottery Draws)
+- `POST /draws/upload-csv` - Upload CSV file with history
+- `GET /draws/` - Get all draws
+- `GET /draws/{id}` - Get specific draw
+- `DELETE /draws/{id}` - Delete draw
+- `DELETE /draws/clear` - Delete all draws
 
-### Picks (Wygenerowane Układy)
-- `POST /picks/generate` - Generuj nowe układy
-- `GET /picks/` - Pobierz wszystkie układy
-- `GET /picks/{id}` - Pobierz konkretny układ
-- `DELETE /picks/{id}` - Usuń układ
-- `DELETE /picks/clear` - Usuń wszystkie układy
+### Picks (Generated Number Sets)
+- `POST /picks/generate` - Generate new number sets
+- `GET /picks/` - Get all picks
+- `GET /picks/{id}` - Get specific pick
+- `DELETE /picks/{id}` - Delete pick
+- `DELETE /picks/clear` - Delete all picks
 
 ### Statistics
-- `GET /stats/` - Pobierz pełne statystyki
-- `POST /validate` - Waliduj układ liczb
+- `GET /stats/` - Get full statistics
+- `POST /validate` - Validate number set
 
 ## 🎨 Frontend - React Components
 
@@ -256,7 +264,7 @@ docker-compose -f docker-compose.dev.yml down
 docker-compose -f docker-compose.dev.yml logs -f
 ```
 
-## 📝 Format CSV dla Importu
+## 📝 CSV Format for Import
 
 ```csv
 Data Losowania,Liczba 1,Liczba 2,Liczba 3,Liczba 4,Liczba 5,Liczba 6
@@ -265,10 +273,10 @@ Data Losowania,Liczba 1,Liczba 2,Liczba 3,Liczba 4,Liczba 5,Liczba 6
 ...
 ```
 
-**Uwagi:**
-- Liczby muszą być w zakresie 1-49
-- Data w formacie YYYY-MM-DD
-- 6 unikalnych liczb w każdym rzędzie
+**Notes:**
+- Numbers must be in range 1-49
+- Date in YYYY-MM-DD format
+- 6 unique numbers in each row
 
 ## 🐛 Troubleshooting
 
@@ -290,60 +298,60 @@ logs-frontend.bat
 ```
 
 ### Port Conflicts
-Jeśli porty 8000 lub 5173 są zajęte, edytuj `docker-compose.dev.yml`:
+If ports 8000 or 5173 are occupied, edit `docker-compose.dev.yml`:
 ```yaml
 services:
   backend:
     ports:
-      - "8001:8000"  # Zmień 8000 na inny
+      - "8001:8000"  # Change 8000 to another
   frontend:
     ports:
-      - "5174:5173"  # Zmień 5173 na inny
+      - "5174:5173"  # Change 5173 to another
 ```
 
-### Frontend nie łączy się z Backend
-1. Sprawdź czy backend działa: http://localhost:8000/docs
-2. Sprawdź `VITE_API_URL` w `docker-compose.dev.yml`
-3. Zobacz logi: `logs-frontend.bat`
+### Frontend Not Connecting to Backend
+1. Check if backend is running: http://localhost:8000/docs
+2. Check `VITE_API_URL` in `docker-compose.dev.yml`
+3. View logs: `logs-frontend.bat`
 
 ### Database Issues
 ```bash
-# Usuń bazę danych i rozpocznij od nowa
+# Delete database and start fresh
 docker-compose -f docker-compose.dev.yml down -v
 docker-compose -f docker-compose.dev.yml up
 ```
 
-## 📚 Dokumentacja API
+## 📚 API Documentation
 
-Po uruchomieniu backendu dostępna jest interaktywna dokumentacja:
+After starting the backend, interactive documentation is available:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 🎓 Jak używać
+## 🎓 How to Use
 
-### 1. Wgraj Dane Historyczne
-1. Przejdź do Dashboard
-2. Kliknij "Wgraj CSV" lub przeciągnij plik
-3. Poczekaj na import i analizę
+### 1. Upload Historical Data
+1. Go to Dashboard
+2. Click "Upload CSV" or drag and drop file
+3. Wait for import and analysis
 
-### 2. Generuj Układy
-1. Przejdź do "Generuj"
-2. Wybierz strategię
-3. Ustaw ilość układów (1-10)
-4. Kliknij "Generuj"
-5. Kopiuj do schowka lub zapisz
+### 2. Generate Number Sets
+1. Go to "Generate"
+2. Select strategy (including AI Prediction!)
+3. Set number of sets (1-10)
+4. Click "Generate"
+5. Copy to clipboard or save
 
-### 3. Przeglądaj Statystyki
-1. Przejdź do "Statystyki"
-2. Zobacz częstotliwość liczb
-3. Sprawdź hot/cold numbers
-4. Analizuj najczęstsze pary i trójki
+### 3. Browse Statistics
+1. Go to "Statistics"
+2. View number frequency
+3. Check hot/cold numbers
+4. Analyze most common pairs and triples
 
-### 4. Historia
-1. Przejdź do "Historia"
-2. Zobacz wszystkie wygenerowane układy
-3. Przeglądaj historyczne losowania
-4. Usuń niepotrzebne wpisy
+### 4. History
+1. Go to "History"
+2. View all generated picks
+3. Browse historical draws
+4. Delete unnecessary entries
 
 ## 🤝 Contributing
 
@@ -353,33 +361,34 @@ Po uruchomieniu backendu dostępna jest interaktywna dokumentacja:
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-## � Dokumentacja
+## 📖 Documentation
 
-> 📖 **[🔍 Pełny Spis Treści Dokumentacji → docs/INDEX.md](docs/INDEX.md)**
+> 📖 **[🔍 Full Documentation Index → docs/INDEX.md](docs/INDEX.md)**
 
-### 🚀 Quick Start & Skrypty
-- **[Quick_start_dev/](Quick_start_dev/)** - Wszystkie skrypty zarządzające i quick start guides
-  - [FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md) - Pierwsze uruchomienie
-  - [QUICK_START.md](Quick_start_dev/QUICK_START.md) - Szybki start w 5 minut
-  - [LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md) - Konfiguracja API w 6 krokach
+### 🚀 Quick Start & Scripts
+- **[Quick_start_dev/](Quick_start_dev/)** - All management scripts and quick start guides
+  - [FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md) - First launch
+  - [QUICK_START.md](Quick_start_dev/QUICK_START.md) - Quick start in 5 minutes
+  - [LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md) - API configuration in 6 steps
 
-### 🔄 Integracje i Funkcjonalności
-- **[docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)** - Pełna dokumentacja synchronizacji z Lotto.pl API
-- **[docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)** - Zarządzanie danymi, backup, restore, persistence
-- **[docs/INSTALLATION_GUIDE.md](docs/INSTALLATION_GUIDE.md)** - Szczegółowy przewodnik instalacji
-- **[docs/VISUALIZATION.md](docs/VISUALIZATION.md)** - Diagramy architektury i flow
+### 🔄 Integrations and Features
+- **[docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)** - Full Lotto.pl API synchronization documentation
+- **[docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)** - Data management, backup, restore, persistence
+- **[docs/AI_STRATEGY.md](docs/AI_STRATEGY.md)** - AI Prediction strategy - machine learning documentation
+- **[docs/INSTALLATION_GUIDE.md](docs/INSTALLATION_GUIDE.md)** - Detailed installation guide
+- **[docs/VISUALIZATION.md](docs/VISUALIZATION.md)** - Architecture and flow diagrams
 
-### 💻 Dokumentacja Techniczna
-- **[backend/docs/](backend/docs/)** - Dokumentacja Backend
-  - API endpoints, modele, strategie, konfiguracja
-- **[frontend/docs/](frontend/docs/)** - Dokumentacja Frontend
-  - Komponenty React, strony, architektury, Material UI
+### 💻 Technical Documentation
+- **[backend/docs/](backend/docs/)** - Backend Documentation
+  - API endpoints, models, strategies, configuration
+- **[frontend/docs/](frontend/docs/)** - Frontend Documentation
+  - React components, pages, architecture, Material UI
 
-### 📦 Wdrożenie
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Wdrożenie produkcyjne
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Jak kontrybuować do projektu
+### 📦 Deployment
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 
-## �📄 License
+## 📄 License
 
 MIT License - see LICENSE file for details
 
@@ -389,4 +398,4 @@ Created with ❤️ for lottery enthusiasts
 
 ---
 
-**Note**: Aplikacja służy celom rozrywkowym i edukacyjnym. Nie gwarantujemy wygranej w loterii! 🍀
+**Note**: This application is for entertainment and educational purposes. We do not guarantee lottery winnings! 🍀

@@ -111,27 +111,34 @@ Generate new lottery picks with different strategies.
 **Route**: `/generate`
 
 Features:
-- Strategy selection (5 options)
+- Strategy selection (6 options)
 - Count input (1-10)
 - Results display
 - Copy to clipboard
 - Clear results
 - Strategy descriptions
+- Color-coded strategy icons
 
 Strategies:
-1. Random - Completely random
-2. Hot - Frequent numbers
-3. Cold - Rare numbers
-4. Balanced - Mix of hot/cold
-5. Combo Based - Based on pairs/triples
+1. Random - Completely random (Shuffle icon, orange)
+2. Hot - Frequent numbers (TrendingUp icon, red)
+3. Cold - Rare numbers (TrendingDown icon, blue)
+4. Balanced - Mix of hot/cold (Star icon, blue)
+5. Combo Based - Based on pairs/triples (GpsFixed icon, purple)
+6. **AI Prediction** 🧠 **NEW!** - Machine learning prediction (Psychology icon, cyan)
+   - Uses RandomForestClassifier
+   - Analyzes historical patterns
+   - Requires 20+ draws
+   - Smart probability-based selection
 
 Components used:
-- Select, MenuItem
+- Select, MenuItem with custom renderValue
 - TextField
 - Button
 - Alert
 - Chip
 - NumbersBall
+- Material-UI Icons (Shuffle, TrendingUp, TrendingDown, Star, GpsFixed, Psychology)
 
 #### History
 View and manage generated picks and historical draws.
@@ -233,8 +240,33 @@ interface Draw {
   created_at: string
 }
 
-type Strategy = 'random' | 'hot' | 'cold' | 'balanced' | 'combo_based'
+type Strategy = 'random' | 'hot' | 'cold' | 'balanced' | 'combo_based' | 'ai'
+
+interface StrategyConfig {
+  icon: JSX.Element
+  color: string
+}
 ```
+
+### Configuration
+
+#### Icon Configuration
+Centralized icon and color configuration for strategies.
+
+**Location**: `src/config/icons.ts`
+
+```tsx
+export const STRATEGY_CONFIG: Record<Strategy, StrategyConfig> = {
+  random: { icon: <Shuffle />, color: '#ff9800' },
+  hot: { icon: <TrendingUp />, color: '#f44336' },
+  cold: { icon: <TrendingDown />, color: '#2196f3' },
+  balanced: { icon: <Star />, color: '#2196f3' },
+  combo_based: { icon: <GpsFixed />, color: '#9c27b0' },
+  ai: { icon: <Psychology />, color: '#00bcd4' }
+}
+```
+
+All Material-UI icons are imported from `@mui/icons-material`
 
 ### Theme
 

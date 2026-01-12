@@ -37,7 +37,7 @@ Stores generated lottery picks.
 class Pick(Base):
     id: int (primary key)
     numbers: List[int] (6 numbers, 1-49)
-    strategy: str (random/hot/cold/balanced/combo_based)
+    strategy: str (random/hot/cold/balanced/combo_based/ai)
     created_at: datetime
 ```
 
@@ -71,7 +71,7 @@ class Pick(Base):
 **POST /picks/generate**
 - Generate new lottery picks
 - Body: `{ "strategy": "balanced", "count": 1 }`
-- Strategies: random, hot, cold, balanced, combo_based
+- Strategies: random, hot, cold, balanced, combo_based, **ai**
 - Returns: List of generated picks
 
 **GET /picks/**
@@ -136,6 +136,17 @@ Based on most common pairs and triples from history.
 - Builds numbers from frequent combinations
 - Fills remaining with weighted random
 
+#### 6. AI Prediction 🧠 **NEW!**
+Machine learning prediction using RandomForestClassifier.
+- **Technology**: scikit-learn (RandomForest)
+- **Approach**: Binary classification for each number (1-49)
+- **Features**: Analyzes 10 features per draw (sum, even count, range, frequency, gaps)
+- **Training**: Requires minimum 20 historical draws
+- **Selection**: Top 3 high-probability + 2-3 medium-probability + weighted random
+- **Fallback**: Switches to "balanced" if insufficient data
+- **Dependencies**: scikit-learn==1.3.2, numpy==1.26.2
+- **Documentation**: See [docs/AI_STRATEGY.md](../../docs/AI_STRATEGY.md) for full details
+
 ### Database
 
 **SQLite** (Development)
@@ -191,6 +202,8 @@ sqlalchemy==2.0.35
 uvicorn[standard]==0.32.0
 pydantic==2.10.3
 python-multipart==0.0.12
+scikit-learn==1.3.2
+numpy==1.26.2
 ```
 
 ### Error Handling

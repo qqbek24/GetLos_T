@@ -1,60 +1,71 @@
 # Development Tasks TODO
 
-## ✅ Zrobione (Starter)
+## ✅ Completed (Starter)
 - [x] Backend FastAPI setup
-- [x] Frontend Vue.js setup
-- [x] Docker & Docker Compose konfiguracja
-- [x] Podstawowe endpointy API
-- [x] UI komponenty (Dashboard, Generate, History, Stats)
-- [x] Upload CSV funkcjonalność
-- [x] Strategie generowania (random, hot, cold, balanced, combo_based)
-- [x] Statystyki i analiza danych
+- [x] Frontend React.js setup
+- [x] Docker & Docker Compose configuration
+- [x] Basic API endpoints
+- [x] UI components (Dashboard, Generate, History, Stats)
+- [x] CSV upload functionality
+- [x] Generation strategies (random, hot, cold, balanced, combo_based, **ai**)
+- [x] Statistics and data analysis
+- [x] **AI Prediction Strategy** - Machine Learning using RandomForestClassifier
+  - Analyzes historical patterns and sequences
+  - 10 features per draw extraction
+  - 49 binary classifiers (one per number)
+  - Intelligent selection algorithm
+  - Minimum 20 draws requirement
+  - Full documentation in docs/AI_STRATEGY.md
 
-## 🚧 Do zrobienia (Funkcjonalności)
+## 🚧 To Do (Features)
 
-### Priorytet 1 - Automatyczne pobieranie wyników
-- [ ] Scheduler/Cron job do automatycznego pobierania
-- [ ] Web scraper dla strony z losowaniami
-- [ ] API endpoint do manualnego triggera aktualizacji
-- [ ] Walidacja nowych danych przed zapisem
-- [ ] Notyfikacje o nowych wynikach
+### Priority 1 - Automatic Result Fetching
+- [ ] Scheduler/Cron job for automatic fetching
+- [ ] Web scraper for lottery results page
+- [ ] API endpoint for manual update trigger
+- [ ] Validation of new data before saving
+- [ ] Notifications about new results
 
-### Priorytet 2 - Rozszerzona analiza
-- [ ] Dashboard z wykresami (Chart.js lub Plotly)
-- [ ] Analiza trendów czasowych
-- [ ] Predykcja na podstawie ML (opcjonalne)
-- [ ] Export statystyk do PDF/Excel
-- [ ] Historia zmian w czasie
+### Priority 2 - Extended Analysis
+- [ ] Dashboard with charts (Chart.js or Plotly)
+- [ ] Time trend analysis
+- [ ] ML-based prediction improvements (neural networks)
+- [ ] Export statistics to PDF/Excel
+- [ ] Change history over time
 
-### Priorytet 3 - UX Improvements
+### Priority 3 - UX Improvements
 - [ ] Dark mode
-- [ ] Responsywny design (mobile)
+- [ ] Responsive design (mobile)
 - [ ] Loading skeletons
-- [ ] Animacje i transitions
+- [ ] Animations and transitions
 - [ ] Toast notifications
 
-### Priorytet 4 - Deployment
+### Priority 4 - Deployment
 - [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Testy jednostkowe (pytest dla backend)
-- [ ] Testy E2E (Playwright/Cypress)
+- [ ] Unit tests (pytest for backend)
+- [ ] E2E tests (Playwright/Cypress)
 - [ ] Production docker-compose
-- [ ] Environment configs dla prod
+- [ ] Environment configs for prod
 
-### Priorytet 5 - Security & Performance
+### Priority 5 - Security & Performance
 - [ ] Rate limiting
-- [ ] API authentication (opcjonalne)
+- [ ] API authentication (optional)
 - [ ] Caching (Redis)
 - [ ] Database optimization (indices)
 - [ ] Error tracking (Sentry)
 
-## 💡 Pomysły na przyszłość
-- [ ] Multi-user support (rejestracja/login)
-- [ ] Zapisywanie ulubionych strategii
-- [ ] Porównywanie wyników z rzeczywistymi losowaniami
+## 💡 Future Ideas
+- [ ] Multi-user support (registration/login)
+- [ ] Saving favorite strategies
+- [ ] Comparing results with actual draws
 - [ ] Social sharing
 - [ ] Mobile app (React Native?)
+- [ ] AI model performance metrics
+- [ ] AI confidence score display
+- [ ] Historical accuracy tracking
+- [ ] Multiple AI models comparison
 
 ## 🐛 Known Issues
-- Brak walidacji rozmiaru pliku CSV (dodać limit)
-- Brak paginacji dla długich list
-- Trzeba odświeżać stronę po upload CSV
+- No CSV file size validation (add limit)
+- No pagination for long lists
+- Need to refresh page after CSV upload
