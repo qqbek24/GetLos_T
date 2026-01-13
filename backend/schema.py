@@ -38,12 +38,20 @@ class Stats(BaseModel):
 
 
 class DrawResponse(BaseModel):
+    id: int
+    numbers: List[int]
+    key: str
+    created_at: datetime
+    source: Optional[str] = None
+    draw_system_id: Optional[int] = None
+    sequential_id: Optional[int] = None
     """Response for single draw"""
     id: int
     numbers: List[int]
     key: str
     created_at: datetime
     source: Optional[str] = None
+    draw_system_id: Optional[int] = None
     
     class Config:
         from_attributes = True
@@ -138,6 +146,44 @@ class BackupResponse(BaseModel):
     """Response after backup/restore operation"""
     success: bool
     count: int
+    message: str
+    error: Optional[str] = None
+
+
+class BatchDeleteRequest(BaseModel):
+    """Request to delete multiple items"""
+    ids: List[int] = Field(..., min_length=1)
+
+
+class IntegrityIssue(BaseModel):
+    """Single integrity issue"""
+    type: str  # "duplicate", "missing_date", "gap_in_sequence", "broken_sequential_id"
+    severity: str  # "error", "warning", "info"
+    description: str
+    details: Optional[dict] = None
+
+
+class IntegrityReport(BaseModel):
+    """Response from integrity verification"""
+    success: bool
+    has_issues: bool
+    total_draws: int
+    issues: List[IntegrityIssue]
+    summary: str
+    # Reference metadata
+    lottery_start_date: Optional[str] = None
+    lottery_start_sequential_id: Optional[int] = None
+    api_reliable_start_date: Optional[str] = None
+    api_reliable_start_sequential_id: Optional[int] = None
+    historical_era_draws_count: Optional[int] = None
+
+
+class IntegrityFixResponse(BaseModel):
+    """Response from integrity fix operation"""
+    success: bool
+    duplicates_removed: int
+    gaps_filled: int
+    sequential_ids_fixed: int
     message: str
     error: Optional[str] = None
 

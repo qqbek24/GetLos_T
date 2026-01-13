@@ -1,0 +1,3645 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "LOTTO OpenAPI",
+    "description": "# Specyfikacja\nUsługa LOTTO OpenAPI pozwala na pobranie powszechnie dostępnych danych przez usługę REST, są to m.in. wyniki, wygrane, statystyki, informacje o grach Totalizatora Sportowego, czy też różne statystyki.\n\nTreści te są udostępniane bezpłatnie, a aby uzyskać dostęp do usługi LOTTO OpenAPI, wystarczy skontaktować się z nami przez adres email: [kontakt@lotto.pl](mailto:kontakt@lotto.pl), lub przez formularz kontaktowy: [https://www.lotto.pl/kontakt](https://www.lotto.pl/kontakt). W treści prosimy o podanie: imienia, nazwiska, nazwy firmy (jeśli istnieje) oraz adresu email i numeru telefonu. Na tej podstawie utworzymy dostęp do LOTTO OpenAPI i wygenerujemy dla Ciebie klucz API key, który będzie służył do autoryzacji zapytań.\n# Autoryzacja\nUsługa LOTTO OpenAPI udostępnia autoryzacje dostępu do metod za pomocą API key, który jest tokenem autoryzacyjnym.\n\nAutoryzacja za pomocą klucza API (API Key) to metoda uwierzytelniania, w której użytkownik lub aplikacja klienta musi przesłać specjalny klucz w nagłówku żądania HTTP, aby uzyskać dostęp do zasobów serwera API. Klucz API jest unikalnym identyfikatorem, który serwer używa do weryfikacji tożsamości klienta i uprawnień do wykonania określonych operacji.\n\n\n*Przykład nagłówków:*\n\n    accept: application/json\n    secret: GNq0pdsAAW2fPgXokLyZ4a8pJ1KEkKaj7kPICqQVbwg=\n  \n  *Przykład zapytania:*\n  \n\n    GET https://developers.lotto.pl/api/api/open/v1/departments?City=Kraków HTTP/1.1\n\n\n\n\n<SecurityDefinitions/>\n",
+    "contact": {
+      "email": "kontakt@lotto.pl"
+    },
+    "version": "v1.0",
+    "x-logo": {
+      "url": "./logo.svg",
+      "altText": "LOTTO Logo"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://developers.lotto.pl",
+      "description": "Base URL for API"
+    }
+  ],
+  "paths": {
+    "/api/open/v1/departments": {
+      "get": {
+        "tags": [
+          "Oddziały Totalizatora Sportowego"
+        ],
+        "summary": "Lista wszystkich Oddziałów Totalizatora Sportowego",
+        "description": "W Oddziałach Totalizatora Sportowego, możesz odebrać wysokie wygrane i załatwić wszystkie sprawy formalne.",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "query",
+            "description": "Nazwa odziału.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "example1": {
+                "summary": "Przykład 1",
+                "value": "Warszawa - I Oddział"
+              },
+              "example2": {
+                "summary": "Przykład 2",
+                "value": "Kraków - II Oddział"
+              }
+            }
+          },
+          {
+            "name": "City",
+            "in": "query",
+            "description": "Miasto odziału.",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "example1": {
+                "summary": "Przykład 1",
+                "value": "Warszawa"
+              },
+              "example2": {
+                "summary": "Przykład 2",
+                "value": "Kraków"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista Oddziałów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.V1.Models.Departments.DepartmentModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-prizes/{drawType}/{drawSystemId}": {
+      "get": {
+        "tags": [
+          "Wygrane"
+        ],
+        "summary": "Liczba wygranych",
+        "description": "Liczba wygranych każdego stopnia dla wybranej gry liczbowej lub loterii pieniężnej z wyjątkiem Multi Multi, EuroJackpot, Szybkie600 oraz Keno. Liczba zwracana jest dla danego identyfikatora losowania.",
+        "parameters": [
+          {
+            "name": "drawType",
+            "in": "path",
+            "description": "Typ gry\r\n \r\n  Dostępne wartości:\r\n   - Lotto\r\n   - LottoPlus\r\n   - MiniLotto\r\n   - Kaskada\r\n   - EkstraPensja\r\n   - EkstraPremia\r\n   - ZakladySpecjalne",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "drawSystemId",
+            "in": "path",
+            "description": "Numer losowania",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.ListItemModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-prizes/eurojackpot/{drawSystemId}": {
+      "get": {
+        "tags": [
+          "Wygrane"
+        ],
+        "summary": "Liczba wygranych – Eurojackpot",
+        "description": "Liczba wygranych dla każdego stopnia gry liczbowej EuroJackpot. Liczba zwracana jest dla danego identyfikatora losowania.",
+        "parameters": [
+          {
+            "name": "drawSystemId",
+            "in": "path",
+            "description": "Numer losowania",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.EuroJackpotModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-prizes/keno/{drawSystemId}": {
+      "get": {
+        "tags": [
+          "Wygrane"
+        ],
+        "summary": "Liczba wygranych - Keno",
+        "description": "Liczba wygranych dla każdego stopnia gry liczbowej Keno. Liczba zwracana jest dla danego identyfikatora losowania.",
+        "parameters": [
+          {
+            "name": "drawSystemId",
+            "in": "path",
+            "description": "Numer losowania",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.ListItemModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-prizes/multimulti/{drawSystemId}": {
+      "get": {
+        "tags": [
+          "Wygrane"
+        ],
+        "summary": "Liczba wygranych – Multi Multi",
+        "description": "Liczba wygranych dla każdego stopnia gry liczbowej Multi Multi. Liczba zwracana jest dla danego identyfikatora losowania.",
+        "parameters": [
+          {
+            "name": "drawSystemId",
+            "in": "path",
+            "description": "Numer losowania",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.MultiMultiModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-prizes/szybkie600/{drawSystemId}": {
+      "get": {
+        "tags": [
+          "Wygrane"
+        ],
+        "summary": "Liczba wygranych - Szybkie 600",
+        "description": "Liczba wygranych dla każdego stopnia gry liczbowej Szybkie 600. Liczba zwracana jest dla danego identyfikatora losowania.",
+        "parameters": [
+          {
+            "name": "drawSystemId",
+            "in": "path",
+            "description": "Numer losowania",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.Szybkie600Model"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-results/by-date": {
+      "get": {
+        "tags": [
+          "Wyniki"
+        ],
+        "summary": "Wyniki dla określonej daty",
+        "description": "Ostatnie wyniki dla określonej daty. W zapytaniu należy podać zarówno datę jak i godzinę losowania.",
+        "parameters": [
+          {
+            "name": "drawDate",
+            "in": "query",
+            "description": "Data losowania",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ostatnie wyniki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wyników.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-results/by-date-per-game": {
+      "get": {
+        "tags": [
+          "Wyniki"
+        ],
+        "summary": "Wyniki dla określonej daty oraz typu gry",
+        "description": "Ostatnie wyniki dla określonej daty oraz typu gry. W zapytaniu należy podać zarówno datę losowania oraz typ gry. Dodatkowo można doprecyzować godzinę oraz minutę losowania.",
+        "parameters": [
+          {
+            "name": "hour",
+            "in": "query",
+            "description": "Godzina losowania",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "minute",
+            "in": "query",
+            "description": "Minuta losowania",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - LottoPlus\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "drawDate",
+            "in": "query",
+            "description": "Data losowania",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ostatnie wyniki.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped]"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany."
+          },
+          "404": {
+            "description": "Nie znaleziono wyników.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-results/last-results": {
+      "get": {
+        "tags": [
+          "Wyniki"
+        ],
+        "summary": "Ostatnie wyniki",
+        "description": "Ostatnie wyniki losowań dla wszystkich gier liczbowych i loterii pieniężnych.",
+        "responses": {
+          "200": {
+            "description": "Ostatnie wyniki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wyników.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-results/last-results-per-game": {
+      "get": {
+        "tags": [
+          "Wyniki"
+        ],
+        "summary": "Ostatnie wyniki dla wybranej gry",
+        "description": "Ostatnie wyniki losowań dla wybranej gry liczbowej lub loterii pieniężnej.",
+        "parameters": [
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - LottoPlus\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ostatnie wyniki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wyników.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/draw-statistics/numbers-frequency": {
+      "get": {
+        "tags": [
+          "Statystyki"
+        ],
+        "summary": "Częstość występowania liczb",
+        "description": "Statystyki najczęściej występujących liczb w danej grze dla określonego przedziału czasowego.",
+        "parameters": [
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - LottoPlus\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "description": "Data od.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "description": "Data do.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liczby wraz z ich częstością występowania",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawStatistics.DrawNumbersFrequencyModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono rekordów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/ekspres-losy": {
+      "get": {
+        "tags": [
+          "Ekspres Losy"
+        ],
+        "summary": "Lista Ekspres losów",
+        "description": "Lista Ekspres Losów wraz ze szczegółami.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Nazwa.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status\r\n            \r\nDostępne wartości:\r\n - Standard - Standardowe\r\n - LastChance - Ostatnia szansa\r\n - Novelity - Nowość\r\n - Debut - Debiut\r\n - Announcement - Ogłoszenie\r\n - SalesEnd - Zakończenie sprzedaży\r\n - Archival - Archiwalne",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "yearSalesEnd",
+            "in": "query",
+            "description": "Rok zakończenia sprzedaży.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista Ekspres Losów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ListItemModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brak elementów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/ekspres-losy/{id}": {
+      "get": {
+        "tags": [
+          "Ekspres Losy"
+        ],
+        "summary": "Szczegóły Ekspres Losu",
+        "description": "Szczegóły dla danego ekspres losu – stawki, wygrane, kwoty do wygrania.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Szczegóły wybranego Ekspres Losu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ViewModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono Ekspres Losu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/highest-wins": {
+      "get": {
+        "tags": [
+          "Największe wygrane"
+        ],
+        "summary": "Lista największych wygranych",
+        "parameters": [
+          {
+            "name": "games",
+            "in": "query",
+            "description": "Gry.\r\n            \r\nDostępne wartości:\r\n  - Lotto\r\n  - LottoPlus\r\n  - MiniLotto\r\n  - Kaskada\r\n  - Keno\r\n  - EkstraPensja\r\n  - EkstraPremia\r\n  - Szybkie600\r\n  - ZakladySpecjalne\r\n            \r\nWartości w zapytaniu można podawać po przecinku.\r\n            \r\nPrzykład: games=Lotto,LottoPlus,MiniLotto",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "place",
+            "in": "query",
+            "description": "Miejsce.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "onlyOnlineWins",
+            "in": "query",
+            "description": "Tylko wygrane online.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "scratchId",
+            "in": "query",
+            "description": "Identyfikator zdrapki.",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Największe wygrane.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.HighestWins.ExtendedListItemModel]"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono wygranych.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/info": {
+      "get": {
+        "tags": [
+          "Ogólne informacje"
+        ],
+        "summary": "Informacje na temat gry",
+        "description": "Ogólne (opisowe) informacje na temat wybranej gry.",
+        "parameters": [
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informacja na temat gry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.GameInfo.GameInformationModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono gry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/info/game-jackpot": {
+      "get": {
+        "tags": [
+          "Ogólne informacje"
+        ],
+        "summary": "Wartość kumulacji",
+        "description": "Wartość kumulacji dla gier kumulacyjnych – Lotto oraz Eurojackpot. Dla pozostałych zwraca najwyższą wartość możliwą do wygrania.",
+        "parameters": [
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - LottoPlus\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informacja na kumulacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Areas.IGT.Core.Models.DrawGames.GameInfoModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/info/next-draw": {
+      "get": {
+        "tags": [
+          "Ogólne informacje"
+        ],
+        "summary": "Następne losowanie",
+        "parameters": [
+          {
+            "name": "gameType",
+            "in": "query",
+            "description": "Typ gry\r\n            \r\nDostępne wartości:\r\n - Lotto\r\n - LottoPlus\r\n - EuroJackpot\r\n - MultiMulti\r\n - MiniLotto\r\n - Kaskada\r\n - Keno\r\n - EkstraPensja\r\n - EkstraPremia\r\n - Szybkie600\r\n - ZakladySpecjalne",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informacja na następnego losowania.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.GameInfo.PlayBannerViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/little-games": {
+      "get": {
+        "tags": [
+          "Gierki"
+        ],
+        "summary": "Lista Gierek",
+        "description": "Lista Gierek wraz ze szczegółami.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Nazwa",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status\r\n            \r\nDostępne wartości:\r\n - Novelity - Nowość\r\n - Active - Aktywne",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Kategoria\r\n            \r\nDostępne wartości:\r\n - All - Wszystkie\r\n - Novelity - Nowość\r\n - HighestWins - Największe wygrane\r\n - HighestChance - Największa szansa\r\n - FavoriteGames - Ulubione gry",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista Gierek.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.Lotteries.Gierki.ListItemModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brak elementów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/little-games/{id}": {
+      "get": {
+        "tags": [
+          "Gierki"
+        ],
+        "summary": "Szczegóły Gierki",
+        "description": "Szczegóły dla danej gierki – stawki, wygrane, kwoty do wygrania.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identyfikator Gierki",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Szczegóły wybranej Gierki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.ViewModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono Gierki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/zdrapki": {
+      "get": {
+        "tags": [
+          "Zdrapki"
+        ],
+        "summary": "Lista Zdrapek",
+        "description": "Lista Zdrapek wraz ze szczegółami.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Nazwa",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status\r\n            \r\nDostępne wartości:\r\n - Standard - Standardowe\r\n - LastChance - Ostatnia szansa\r\n - Novelity - Nowość\r\n - Debut - Debiut\r\n - Announcement - Ogłoszenie\r\n - SalesEnd - Zakończenie sprzedaży\r\n - Archival - Archiwalne",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "yearSalesEnd",
+            "in": "query",
+            "description": "Rok zakończenia sprzedaży",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista Zdrapek.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ListItemModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brak elementów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Błąd walidacji.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Unprocessable"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/lotteries/zdrapki/{id}": {
+      "get": {
+        "tags": [
+          "Zdrapki"
+        ],
+        "summary": "Szczegóły Zdrapki",
+        "description": "Szczegóły dla danej Zdrapki – stawki, wygrane, kwoty do wygrania.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identyfikator Zdrapki",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Szczegóły wybranej Zdrapki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ViewModel]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Niepoprawne zapytanie."
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono Zdrapki.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/open/v1/office-lottery": {
+      "get": {
+        "tags": [
+          "Punkty LOTTO"
+        ],
+        "summary": "Lista wszystkich punktów LOTTO",
+        "description": "Lista wszystkich punktów LOTTO, w których można zakupić kupon lub los.",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "query",
+            "description": "Indeks.\r\n            \r\nWartość 'index' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Rozmiar listy.\r\n            \r\nWartość 'size' > 0",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Pole sortowania.\r\n            \r\nDostępne wartości:\r\n - Wszystkie właściwości obiektu o określonym typie pola 'items'",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Kolejność sortowania.\r\n            \r\nDostępne wartości:\r\n - ASC - rosnąco\r\n - DESC - malejąco",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista punktów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.OfficeLottery.OfficeLotteryListItemModel]"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Klient nieautoryzowany.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono punktów.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ideo.Core.App.Extensions.Responses.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Ideo.Core.App.Areas.IGT.Core.Models.DrawGames.GameInfoModel": {
+        "type": "object",
+        "properties": {
+          "jackpotValue": {
+            "type": "number",
+            "description": "Wartość kumulacji.",
+            "format": "double"
+          },
+          "jackpotPlusValue": {
+            "type": "number",
+            "description": "Wartość kumulacji dla gry z Plusem.",
+            "format": "double",
+            "nullable": true
+          },
+          "closestDraw": {
+            "type": "string",
+            "description": "Data najbliższego losowania.",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.V1.Models.Departments.DepartmentModel": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Adres Odziału.",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "Miasto, w którym znajduje się Odział.",
+            "nullable": true
+          },
+          "comments": {
+            "type": "string",
+            "description": "Komentarze dotyczące Odziału.",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Adres e-mail Odziału.",
+            "nullable": true
+          },
+          "gpsX": {
+            "type": "number",
+            "description": "Współrzędna GPS X lokalizacji Odziału.",
+            "format": "double"
+          },
+          "gpsY": {
+            "type": "number",
+            "description": "Współrzędna GPS Y lokalizacji Odziału.",
+            "format": "double"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa Odziału.",
+            "nullable": true
+          },
+          "openingHours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.V1.Models.Departments.OpeningHours"
+            },
+            "description": "Lista godzin otwarcia Odziału.",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Numer telefonu Odziału.",
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "Kod pocztowy lokalizacji Odziału.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Model Oddziału."
+      },
+      "Ideo.Core.App.Areas.Open.Api.V1.Models.Departments.OpeningHours": {
+        "type": "object",
+        "properties": {
+          "openHour": {
+            "type": "string",
+            "description": "Godzina otwarcia.",
+            "nullable": true
+          },
+          "closeHour": {
+            "type": "string",
+            "description": "Godzina zamknięcia.",
+            "nullable": true
+          },
+          "day": {
+            "type": "integer",
+            "description": "Dzień tygodnia.\r\n\r\nDostępne wartości:\r\n - 0 - Poniedziałek\r\n - 1 - Wtorek\r\n - 2 - Środa\r\n - 3 - Czwartek\r\n - 4 - Piątek\r\n - 5 - Sobota\r\n - 6 - Niedziela",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.V1.Models.HighestWins.ExtendedListItemModel": {
+        "type": "object",
+        "properties": {
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "bonus": {
+            "type": "number",
+            "description": "Bonus.",
+            "format": "double",
+            "nullable": true
+          },
+          "winDateUtc": {
+            "type": "string",
+            "description": "Data wygranej w formacie UTC.",
+            "format": "date-time"
+          },
+          "amountFixed": {
+            "type": "number",
+            "description": "Stała kwota.",
+            "format": "double"
+          },
+          "years": {
+            "type": "integer",
+            "description": "Rok",
+            "format": "int32",
+            "nullable": true
+          },
+          "withPlus": {
+            "type": "boolean",
+            "description": "Losowanie z plusem."
+          },
+          "onlineWin": {
+            "type": "boolean",
+            "description": "Wygrana online."
+          },
+          "pictureUrl": {
+            "type": "string",
+            "description": "URL do obrazka.",
+            "nullable": true
+          },
+          "place": {
+            "type": "string",
+            "description": "Miejsce.",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "description": "Adres.",
+            "nullable": true
+          },
+          "playSitePath": {
+            "type": "string",
+            "description": "Ścieżka do strony gry.",
+            "nullable": true
+          },
+          "system": {
+            "type": "string",
+            "description": "System gry.",
+            "nullable": true
+          },
+          "rank": {
+            "type": "string",
+            "description": "Ranga todo.",
+            "nullable": true
+          },
+          "rate": {
+            "type": "string",
+            "description": "Ocena todo.",
+            "nullable": true
+          },
+          "scratchName": {
+            "type": "string",
+            "description": "Nazwa Zdrapki.",
+            "nullable": true
+          },
+          "gierkaName": {
+            "type": "string",
+            "description": "Nazwa Gierki.",
+            "nullable": true
+          },
+          "scratchUrl": {
+            "type": "string",
+            "description": "URL do Zdrapki.",
+            "nullable": true
+          },
+          "ekspresLosName": {
+            "type": "string",
+            "description": "Nazwa Ekspres Losu.",
+            "nullable": true
+          },
+          "ekspresLosUrl": {
+            "type": "string",
+            "description": "URL do Ekspres Losu.",
+            "nullable": true
+          },
+          "multiplier": {
+            "type": "integer",
+            "description": "Mnożnik.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.V1.Models.Lotteries.Gierki.ListItemModel": {
+        "type": "object",
+        "properties": {
+          "logoUrl": {
+            "type": "string",
+            "description": "URL do loga.",
+            "nullable": true
+          },
+          "bannerUrl": {
+            "type": "string",
+            "description": "URL do baneru.",
+            "nullable": true
+          },
+          "bannerBlurUrl": {
+            "type": "string",
+            "description": "URL do rozmytego baneru.",
+            "nullable": true
+          },
+          "bannerRectangularUrl": {
+            "type": "string",
+            "description": "URL do prostokątnego baneru.",
+            "nullable": true
+          },
+          "bannerHomePageUrl": {
+            "type": "string",
+            "description": "URL do baneru domowego.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identyfikator.",
+            "format": "int64"
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64"
+          },
+          "dateRelease": {
+            "type": "string",
+            "description": "Data wydania.",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string",
+            "description": "Opis.",
+            "nullable": true
+          },
+          "additionalDescription": {
+            "type": "string",
+            "description": "Dodatkowy opis.",
+            "nullable": true
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Kolor tła.",
+            "nullable": true
+          },
+          "summaryWinningAmount": {
+            "type": "integer",
+            "description": "Sumaryczna kwota do wygrania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "highestChanceStake": {
+            "type": "number",
+            "description": "Stawka dla największej szansy gierki.",
+            "format": "double"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.V1.Models.OfficeLottery.OfficeLotteryListItemModel": {
+        "type": "object",
+        "properties": {
+          "gpsX": {
+            "type": "number",
+            "format": "double"
+          },
+          "gpsY": {
+            "type": "number",
+            "format": "double"
+          },
+          "number": {
+            "type": "string",
+            "nullable": true
+          },
+          "card": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "verificationPoint": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ioGadgetsPickup": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "giftCardPickup": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointName": {
+            "type": "string",
+            "nullable": true
+          },
+          "today": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.HighestWins.EkspresLosyWinModel": {
+        "type": "object",
+        "properties": {
+          "place": {
+            "type": "string",
+            "description": "Miejsce.",
+            "nullable": true
+          },
+          "winDate": {
+            "type": "string",
+            "description": "Data.",
+            "format": "date-time"
+          },
+          "ekspresLosFileUrl": {
+            "type": "string",
+            "description": "URL do Ekspres Losu.",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "description": "Kwota.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.HighestWins.ScratchWinModel": {
+        "type": "object",
+        "properties": {
+          "place": {
+            "type": "string",
+            "description": "Miejsce.",
+            "nullable": true
+          },
+          "winDate": {
+            "type": "string",
+            "description": "Data.",
+            "format": "date-time"
+          },
+          "scratchFileUrl": {
+            "type": "string",
+            "description": "URL do Zdrapki.",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "description": "Kwota.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.CountryPrize": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Państwo.",
+            "nullable": true
+          },
+          "prizeValue": {
+            "type": "number",
+            "description": "Wartość wygranej.",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.EuroJackpotModel": {
+        "type": "object",
+        "properties": {
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "prizesEmpty": {
+            "type": "boolean",
+            "description": "Brak wygranych."
+          },
+          "prizes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Ideo.Core.Data.Model.PrizeModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          },
+          "countriesPrizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.PrizeViewModel"
+            },
+            "description": "Wygrane w państwach.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.ListItemModel": {
+        "type": "object",
+        "properties": {
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "prizesEmpty": {
+            "type": "boolean",
+            "description": "Brak wygranych."
+          },
+          "prizes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Ideo.Core.Data.Model.PrizeModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.MultiMultiModel": {
+        "type": "object",
+        "properties": {
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "prizesEmpty": {
+            "type": "boolean",
+            "description": "Brak wygranych."
+          },
+          "prizes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          },
+          "prizesValues": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "description": "Wartości wygranych.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.PrizeViewModel": {
+        "type": "object",
+        "properties": {
+          "degree": {
+            "type": "integer",
+            "description": "Stopień.",
+            "format": "int64",
+            "nullable": true
+          },
+          "countWinners": {
+            "type": "integer",
+            "description": "Ilość wygranych.",
+            "format": "int64",
+            "nullable": true
+          },
+          "prizesValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.CountryPrize"
+            },
+            "description": "Wartości wygranych.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.Szybkie600Bonus": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "degree": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "amountUnit": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.Szybkie600Model": {
+        "type": "object",
+        "properties": {
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "prizesEmpty": {
+            "type": "boolean",
+            "description": "Brak wygranych."
+          },
+          "prizes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Ideo.Core.Data.Model.PrizeModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          },
+          "bonus": {
+            "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawPrizes.Szybkie600Bonus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped": {
+        "type": "object",
+        "properties": {
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ losowania.",
+            "nullable": true
+          },
+          "multiplierValue": {
+            "type": "integer",
+            "description": "Wartość Mnożnika.",
+            "format": "int32",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.ListItemModel"
+            },
+            "description": "Wyniki.",
+            "nullable": true
+          },
+          "showSpecialResults": {
+            "type": "boolean",
+            "description": "Pokaż specialne wyniki."
+          },
+          "isNewEuroJackpotDraw": {
+            "type": "boolean",
+            "description": "Nowy losowanie EuroJackpot (losowanie po 2022-03-25).",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.ListItemModel": {
+        "type": "object",
+        "properties": {
+          "drawDate": {
+            "type": "string",
+            "description": "Data losowania.",
+            "format": "date-time"
+          },
+          "drawSystemId": {
+            "type": "integer",
+            "description": "Identyfikator losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "resultsJson": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Wyniki.",
+            "nullable": true
+          },
+          "specialResults": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Specialne wyniki.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawStatistics.DrawNumbersFrequencyModel": {
+        "type": "object",
+        "properties": {
+          "totalDraws": {
+            "type": "integer",
+            "description": "Łączna liczba losowań.",
+            "format": "int32"
+          },
+          "numberFrequrency": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawStatistics.NumberFrequrency"
+            },
+            "description": "Lista reprezentująca częstotliwość występowania poszczególnych liczb.",
+            "nullable": true
+          },
+          "numberSpecialFrequrency": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawStatistics.NumberFrequrency"
+            },
+            "description": "Lista reprezentująca częstotliwość występowania poszczególnych liczb specjalnych.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawStatistics.NumberFrequrency": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer, którego częstotliwość jest reprezentowana.",
+            "format": "int32"
+          },
+          "numberOfOccurrences": {
+            "type": "integer",
+            "description": "Liczba wystąpień danego numeru.",
+            "format": "int32"
+          },
+          "percentOfOccurrences": {
+            "type": "integer",
+            "description": "Procent wystąpień danego numeru.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.EkspresLosyPrizeModel": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer.",
+            "format": "int32",
+            "nullable": true
+          },
+          "quantityLeft": {
+            "type": "integer",
+            "description": "Pozostała ilość.",
+            "format": "int32",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Ilość.",
+            "format": "int32",
+            "nullable": true
+          },
+          "prize": {
+            "type": "number",
+            "description": "Kwota wygranej.",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ListItemModel": {
+        "type": "object",
+        "properties": {
+          "emissionNumber": {
+            "type": "integer",
+            "description": "Numer emisji.",
+            "format": "int64"
+          },
+          "drawPrice": {
+            "type": "integer",
+            "description": "Cena losowania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "pictureUrl": {
+            "type": "string",
+            "description": "URL do obrazka.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "hit": {
+            "type": "boolean",
+            "description": "Określa czy gra jest HIT'em sprzedażowym."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identyfikator.",
+            "format": "int64"
+          },
+          "dateSales": {
+            "type": "string",
+            "description": "Data rozpoczęcia sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateSalesEnd": {
+            "type": "string",
+            "description": "Data zakończenia sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.RegulationModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nazwa",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "URL",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ViewModel": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Opis.",
+            "nullable": true
+          },
+          "dateSales": {
+            "type": "string",
+            "description": "Data sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "descriptionAdditional": {
+            "type": "string",
+            "description": "Dodatkowy opis.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          },
+          "emissionNumber": {
+            "type": "integer",
+            "description": "Numer emisji.",
+            "format": "int64"
+          },
+          "mainImageUrl": {
+            "type": "string",
+            "description": "URL do głónego obrazka.",
+            "nullable": true
+          },
+          "legalNote": {
+            "type": "string",
+            "description": "Uwaga prawna.",
+            "nullable": true
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64",
+            "nullable": true
+          },
+          "hit": {
+            "type": "boolean",
+            "description": "Określa czy gra jest HIT'em sprzedażowym."
+          },
+          "circulation": {
+            "type": "integer",
+            "description": "Nakład.",
+            "format": "int64",
+            "nullable": true
+          },
+          "drawPrice": {
+            "type": "integer",
+            "description": "Cena.",
+            "format": "int64",
+            "nullable": true
+          },
+          "currentWinningsPrizesPool": {
+            "type": "integer",
+            "description": "Aktualna pula nagród za wygrane.",
+            "format": "int64",
+            "nullable": true
+          },
+          "dateClaimsEnd": {
+            "type": "string",
+            "description": "Data zakończenia roszczeń.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "regulations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.RegulationModel"
+            },
+            "description": "Przepisy prawne.",
+            "nullable": true
+          },
+          "prizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.EkspresLosyPrizeModel"
+            },
+            "description": "Nagrody.",
+            "nullable": true
+          },
+          "ekspresLosWins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.HighestWins.EkspresLosyWinModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.GameInfo.GameInformationModel": {
+        "type": "object",
+        "properties": {
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "nextDrawDate": {
+            "type": "string",
+            "description": "Data następnego losowania.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "closestPrizeValue": {
+            "type": "number",
+            "description": "Najbliższa wartość wygranej.",
+            "format": "double"
+          },
+          "draws": {
+            "type": "string",
+            "description": "Losowania.",
+            "nullable": true
+          },
+          "couponPrice": {
+            "type": "string",
+            "description": "Cena kuponu.",
+            "nullable": true
+          },
+          "closestPrizePoolType": {
+            "type": "string",
+            "description": "Typ puli najbliższgo losowania\r\n            \r\n Dostępne wartości:\r\n  - Cumulation - pula kumulacyjna\r\n  - Guaranteed - pula gwarantowana",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.GameInfo.PlayBannerViewModel": {
+        "type": "object",
+        "properties": {
+          "gameType": {
+            "type": "string",
+            "description": "Typ gry.",
+            "nullable": true
+          },
+          "closestPrizeValue": {
+            "type": "number",
+            "description": "Najbliższa wartość wygranej.",
+            "format": "double"
+          },
+          "nextDrawDate": {
+            "type": "string",
+            "description": "Data następnego losowania.",
+            "format": "date-time"
+          },
+          "playSitePath": {
+            "type": "string",
+            "description": "Ścieżka do strony gry.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkaWinModel": {
+        "type": "object",
+        "properties": {
+          "place": {
+            "type": "string",
+            "description": "Miejsce.",
+            "nullable": true
+          },
+          "winDate": {
+            "type": "string",
+            "description": "Data.",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Kwota.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiPrizeModel": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer.",
+            "format": "int32",
+            "nullable": true
+          },
+          "stack": {
+            "type": "number",
+            "description": "Stawka.",
+            "format": "double",
+            "nullable": true
+          },
+          "numberOfSelectedDigits": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiRegulationsModel": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer.",
+            "format": "int32",
+            "nullable": true
+          },
+          "regulation": {
+            "type": "string",
+            "description": "Przepis prawny.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiWinningDegreesModel": {
+        "type": "object",
+        "properties": {
+          "stackNumber": {
+            "type": "integer",
+            "description": "Stawka.",
+            "format": "int32"
+          },
+          "degree": {
+            "type": "integer",
+            "description": "Stopień.",
+            "format": "int32"
+          },
+          "winningAmount": {
+            "type": "number",
+            "description": "Kwota wygranej.",
+            "format": "double"
+          },
+          "numberTicketsWon": {
+            "type": "integer",
+            "description": "Liczba wygranych.",
+            "format": "int32"
+          },
+          "winningAmountSummary": {
+            "type": "number",
+            "description": "Łączna kwota wygranych.",
+            "format": "double",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.ViewModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identyfikator.",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string",
+            "description": "Opis.",
+            "nullable": true
+          },
+          "additionalDescription": {
+            "type": "string",
+            "description": "Dodatkowy opis.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "URL do loga.",
+            "nullable": true
+          },
+          "bannerUrl": {
+            "type": "string",
+            "description": "URL do baneru.",
+            "nullable": true
+          },
+          "bannerRectangularUrl": {
+            "type": "string",
+            "description": "URL do prostokątnego baneru.",
+            "nullable": true
+          },
+          "bannerSecondDesktopUrl": {
+            "type": "string",
+            "description": "URL do drugiego baneru - desktop.",
+            "nullable": true
+          },
+          "bannerTabletUrl": {
+            "type": "string",
+            "description": "URL do baneru - tablet.",
+            "nullable": true
+          },
+          "bannerMobileUrl": {
+            "type": "string",
+            "description": "URL do baneru - mobile.",
+            "nullable": true
+          },
+          "bannerBlurUrl": {
+            "type": "string",
+            "description": "URL do rozmytego baneru.",
+            "nullable": true
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64",
+            "nullable": true
+          },
+          "drawPrice": {
+            "type": "integer",
+            "description": "Cena.",
+            "format": "int64",
+            "nullable": true
+          },
+          "extensiveDescription": {
+            "type": "string",
+            "description": "Obszerny opis.",
+            "nullable": true
+          },
+          "summaryWinningAmount": {
+            "type": "integer",
+            "description": "Sumaryczna kwota do wygrania.",
+            "format": "int64",
+            "nullable": true
+          },
+          "dateCompletion": {
+            "type": "string",
+            "description": "Data zakończenia.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "gierkiWins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkaWinModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          },
+          "prizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiPrizeModel"
+            },
+            "description": "Nagrody.",
+            "nullable": true
+          },
+          "degrees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiWinningDegreesModel"
+            },
+            "description": "Stopnie wygranych.",
+            "nullable": true
+          },
+          "regulations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.GierkiRegulationsModel"
+            },
+            "description": "Przepisy prawne.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ListItemModel": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer.",
+            "format": "int64"
+          },
+          "drawPrice": {
+            "type": "integer",
+            "description": "Kwota zakupu.",
+            "format": "int64",
+            "nullable": true
+          },
+          "pictureUrl": {
+            "type": "string",
+            "description": "URL do obrazka.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identyfikator.",
+            "format": "int64"
+          },
+          "hit": {
+            "type": "boolean",
+            "description": "Określa czy gra jest HIT'em sprzedażowym."
+          },
+          "dateSales": {
+            "type": "string",
+            "description": "Data rozpoczęcia sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateSalesEnd": {
+            "type": "string",
+            "description": "Data zakończenia sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64",
+            "nullable": true
+          },
+          "popularity": {
+            "type": "integer",
+            "description": "Popularność.",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.RegulationModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nazwa",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "URL",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ViewModel": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Opis.",
+            "nullable": true
+          },
+          "dateSales": {
+            "type": "string",
+            "description": "Data sprzedaży.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "descriptionAdditional": {
+            "type": "string",
+            "description": "Dodatkowy opis.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nazwa.",
+            "nullable": true
+          },
+          "popularity": {
+            "type": "integer",
+            "description": "Popularność.",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status.",
+            "nullable": true
+          },
+          "number": {
+            "type": "integer",
+            "description": "Numer Zdrapki.",
+            "format": "int64"
+          },
+          "flashImageUrl": {
+            "type": "string",
+            "description": "URL do zdrapanej Zdrapki.",
+            "nullable": true
+          },
+          "scratchImageUrl": {
+            "type": "string",
+            "description": "URL do obrazka Zdrapki.",
+            "nullable": true
+          },
+          "legalNote": {
+            "type": "string",
+            "description": "Uwaga prawna.",
+            "nullable": true
+          },
+          "highestWin": {
+            "type": "integer",
+            "description": "Najwyższa wygrana.",
+            "format": "int64",
+            "nullable": true
+          },
+          "circulation": {
+            "type": "integer",
+            "description": "Nakład.",
+            "format": "int64",
+            "nullable": true
+          },
+          "drawPrice": {
+            "type": "integer",
+            "description": "Cena.",
+            "format": "int64",
+            "nullable": true
+          },
+          "currentWinningsPrizesPool": {
+            "type": "integer",
+            "description": "Aktualna pula nagród za wygrane.",
+            "format": "int64",
+            "nullable": true
+          },
+          "hit": {
+            "type": "boolean",
+            "description": "Określa czy gra jest HIT'em sprzedażowym."
+          },
+          "dateClaimsEnd": {
+            "type": "string",
+            "description": "Data zakończenia roszczeń.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "regulations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.RegulationModel"
+            },
+            "description": "Przepisy prawne.",
+            "nullable": true
+          },
+          "prizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ZdrapkiPrizeModel"
+            },
+            "description": "Nagrody.",
+            "nullable": true
+          },
+          "scratchWins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.HighestWins.ScratchWinModel"
+            },
+            "description": "Wygrane.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ZdrapkiPrizeModel": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "Numer.",
+            "format": "int32",
+            "nullable": true
+          },
+          "quantityLeft": {
+            "type": "integer",
+            "description": "Pozostała ilość.",
+            "format": "int32",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Ilość.",
+            "format": "int32",
+            "nullable": true
+          },
+          "prize": {
+            "type": "number",
+            "description": "Kwota wygranej.",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "stackTrace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.HighestWins.ExtendedListItemModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.V1.Models.HighestWins.ExtendedListItemModel"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.Lotteries.Gierki.ListItemModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.V1.Models.Lotteries.Gierki.ListItemModel"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.V1.Models.OfficeLottery.OfficeLotteryListItemModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.V1.Models.OfficeLottery.OfficeLotteryListItemModel"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.DrawResults.DrawResultsGrouped"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ListItemModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ListItemModel"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Pagination[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ListItemModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "showMorePossible": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ListItemModel"
+            },
+            "nullable": true
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ViewModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.EkspresLosy.ViewModel"
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.ViewModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Gierki.ViewModel"
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Resource[Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ViewModel]": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "$ref": "#/components/schemas/Ideo.Core.App.Areas.Open.Api.v1.Models.Lotteries.Zdrapki.ViewModel"
+          },
+          "meta": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.App.Extensions.Responses.Unprocessable": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ideo.Core.Data.Model.PrizeModel": {
+        "type": "object",
+        "properties": {
+          "prize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "prizeValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Microsoft.AspNetCore.Mvc.ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": {}
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "API Key token autoryzacyjny. Przykład: \"secret {key}\"",
+        "name": "secret",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Oddziały Totalizatora Sportowego",
+      "description": "Informacje na temat Oddziałów Totalizatora Sportowego."
+    },
+    {
+      "name": "Wygrane",
+      "description": "Informacje na temat wygranych."
+    },
+    {
+      "name": "Wyniki",
+      "description": "Informacje na temat wyników."
+    },
+    {
+      "name": "Statystyki",
+      "description": "Informacje na temat statystyk."
+    },
+    {
+      "name": "Ekspres Losy",
+      "description": "Informacje na temat ekspres losów."
+    },
+    {
+      "name": "Największe wygrane",
+      "description": "Informacje na temat największych wygranych."
+    },
+    {
+      "name": "Gierki",
+      "description": "Informacje na temat gierek."
+    },
+    {
+      "name": "Ogólne informacje",
+      "description": "Informacje na temat gier."
+    },
+    {
+      "name": "Punkty LOTTO",
+      "description": "Informacje na temat Odziałów Punktów LOTTO."
+    },
+    {
+      "name": "Zdrapki",
+      "description": "Informacje na temat zdrapek."
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Gry liczbowe i loterie pieniężne",
+      "tags": [
+        "Ogólne informacje",
+        "Wyniki",
+        "Wygrane",
+        "Największe wygrane",
+        "Statystyki",
+        "Gierki",
+        "Ekspres Losy",
+        "Zdrapki"
+      ]
+    },
+    {
+      "name": "Lokalizacje",
+      "tags": [
+        "Punkty LOTTO",
+        "Oddziały Totalizatora Sportowego"
+      ]
+    }
+  ]
+}

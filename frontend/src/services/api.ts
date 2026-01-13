@@ -2,7 +2,6 @@ import axios from 'axios'
 import type {
   Stats,
   Pick,
-  Draw,
   GenerateRequest,
   UploadResponse,
   SyncLottoResponse,
@@ -12,6 +11,8 @@ import type {
   PairTripleStats,
   PaginatedPicksResponse,
   PaginatedDrawsResponse,
+  IntegrityReport,
+  IntegrityFixResponse,
 } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
@@ -48,6 +49,12 @@ export const api = {
     return response.data
   },
 
+  // Add custom pick
+  async addCustomPick(numbers: number[]): Promise<Pick> {
+    const response = await apiClient.post<Pick>('/add-pick', { numbers })
+    return response.data
+  },
+
   // Get all picks
   async getPicks(limit: number = 50, offset: number = 0): Promise<PaginatedPicksResponse> {
     const response = await apiClient.get<PaginatedPicksResponse>(`/picks?limit=${limit}&offset=${offset}`)
@@ -69,6 +76,22 @@ export const api = {
   // Delete draw
   async deleteDraw(drawId: number): Promise<{ success: boolean; message: string }> {
     const response = await apiClient.delete(`/draws/${drawId}`)
+    return response.data
+  },
+
+  // Delete multiple picks
+  async deletePicksBatch(ids: number[]): Promise<{ success: boolean; deleted: number }> {
+    const response = await apiClient.delete('/picks/batch', {
+      data: { ids }
+    })
+    return response.data
+  },
+
+  // Delete multiple draws
+  async deleteDrawsBatch(ids: number[]): Promise<{ success: boolean; deleted: number }> {
+    const response = await apiClient.delete('/draws/batch', {
+      data: { ids }
+    })
     return response.data
   },
 
@@ -117,6 +140,37 @@ export const api = {
   // Import draws from JSON
   async importDraws(data: any): Promise<BackupResponse> {
     const response = await apiClient.post<BackupResponse>('/import-draws', data)
+    return response.data
+  },
+
+  // Verify data integrity
+  async verifyIntegrity(): Promise<IntegrityReport> {
+    const response = await apiClient.get<IntegrityReport>('/verify-integrity')
+    return response.data
+  },
+
+  // Fix data integrity issues
+  async fixIntegrity(): Promise<IntegrityFixResponse> {
+    const response = await apiClient.post<IntegrityFixResponse>('/fix-integrity')
+    return response.data
+  },
+
+  // Check missing dates against API
+  async checkMissingDates(dates: string[]): Promise<{
+    success: boolean
+    total_checked: number
+    results: Array<{
+      date: string
+      exists_in_db: boolean
+      exists_in_api: boolean
+      should_add: boolean
+      api_numbers?: number[]
+      api_draw_id?: number
+      weekday?: string
+      error?: string
+    }>
+  }> {
+    const response = await apiClient.post('/check-missing-dates', dates)
     return response.data
   },
 }

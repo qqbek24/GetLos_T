@@ -20,6 +20,8 @@ export interface Draw {
   key: string
   created_at: string
   source?: string
+  draw_system_id?: number
+  sequential_id?: number
 }
 
 export interface Pick {
@@ -95,3 +97,33 @@ export interface PaginatedDrawsResponse {
   per_page: number
   total_pages: number
 }
+
+export interface IntegrityIssue {
+  type: string
+  severity: string
+  description: string
+  details?: Record<string, any>
+}
+
+export interface IntegrityReport {
+  success: boolean
+  has_issues: boolean
+  total_draws: number
+  issues: IntegrityIssue[]
+  summary: string
+  lottery_start_date?: string
+  lottery_start_sequential_id?: number
+  api_reliable_start_date?: string
+  api_reliable_start_sequential_id?: number
+  historical_era_draws_count?: number
+}
+
+export interface IntegrityFixResponse {
+  success: boolean
+  duplicates_removed: number
+  gaps_filled: number
+  sequential_ids_fixed: number
+  message: string
+  error?: string
+}
+
