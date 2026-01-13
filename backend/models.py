@@ -27,10 +27,12 @@ class HistoricalDraw(Base):
     numbers = Column(JSON, nullable=False)  # 6 numbers as JSON array
     key = Column(String, unique=True, index=True, nullable=False)  # normalized key for uniqueness
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    source = Column(String, nullable=True)  # source of data (e.g., "manual_upload", "api", "csv")
+    source = Column(String, nullable=True)  # source of data (e.g., "manual_upload", "api", "csv", or draw date YYYY-MM-DD)
+    draw_system_id = Column(Integer, nullable=True, index=True)  # Lotto.pl API draw system ID (e.g., 7299)
+    sequential_id = Column(Integer, nullable=True, index=True)  # Sequential number starting from 1 for oldest draw (1957-01-27)
     
     def __repr__(self):
-        return f"<HistoricalDraw(id={self.id}, numbers={self.numbers})>"
+        return f"<HistoricalDraw(id={self.id}, numbers={self.numbers}, draw_id={self.draw_system_id})>"
 
 
 class Pick(Base):
@@ -52,3 +54,22 @@ class Pick(Base):
     
     def __repr__(self):
         return f"<Pick(id={self.id}, numbers={self.numbers}, strategy={self.strategy})>"
+
+
+class DrawSchedule(Base):
+    """
+    Draw schedule periods - defines which days of week draws occurred in different time periods
+    Example: 2007-2017 draws were on Wednesday, Friday, Sunday
+             2017-now draws are on Tuesday, Thursday, Saturday
+    """
+    __tablename__ = "draw_schedules"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    date_from = Column(String, nullable=False)  # Start date YYYY-MM-DD
+    date_to = Column(String, nullable=True)  # End date YYYY-MM-DD (null = ongoing)
+    weekdays = Column(JSON, nullable=False)  # List of weekday numbers: 0=Monday, 1=Tuesday, ..., 6=Sunday
+    description = Column(String, nullable=True)  # Optional description like "Modern era", "Historical period"
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    def __repr__(self):
+        return f"<DrawSchedule(id={self.id}, from={self.date_from}, to={self.date_to}, days={self.weekdays})>"
