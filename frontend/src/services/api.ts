@@ -13,6 +13,8 @@ import type {
   PaginatedDrawsResponse,
   IntegrityReport,
   IntegrityFixResponse,
+  DrawSchedule,
+  DrawScheduleCreate,
 } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
@@ -171,6 +173,38 @@ export const api = {
     }>
   }> {
     const response = await apiClient.post('/check-missing-dates', dates)
+    return response.data
+  },
+
+  // Draw Schedules Management
+  async getDrawSchedules(): Promise<DrawSchedule[]> {
+    const response = await apiClient.get<DrawSchedule[]>('/draw-schedules')
+    return response.data
+  },
+
+  async createDrawSchedule(schedule: DrawScheduleCreate): Promise<DrawSchedule> {
+    const response = await apiClient.post<DrawSchedule>('/draw-schedules', schedule)
+    return response.data
+  },
+
+  async updateDrawSchedule(id: number, schedule: DrawScheduleCreate): Promise<DrawSchedule> {
+    const response = await apiClient.put<DrawSchedule>(`/draw-schedules/${id}`, schedule)
+    return response.data
+  },
+
+  async deleteDrawSchedule(id: number): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.delete(`/draw-schedules/${id}`)
+    return response.data
+  },
+
+  async initializeDefaultSchedules(): Promise<{ success: boolean; message: string; count: number }> {
+    const response = await apiClient.post('/draw-schedules/initialize')
+    return response.data
+  },
+
+  // Check picks for hits in historical draws
+  async checkPickHits(): Promise<any> {
+    const response = await apiClient.post('/check-pick-hits')
     return response.data
   },
 }

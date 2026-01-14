@@ -33,42 +33,51 @@ export default function Layout({ children }: LayoutProps) {
       <AppBar
         position="static"
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          bgcolor: '#37474f',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
         }}
       >
-        <Toolbar>
-          <CasinoIcon sx={{ mr: 2, fontSize: 32 }} />
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h5" component="h1" fontWeight={700}>
-              GetLos_T
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              Aplikacja do losowania prognozowanych układów
-            </Typography>
-          </Box>
-        </Toolbar>
-        <Tabs
-          value={currentTab !== -1 ? currentTab : 0}
-          onChange={(_, newValue) => navigate(tabs[newValue].path)}
-          textColor="inherit"
-          indicatorColor="secondary"
-          sx={{
-            px: 2,
-            '& .MuiTab-root': {
-              color: 'rgba(255, 255, 255, 0.7)',
-              '&.Mui-selected': {
-                color: 'white',
-              },
-            },
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <Tab key={index} label={tab.label} />
-          ))}
-        </Tabs>
+        <Container maxWidth="xl">
+          <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3, md: 0 }, py: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <CasinoIcon sx={{ mr: 2, fontSize: 28 }} />
+              <Box>
+                <Typography variant="h6" component="h1" fontWeight={700}>
+                  GetLos_T
+                </Typography>
+                <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                  Aplikacja do losowania prognozowanych układów
+                </Typography>
+              </Box>
+            </Box>
+            <Tabs
+              value={currentTab !== -1 ? currentTab : 0}
+              onChange={(_, newValue) => navigate(tabs[newValue].path)}
+              textColor="inherit"
+              TabIndicatorProps={{
+                style: { backgroundColor: '#ff6f00' }
+              }}
+              sx={{
+                '& .MuiTab-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  minWidth: 90,
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  '&.Mui-selected': {
+                    color: '#ff6f00',
+                  },
+                },
+              }}
+            >
+              {tabs.map((tab, index) => (
+                <Tab key={index} label={tab.label} />
+              ))}
+            </Tabs>
+          </Toolbar>
+        </Container>
       </AppBar>
 
-      <Container maxWidth="lg" sx={{ flex: 1, py: 4 }}>
+      <Container maxWidth="xl" sx={{ flex: 1, py: 3 }}>
         {children}
       </Container>
 

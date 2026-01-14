@@ -81,7 +81,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_draws || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -98,7 +98,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_picks || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -112,7 +112,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.avg_sum.toFixed(1) || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">

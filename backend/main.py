@@ -19,12 +19,13 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 from db import get_db, init_db
-from models import HistoricalDraw, Pick, norm_key
+from models import HistoricalDraw, Pick, DrawSchedule, norm_key
 from schema import (
     Numbers, Stats, Strategy, GenerateRequest, 
     UploadResponse, DrawResponse, PickResponse, SyncLottoResponse,
     ManualDrawRequest, BackupResponse, BatchDeleteRequest,
-    IntegrityReport, IntegrityIssue, IntegrityFixResponse
+    IntegrityReport, IntegrityIssue, IntegrityFixResponse,
+    DrawScheduleCreate, DrawScheduleResponse
 )
 from lotto_api import (
     get_last_results_for_lotto, 
@@ -58,11 +59,49 @@ app.add_middleware(
 # Initialize database on startup
 @app.on_event("startup")
 def startup_event():
-    """Initialize database tables on application startup"""
+    """Initialize database tables and load schedules from YAML on startup"""
     init_db()
+    load_schedules_from_yaml()
 
 
-# ========== Helper Functions ==========
+def load_schedules_from_yaml():
+    """Load draw schedules from YAML file on startup"""
+    yaml_file = Path("draw_schedules.yaml")
+    
+    if not yaml_file.exists():
+        return
+    
+    try:
+        with open(yaml_file, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+        
+        if not data or 'schedules' not in data:
+            return
+        
+        db = next(get_db())
+        
+        # Check if schedules already exist
+        existing_count = db.query(DrawSchedule).count()
+        if existing_count > 0:
+            return
+        
+        # Add schedules from YAML
+        schedules_data = data['schedules']
+        for schedule_data in schedules_data:
+            schedule = DrawSchedule(
+                date_from=schedule_data['date_from'],
+                date_to=schedule_data.get('date_to'),
+                weekdays=schedule_data['weekdays'],
+                description=schedule_data.get('description')
+            )
+            db.add(schedule)
+        
+        db.commit()
+    except Exception as e:
+        print(f"[!] Blad przy ladowaniu harmonogramow z YAML: {e}")
+
+
+
 
 def parse_csv_bytes(b: bytes) -> List[tuple]:
     """
@@ -1050,6 +1089,36 @@ def import_draws_from_json(draws_data: dict, db: Session = Depends(get_db)):
         )
 
 
+def get_expected_weekdays_for_date(date_obj: datetime.date, db: Session) -> List[int]:
+    """
+    Get expected weekdays for draws based on date and configured schedules
+    Returns list of weekday numbers (0=Mon, 1=Tue, ..., 6=Sun)
+    If no schedule found, returns default [1, 3, 5] (Tue, Thu, Sat)
+    """
+    schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
+    
+    if not schedules:
+        # Default: Tue, Thu, Sat
+        return [1, 3, 5]
+    
+    date_str = str(date_obj)
+    
+    # Find matching schedule for this date
+    for schedule in schedules:
+        from_date = schedule.date_from
+        to_date = schedule.date_to or "9999-12-31"  # No end = ongoing
+        
+        if from_date <= date_str <= to_date:
+            return schedule.weekdays
+    
+    # If before all schedules, use first schedule's days
+    if date_str < schedules[0].date_from:
+        return schedules[0].weekdays
+    
+    # If after all schedules, use last schedule's days
+    return schedules[-1].weekdays
+
+
 @app.get("/verify-integrity", response_model=IntegrityReport)
 def verify_integrity(db: Session = Depends(get_db)):
     """
@@ -1128,6 +1197,7 @@ def verify_integrity(db: Session = Depends(get_db)):
     
     # 4. Check for missing dates (gaps in draw schedule)
     # Only check from 2007 onwards (when API has reliable data)
+    # Uses configured draw schedules to determine expected days
     API_RELIABLE_START_DATE_CHECK = datetime(2007, 1, 1).date()
     
     draws_with_dates = db.query(HistoricalDraw).filter(
@@ -1142,11 +1212,12 @@ def verify_integrity(db: Session = Depends(get_db)):
                 min_date = max(min(dates), API_RELIABLE_START_DATE_CHECK)
                 max_date = max(dates)
                 
-                # Generate expected Lotto dates (Tue, Thu, Sat)
+                # Generate expected dates using dynamic schedules
                 expected_dates = []
                 current = min_date
                 while current <= max_date:
-                    if current.weekday() in [1, 3, 5]:  # Tue=1, Thu=3, Sat=5
+                    expected_weekdays = get_expected_weekdays_for_date(current, db)
+                    if current.weekday() in expected_weekdays:
                         expected_dates.append(current)
                     current += timedelta(days=1)
                 
@@ -1156,6 +1227,26 @@ def verify_integrity(db: Session = Depends(get_db)):
                 if missing_dates:
                     # Include full list of missing dates for detailed view
                     missing_dates_str = [str(d) for d in missing_dates]
+
+                    # Add harmonogram context for missing dates
+                    # Group missing dates by applicable harmonogram
+                    schedule_contexts = []
+                    for missing_date in missing_dates:
+                        schedule = db.query(DrawSchedule).filter(
+                            DrawSchedule.date_from <= missing_date,
+                            DrawSchedule.date_to >= missing_date
+                        ).first()
+
+                        if schedule:
+                            weekdays_names = []
+                            for wd in sorted(schedule.weekdays):
+                                wd_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][wd]
+                                weekdays_names.append(wd_name[:3])
+
+                            context = f"Period {schedule.date_from}-{schedule.date_to}: scheduled {', '.join(weekdays_names)}"
+                            if context not in schedule_contexts:
+                                schedule_contexts.append(context)
+
                     issues.append(IntegrityIssue(
                         type="missing_date",
                         severity="warning",
@@ -1164,7 +1255,8 @@ def verify_integrity(db: Session = Depends(get_db)):
                             "count": len(missing_dates),
                             "first_missing": str(missing_dates[0]),
                             "last_missing": str(missing_dates[-1]),
-                            "missing_dates": missing_dates_str
+                            "missing_dates": missing_dates_str,
+                            "schedule_context": schedule_contexts
                         }
                     ))
         except ValueError:
@@ -1382,11 +1474,12 @@ async def fix_integrity(db: Session = Depends(get_db)):
                     min_date = max(min(dates), API_RELIABLE_START_DATE)
                     max_date = max(dates)
                     
-                    # Generate missing dates
+                    # Generate missing dates using dynamic schedules
                     expected_dates = []
                     current = min_date
                     while current <= max_date:
-                        if current.weekday() in [1, 3, 5]:
+                        expected_weekdays = get_expected_weekdays_for_date(current, db)
+                        if current.weekday() in expected_weekdays:
                             expected_dates.append(current)
                         current += timedelta(days=1)
                     
@@ -1467,6 +1560,140 @@ async def fix_integrity(db: Session = Depends(get_db)):
             message="Fix failed",
             error=str(e)
         )
+
+
+# ========== Draw Schedule Management ==========
+
+@app.get("/draw-schedules", response_model=List[DrawScheduleResponse])
+def list_draw_schedules(db: Session = Depends(get_db)):
+    """Get all configured draw schedules ordered by date_from"""
+    schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
+    return schedules
+
+
+@app.post("/draw-schedules", response_model=DrawScheduleResponse)
+def create_draw_schedule(schedule: DrawScheduleCreate, db: Session = Depends(get_db)):
+    """Create new draw schedule period"""
+    new_schedule = DrawSchedule(
+        date_from=schedule.date_from,
+        date_to=schedule.date_to,
+        weekdays=schedule.weekdays,
+        description=schedule.description
+    )
+    db.add(new_schedule)
+    db.commit()
+    db.refresh(new_schedule)
+    return new_schedule
+
+
+@app.put("/draw-schedules/{schedule_id}", response_model=DrawScheduleResponse)
+def update_draw_schedule(schedule_id: int, schedule: DrawScheduleCreate, db: Session = Depends(get_db)):
+    """Update existing draw schedule"""
+    existing = db.query(DrawSchedule).filter_by(id=schedule_id).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    
+    existing.date_from = schedule.date_from
+    existing.date_to = schedule.date_to
+    existing.weekdays = schedule.weekdays
+    existing.description = schedule.description
+    db.commit()
+    db.refresh(existing)
+    return existing
+
+
+@app.delete("/draw-schedules/{schedule_id}")
+def delete_draw_schedule(schedule_id: int, db: Session = Depends(get_db)):
+    """Delete draw schedule"""
+    schedule = db.query(DrawSchedule).filter_by(id=schedule_id).first()
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    
+    db.delete(schedule)
+    db.commit()
+    return {"success": True, "message": f"Schedule {schedule_id} deleted"}
+
+
+@app.post("/draw-schedules/initialize")
+def initialize_default_schedules(db: Session = Depends(get_db)):
+    """Initialize with default Lotto schedule (current: Tue, Thu, Sat)"""
+    # Check if any schedules exist
+    existing_count = db.query(DrawSchedule).count()
+    if existing_count > 0:
+        return {"success": False, "message": "Schedules already exist", "count": existing_count}
+    
+    # Add default schedule for modern era (2017-present: Tue, Thu, Sat)
+    default_schedule = DrawSchedule(
+        date_from="2017-01-01",
+        date_to=None,  # ongoing
+        weekdays=[1, 3, 5],  # Tuesday, Thursday, Saturday
+        description="Era współczesna (wt, czw, sob)"
+    )
+    db.add(default_schedule)
+    db.commit()
+    
+    return {"success": True, "message": "Default schedule created", "count": 1}
+
+
+@app.post("/check-pick-hits")
+def check_pick_hits(db: Session = Depends(get_db)):
+    """
+    Check all picks against historical draws to see if any numbers matched.
+    Returns list of picks with their best matches in history.
+    """
+    from collections import defaultdict
+    
+    picks = db.query(Pick).all()
+    draws = db.query(HistoricalDraw).filter(HistoricalDraw.source.isnot(None)).all()
+    
+    results = []
+    
+    for pick in picks:
+        pick_numbers = set(pick.numbers)
+        best_match = {
+            "pick_id": pick.id,
+            "pick_numbers": pick.numbers,
+            "pick_key": pick.key,
+            "pick_strategy": pick.strategy,
+            "pick_created_at": pick.created_at.isoformat(),
+            "best_hit_count": 0,
+            "matches": []
+        }
+        
+        # Check against all draws
+        for draw in draws:
+            draw_numbers = set(draw.numbers)
+            hit_count = len(pick_numbers & draw_numbers)
+            
+            if hit_count >= 3:  # Only report 3+ matches
+                match_info = {
+                    "draw_id": draw.id,
+                    "draw_numbers": draw.numbers,
+                    "draw_date": draw.source,
+                    "draw_sequential_id": draw.sequential_id,
+                    "hit_count": hit_count,
+                    "matched_numbers": sorted(list(pick_numbers & draw_numbers))
+                }
+                best_match["matches"].append(match_info)
+                
+                if hit_count > best_match["best_hit_count"]:
+                    best_match["best_hit_count"] = hit_count
+        
+        # Sort matches by hit_count descending, then by date descending
+        best_match["matches"].sort(key=lambda x: (x["hit_count"], x["draw_date"]), reverse=True)
+        
+        results.append(best_match)
+    
+    # Sort results by best hit count descending
+    results.sort(key=lambda x: x["best_hit_count"], reverse=True)
+    
+    return {
+        "success": True,
+        "total_picks": len(picks),
+        "total_draws": len(draws),
+        "picks_with_hits": len([r for r in results if r["best_hit_count"] >= 3]),
+        "results": results
+    }
 
 
 if __name__ == "__main__":

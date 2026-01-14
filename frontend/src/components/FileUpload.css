@@ -3,28 +3,28 @@
 }
 
 .dropzone {
-  border: 2px dashed #ccc;
+  border: 1.5px dashed #546e7a;
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #fafafa;
+  background: #37474f;
 }
 
 .dropzone:hover {
-  border-color: #667eea;
-  background: #f0f0ff;
+  border-color: #ff6f00;
+  background: #37474f;
 }
 
 .dropzone.active {
-  border-color: #667eea;
-  background: #e8e8ff;
+  border-color: #ff6f00;
+  background: #37474f;
 }
 
 .dropzone.error {
-  border-color: #dc3545;
-  background: #fff5f5;
+  border-color: #e53935;
+  background: #37474f;
 }
 
 .dropzone-content {
@@ -40,27 +40,28 @@
 }
 
 .upload-icon svg {
-  color: #667eea;
+  color: #ff6f00;
   transition: all 0.3s ease;
 }
 
 .dropzone:hover .upload-icon svg {
-  opacity: 0.85;
+  opacity: 1;
+  color: #ff9800;
 }
 
 .dropzone.active .upload-icon svg {
-  color: #28a745;
+  color: #ff6f00;
   transform: scale(1.1);
 }
 
 .dropzone p {
   margin: 0;
-  color: #666;
+  color: #b0bec5;
 }
 
 .file-info {
   font-size: 0.875rem;
-  color: #999;
+  color: #b0bec5;
 }
 
 .upload-error {
@@ -78,7 +79,7 @@
 
 .uploaded-files h4 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: #ffffff;
   font-size: 1rem;
 }
 
@@ -92,11 +93,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: white;
-  border: 1px solid #e1e5e9;
+  padding: 0.75rem;
+  background: #455a64;
+  border: 1px solid #546e7a;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .file-info {

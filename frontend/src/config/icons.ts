@@ -34,6 +34,8 @@ import {
   DeleteSweep,
   ContentCopy,
   Sync,
+  Edit,
+  Search,
   
   // Trendy i status
   TrendingUp,
@@ -81,6 +83,8 @@ export const ICONS = {
   DeleteAll: DeleteSweep,    // Usuwanie wszystkich
   Copy: ContentCopy,         // Kopiowanie do schowka
   Sync: Sync,                // Synchronizacja z API
+  Edit: Edit,                // Edycja
+  Search: Search,            // Wyszukiwanie/sprawdzanie
   
   // === TRENDY I STATUS ===
   Hot: TrendingUp,           // Hot numbers (często występujące)

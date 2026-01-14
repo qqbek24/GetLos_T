@@ -14,10 +14,10 @@ export default function NumbersBall({ numbers, size = 'medium', gradient = 'defa
   }
 
   const gradients = {
-    default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    hot: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
-    cold: 'linear-gradient(135deg, #4ecdc4 0%, #44a8a8 100%)',
-    gold: 'linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%)',
+    default: 'linear-gradient(135deg, #78909c 0%, #546e7a 100%)', // Szary jak tekst
+    hot: 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%)',      // Czerwony
+    cold: 'linear-gradient(135deg, #0288d1 0%, #01579b 100%)',     // Niebieski
+    gold: 'linear-gradient(135deg, #f57c00 0%, #e65100 100%)',     // Pomarańczowy
   }
 
   return (
