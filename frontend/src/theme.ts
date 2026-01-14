@@ -185,8 +185,6 @@ const theme = createTheme({
         root: {
           fontWeight: 600,
           fontSize: '0.75rem',
-        },
-        colorDefault: {
           backgroundColor: '#455a64',
           color: '#b0bec5',
         },
