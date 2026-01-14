@@ -1,5 +1,6 @@
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { SxProps, Theme } from '@mui/material'
+import { SxProps, Theme, useTheme } from '@mui/material'
+import './MuiDatePickerField.css'
 
 interface MuiDatePickerFieldProps {
   label: string
@@ -26,6 +27,8 @@ export default function MuiDatePickerField({
   size = 'small',
   sx,
 }: MuiDatePickerFieldProps) {
+  const theme = useTheme()
+  
   // Convert string (YYYY-MM-DD) to Date object
   const dateValue = value ? new Date(value) : null
 
@@ -53,13 +56,26 @@ export default function MuiDatePickerField({
           margin: 'normal',
           size,
           required,
+          className: 'mui-date-picker-field',
           sx: {
             width: width || '100%',
+            boxSizing: 'border-box',
+            // Override hover/focus colors from CSS with theme colors
+            '& :hover fieldset': {
+              borderColor: error ? theme.palette.error.main : `${theme.palette.primary.main} !important`,
+            },
+            '& .Mui-focused fieldset': {
+              borderColor: error ? theme.palette.error.main : `${theme.palette.primary.main} !important`,
+              borderWidth: '2px !important',
+            },
+            '& .Mui-focused:hover fieldset': {
+              borderColor: error ? theme.palette.error.main : `${theme.palette.primary.main} !important`,
+            },
             ...sx,
           },
           InputLabelProps: {
             shrink: true,
-            sx: required ? { '& .MuiFormLabel-asterisk': { color: '#dc3545' } } : undefined,
+            sx: required ? { '& .MuiFormLabel-asterisk': { color: theme.palette.error.main } } : undefined,
           },
         },
         actionBar: { actions: ['today', 'clear'] },
