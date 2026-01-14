@@ -9,7 +9,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
-import csv, io, random, math, os
+import csv, io, random, math, os, json
 import yaml
 from pathlib import Path
 from collections import Counter
@@ -416,13 +416,84 @@ def root():
 @app.post("/upload-csv", response_model=UploadResponse)
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
-    Upload CSV file with historical lottery draws
-    Supported formats:
+    Upload CSV or JSON file with historical lottery draws
+    
+    CSV formats supported:
     - Just numbers: 1,2,3,4,5,6
     - With date: 2024-01-15,1,2,3,4,5,6
+    
+    JSON format (backup):
+    {
+      "draws": [
+        {"numbers": [1,2,3,4,5,6], "date": "2024-01-15"},
+        ...
+      ]
+    }
     """
-    if not file.filename.lower().endswith(".csv"):
-        raise HTTPException(400, "File must be CSV format")
+    filename_lower = file.filename.lower()
+    
+    # Check if JSON backup file
+    if filename_lower.endswith(".json"):
+        data = await file.read()
+        try:
+            backup_data = json.loads(data)
+            if not isinstance(backup_data, dict) or "draws" not in backup_data:
+                raise HTTPException(400, "Invalid JSON format. Expected: {\"draws\": [...]}")
+            
+            draws = backup_data.get("draws", [])
+            if not draws:
+                raise HTTPException(400, "No draws found in JSON backup")
+            
+            inserted = 0
+            duplicates = 0
+            keys_seen = set()
+            
+            for draw in draws:
+                nums = draw.get("numbers")
+                date_str = draw.get("date")
+                
+                if not nums or len(nums) != 6:
+                    continue
+                
+                nums_sorted = tuple(sorted(nums))
+                k = norm_key(nums_sorted)
+                
+                if k in keys_seen:
+                    duplicates += 1
+                    continue
+                
+                keys_seen.add(k)
+                
+                # Check if already exists in database
+                existing = db.query(HistoricalDraw).filter_by(key=k).first()
+                if not existing:
+                    draw_data = {
+                        "numbers": list(nums_sorted),
+                        "key": k,
+                        "source": date_str if date_str else "json_backup",
+                        "draw_system_id": None
+                    }
+                    db.add(HistoricalDraw(**draw_data))
+                    inserted += 1
+                else:
+                    duplicates += 1
+            
+            db.commit()
+            
+            return UploadResponse(
+                success=True,
+                total_processed=len(draws),
+                new_draws=inserted,
+                duplicates=duplicates,
+                message=f"Successfully imported {inserted} new draws from JSON backup, {duplicates} duplicates skipped"
+            )
+            
+        except json.JSONDecodeError:
+            raise HTTPException(400, "Invalid JSON file")
+    
+    # CSV handling
+    if not filename_lower.endswith(".csv"):
+        raise HTTPException(400, "File must be CSV or JSON format")
     
     data = await file.read()
     rows = parse_csv_bytes(data)

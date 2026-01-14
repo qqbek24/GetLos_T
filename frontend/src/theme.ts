@@ -204,21 +204,24 @@ const theme = createTheme({
           borderRadius: 4,
         },
         standardSuccess: {
-          backgroundColor: '#1b5e20',
+          backgroundColor: 'rgba(76, 175, 80, 0.15)',
           color: '#a5d6a7',
+          border: '1px solid rgba(76, 175, 80, 0.3)',
         },
         standardInfo: {
-          backgroundColor: '#37474f',
+          backgroundColor: 'rgba(55, 71, 79, 0.8)',
           color: '#b0bec5',
           border: '1px solid #546e7a',
         },
         standardWarning: {
-          backgroundColor: '#e65100',
+          backgroundColor: 'rgba(255, 152, 0, 0.15)',
           color: '#ffcc80',
+          border: '1px solid rgba(255, 152, 0, 0.3)',
         },
         standardError: {
-          backgroundColor: '#b71c1c',
+          backgroundColor: 'rgba(229, 57, 53, 0.15)',
           color: '#ef9a9a',
+          border: '1px solid rgba(229, 57, 53, 0.3)',
         },
       },
     },

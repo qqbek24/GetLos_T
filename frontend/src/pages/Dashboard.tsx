@@ -134,7 +134,7 @@ export default function Dashboard() {
             <FolderOpen fontSize="small" /> {getLabel('dashboard.uploadSection.title', 'Wgraj Historię Losowań')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {getLabel('dashboard.uploadSection.description', 'Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49)')}
+            {getLabel('dashboard.uploadSection.description', 'Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49) lub JSON backup')}
           </Typography>
 
           <FileUpload

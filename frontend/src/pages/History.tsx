@@ -257,6 +257,10 @@ export default function History() {
         setTimeout(() => setSyncResult(null), 3000)
       }
     },
+    onError: () => {
+      // Silent fail - prawdopodobnie dane zostały usunięte podczas sprawdzania
+      setIntegrityReport(null)
+    },
   })
 
   const fixIntegrityMutation = useMutation({
@@ -1109,9 +1113,9 @@ export default function History() {
                                         fontSize: '0.9rem',
                                         fontWeight: 'bold',
                                         background: isMatched 
-                                          ? 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)'
-                                          : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        boxShadow: isMatched ? '0 0 8px rgba(76, 175, 80, 0.6)' : '0 2px 4px rgba(0,0,0,0.2)',
+                                          ? 'linear-gradient(135deg, #ff6f00 0%, #f57c00 100%)'
+                                          : 'linear-gradient(135deg, #546e7a 0%, #455a64 100%)',
+                                        boxShadow: isMatched ? '0 0 8px rgba(255, 111, 0, 0.6)' : '0 2px 4px rgba(0,0,0,0.2)',
                                       }}
                                     >
                                       {num}
@@ -1440,28 +1444,45 @@ export default function History() {
                             key={idx}
                             sx={{ 
                               bgcolor: result.exists_in_api 
-                                ? 'success.light' 
+                                ? 'rgba(76, 175, 80, 0.08)' // Delikatny zielony
                                 : result.weekday === 'Saturday' || result.weekday === 'Tuesday' || result.weekday === 'Thursday'
-                                  ? 'error.light'
-                                  : 'grey.100'
+                                  ? 'rgba(229, 57, 53, 0.08)' // Delikatny czerwony
+                                  : 'transparent',
+                              '&:hover': {
+                                bgcolor: result.exists_in_api 
+                                  ? 'rgba(76, 175, 80, 0.15)' 
+                                  : result.weekday === 'Saturday' || result.weekday === 'Tuesday' || result.weekday === 'Thursday'
+                                    ? 'rgba(229, 57, 53, 0.15)'
+                                    : 'rgba(255, 111, 0, 0.08)',
+                              }
                             }}
                           >
                             <TableCell>{result.date}</TableCell>
                             <TableCell>{result.weekday || 'N/A'}</TableCell>
-                            <TableCell>{result.exists_in_db ? <Chip label="TAK" color="success" size="small" /> : <Chip label="NIE" color="error" size="small" />}</TableCell>
-                            <TableCell>{result.exists_in_api ? <Chip label="TAK" color="success" size="small" /> : <Chip label="NIE" color="error" size="small" />}</TableCell>
+                            <TableCell>
+                              {result.exists_in_db 
+                                ? <Chip label="TAK" size="small" sx={{ bgcolor: 'rgba(76, 175, 80, 0.2)', color: '#a5d6a7', fontWeight: 600 }} /> 
+                                : <Chip label="NIE" size="small" sx={{ bgcolor: 'rgba(229, 57, 53, 0.2)', color: '#ef9a9a', fontWeight: 600 }} />
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {result.exists_in_api 
+                                ? <Chip label="TAK" size="small" sx={{ bgcolor: 'rgba(76, 175, 80, 0.2)', color: '#a5d6a7', fontWeight: 600 }} /> 
+                                : <Chip label="NIE" size="small" sx={{ bgcolor: 'rgba(229, 57, 53, 0.2)', color: '#ef9a9a', fontWeight: 600 }} />
+                              }
+                            </TableCell>
                             <TableCell>
                               {result.api_numbers ? result.api_numbers.join(', ') : '-'}
                             </TableCell>
                             <TableCell>
                               {result.should_add && (
-                                <Chip label="Dodaj" color="success" size="small" />
+                                <Chip label="Dodaj" size="small" sx={{ bgcolor: 'rgba(76, 175, 80, 0.2)', color: '#a5d6a7', fontWeight: 600 }} />
                               )}
                               {!result.exists_in_api && (
-                                <Chip label="Nie było" color="default" size="small" />
+                                <Chip label="Nie było" size="small" sx={{ bgcolor: 'rgba(144, 164, 174, 0.2)', color: '#b0bec5', fontWeight: 600 }} />
                               )}
                               {result.exists_in_db && (
-                                <Chip label="OK" color="info" size="small" />
+                                <Chip label="OK" size="small" sx={{ bgcolor: 'rgba(66, 165, 245, 0.2)', color: '#90caf9', fontWeight: 600 }} />
                               )}
                             </TableCell>
                           </TableRow>
