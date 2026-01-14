@@ -1287,16 +1287,11 @@ export default function History() {
               helperText="Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami"
             />
             
-            <TextField
-              fullWidth
+            <MuiDatePickerField
               label="Data losowania (opcjonalnie)"
-              type="date"
               value={manualDate}
-              onChange={(e) => setManualDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              helperText="Format: RRRR-MM-DD"
+              onChange={(v) => setManualDate(v || '')}
+              format="dd.MM.yyyy"
             />
           </Box>
         </DialogContent>
@@ -1588,23 +1583,19 @@ export default function History() {
               Dni: 0=Poniedziałek, 1=Wtorek, 2=Środa, 3=Czwartek, 4=Piątek, 5=Sobota, 6=Niedziela
             </Alert>
             
-            <TextField
-              fullWidth
+            <MuiDatePickerField
               label="Data początkowa"
-              type="date"
               value={scheduleDateFrom}
-              onChange={(e) => setScheduleDateFrom(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              required
+              onChange={(v) => setScheduleDateFrom(v || '')}
+              format="dd.MM.yyyy"
+              error={!scheduleDateFrom}
             />
             
-            <TextField
-              fullWidth
+            <MuiDatePickerField
               label="Data końcowa (puste = obecnie)"
-              type="date"
               value={scheduleDateTo}
-              onChange={(e) => setScheduleDateTo(e.target.value)}
-              InputLabelProps={{ shrink: true }}
+              onChange={(v) => setScheduleDateTo(v || '')}
+              format="dd.MM.yyyy"
               helperText="Pozostaw puste jeśli harmonogram obowiązuje do dziś"
             />
             

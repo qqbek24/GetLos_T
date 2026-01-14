@@ -37,7 +37,7 @@ export default function Layout({ children }: LayoutProps) {
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3, md: 0 }, py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <CasinoIcon sx={{ mr: 2, fontSize: 28 }} />
@@ -77,7 +77,7 @@ export default function Layout({ children }: LayoutProps) {
         </Container>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ flex: 1, py: 3 }}>
+      <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
         {children}
       </Container>
 
