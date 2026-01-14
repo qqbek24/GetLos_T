@@ -110,12 +110,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
     onDrop,
     accept: {
       'text/csv': ['.csv'],
+      'application/json': ['.json'],
       'application/pdf': ['.pdf'],
       'image/jpeg': ['.jpg', '.jpeg'],
       'image/png': ['.png']
     },
     maxSize,
-    multiple: false // Dla CSV potrzebujemy tylko jednego pliku
+    multiple: false // Dla CSV/JSON potrzebujemy tylko jednego pliku
   })
 
   const formatFileSize = (bytes: number): string => {
@@ -190,10 +191,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     <div className="file-icon">
                       {fileItem.type === 'text/csv' ? (
                         <ICONS.DescriptionIcon sx={{ fontSize: 32, color: '#4caf50' }} />
+                      ) : fileItem.type === 'application/json' ? (
+                        <ICONS.AttachFileOutlinedIcon sx={{ fontSize: 32, color: '#ff6f00' }} />
                       ) : fileItem.type === 'application/pdf' ? (
                         <ICONS.DescriptionIcon sx={{ fontSize: 32, color: '#d32f2f' }} />
                       ) : (
-                        <ICONS.AttachFileOutlinedIcon sx={{ fontSize: 32, color: '#667eea' }} />
+                        <ICONS.AttachFileOutlinedIcon sx={{ fontSize: 32, color: '#b0bec5' }} />
                       )}
                     </div>
                   )}

@@ -127,3 +127,18 @@ export interface IntegrityFixResponse {
   error?: string
 }
 
+export interface DrawSchedule {
+  id: number
+  date_from: string
+  date_to: string | null
+  weekdays: number[]
+  description: string | null
+  created_at: string
+}
+
+export interface DrawScheduleCreate {
+  date_from: string
+  date_to?: string | null
+  weekdays: number[]
+  description?: string | null
+}

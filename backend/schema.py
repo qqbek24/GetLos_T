@@ -1,7 +1,7 @@
 """
 Pydantic schemas for request/response validation
 """
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, field_serializer
 from typing import Literal, List, Optional
 from datetime import datetime
 
@@ -185,7 +185,40 @@ class IntegrityFixResponse(BaseModel):
     gaps_filled: int
     sequential_ids_fixed: int
     message: str
-    error: Optional[str] = None
+
+
+class DrawScheduleCreate(BaseModel):
+    """Request to create/update draw schedule"""
+    date_from: str  # YYYY-MM-DD
+    date_to: Optional[str] = None  # YYYY-MM-DD or null for ongoing
+    weekdays: List[int] = Field(..., min_length=1, max_length=7)  # 0=Mon, 1=Tue, ..., 6=Sun
+    description: Optional[str] = None
+    
+    @field_validator("weekdays")
+    @classmethod
+    def validate_weekdays(cls, v):
+        if not all(0 <= day <= 6 for day in v):
+            raise ValueError("Weekdays must be integers 0-6 (0=Monday, 6=Sunday)")
+        if len(set(v)) != len(v):
+            raise ValueError("Weekdays must be unique")
+        return sorted(v)
+
+
+class DrawScheduleResponse(BaseModel):
+    """Response with draw schedule info"""
+    id: int
+    date_from: str
+    date_to: Optional[str]
+    weekdays: List[int]
+    description: Optional[str]
+    created_at: datetime
+    
+    @field_serializer('created_at')
+    def serialize_datetime(self, dt: datetime, _info):
+        return dt.isoformat()
+    
+    class Config:
+        from_attributes = True
 
 
 # Strategy type
