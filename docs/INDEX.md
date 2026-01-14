@@ -12,6 +12,24 @@
 
 ---
 
+## Dokumentacja Techniczna
+
+### Harmonogramy Losowań
+| Dokument | Opis | Lokalizacja |
+|----------|------|-------------|
+| [ANALYZE_SCHEDULES.md](ANALYZE_SCHEDULES.md) | Analiza harmonogramów 1957-2026 | docs/ |
+| [SCHEDULES_SOLUTION.py](SCHEDULES_SOLUTION.py) | Podsumowanie rozwiązania | docs/ |
+| [scripts/analyze_schedules.py](scripts/analyze_schedules.py) | Skrypt analizy danych | docs/scripts/ |
+| [scripts/add_all_schedules.py](scripts/add_all_schedules.py) | Dodawanie harmonogramów do API | docs/scripts/ |
+| [backend/draw_schedules.yaml](../backend/draw_schedules.yaml) | 6 harmonogramów (auto-load) | backend/ |
+
+**Kluczowe informacje:**
+- 6 okresów harmonogramów (1957-2026)
+- Automatyczne ładowanie z YAML przy starcie
+- Weryfikacja integralności z uwzględnieniem harmonogramów
+
+---
+
 ## Dokumentacja Modułów
 
 ### Backend
