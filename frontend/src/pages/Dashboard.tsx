@@ -77,7 +77,7 @@ export default function Dashboard() {
         </Box>
       ) : (
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
@@ -94,7 +94,7 @@ export default function Dashboard() {
             </Card>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
@@ -108,7 +108,7 @@ export default function Dashboard() {
             </Card>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
