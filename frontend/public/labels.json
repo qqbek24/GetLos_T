@@ -38,7 +38,7 @@
   "fileUpload": {
     "dragDrop": "Przeciągnij i upuść pliki tutaj, lub kliknij aby wybrać pliki",
     "dropHere": "Upuść pliki tutaj...",
-    "supported": "Obsługiwane: PDF, JPG, PNG, CSV (max {{maxSize}}MB każdy, {{maxFiles}} plików)",
+    "supported": "Obsługiwane: CSV (max {{maxSize}}MB każdy, {{maxFiles}} plików)",
     "uploadedFiles": "Wgrane pliki ({{count}}/{{maxFiles}})",
     "fileTooLarge": "Plik jest za duży. Maksymalny rozmiar to {{maxSize}}MB",
     "invalidFileType": "Nieprawidłowy typ pliku. Wgraj tylko CSV pliki.",

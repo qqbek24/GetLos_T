@@ -1,0 +1,29 @@
+schedules:
+  - date_from: "1957-01-27"
+    date_to: "1984-03-24"
+    weekdays: [6]
+    description: "Niedziela (1957-1984)"
+  
+  - date_from: "1984-03-25"
+    date_to: "1984-06-23"
+    weekdays: [5, 6]
+    description: "Sobota, Niedziela (1984-lato)"
+  
+  - date_from: "1984-06-24"
+    date_to: "1991-09-14"
+    weekdays: [5]
+    description: "Sobota (1984-1991)"
+  
+  - date_from: "1991-09-15"
+    date_to: "2007-08-25"
+    weekdays: [2, 5]
+    description: "Środa, Sobota (1991-2007)"
+  
+  - date_from: "2007-08-26"
+    date_to: "2007-11-24"
+    weekdays: [1, 2, 3, 5]
+    description: "Wtorek, Środa, Czwartek, Sobota (2007-lato)"
+  
+  - date_from: "2007-11-25"
+    weekdays: [1, 3, 5]
+    description: "Wtorek, Czwartek, Sobota (2007-bieżący)"

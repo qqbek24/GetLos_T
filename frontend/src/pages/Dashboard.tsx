@@ -31,10 +31,12 @@ export default function Dashboard() {
     queryFn: api.getStats,
   })
 
-  const { data: recentPicks } = useQuery({
+  const { data: recentPicksResponse } = useQuery({
     queryKey: ['recentPicks'],
     queryFn: () => api.getPicks(5),
   })
+
+  const recentPicks = recentPicksResponse?.items || []
 
   const handleFilesChange = (files: UploadedFile[]) => {
     setUploadedFiles(files)
@@ -79,7 +81,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_draws || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -96,7 +98,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_picks || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -110,7 +112,7 @@ export default function Dashboard() {
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} color="secondary">
+                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.avg_sum.toFixed(1) || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -132,7 +134,7 @@ export default function Dashboard() {
             <FolderOpen fontSize="small" /> {getLabel('dashboard.uploadSection.title', 'Wgraj Historię Losowań')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {getLabel('dashboard.uploadSection.description', 'Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49)')}
+            {getLabel('dashboard.uploadSection.description', 'Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49) lub JSON backup')}
           </Typography>
 
           <FileUpload

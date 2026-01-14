@@ -5,7 +5,7 @@ Official API documentation: https://developers.lotto.pl/
 import httpx
 import os
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,9 +19,12 @@ class LottoAPIError(Exception):
     pass
 
 
-async def get_last_results_for_lotto() -> List[Dict]:
+async def get_last_results_for_lotto(limit: int = 10) -> List[Dict]:
     """
     Fetch the latest Lotto results from the official API
+    
+    Args:
+        limit: Number of recent results to fetch (default 10)
     
     Returns:
         List of draw results with structure:
@@ -49,6 +52,8 @@ async def get_last_results_for_lotto() -> List[Dict]:
         "accept": "application/json",
         "secret": LOTTO_API_SECRET
     }
+    # Note: API might not support 'limit' parameter
+    # If it fails, it will return only the last result per game type
     params = {
         "gameType": "Lotto"
     }
@@ -57,14 +62,23 @@ async def get_last_results_for_lotto() -> List[Dict]:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(url, headers=headers, params=params)
             
+            # Log the request for debugging
+            print(f"Lotto API Request: {url}")
+            print(f"Params: {params}")
+            print(f"Status: {response.status_code}")
+            
             if response.status_code == 401:
                 raise LottoAPIError("Unauthorized: Invalid API key")
             elif response.status_code == 404:
+                print(f"API returned 404: {response.text}")
                 return []  # No results found
             elif response.status_code != 200:
-                raise LottoAPIError(f"API request failed with status {response.status_code}: {response.text}")
+                error_text = response.text
+                print(f"API Error Response: {error_text}")
+                raise LottoAPIError(f"API request failed with status {response.status_code}: {error_text}")
             
             data = response.json()
+            print(f"API returned data type: {type(data)}, length: {len(data) if isinstance(data, list) else 'N/A'}")
             return data if isinstance(data, list) else [data]
             
     except httpx.RequestError as e:
@@ -76,14 +90,14 @@ async def get_results_by_date_range(
     date_to: Optional[datetime] = None
 ) -> List[Dict]:
     """
-    Fetch Lotto results for a specific date range
+    Fetch Lotto results starting from a specific date
     
     Args:
-        date_from: Start date
-        date_to: End date (optional, defaults to now)
+        date_from: Start date (will fetch all draws from this date onwards)
+        date_to: End date (optional, defaults to now, used for limiting results)
     
     Returns:
-        List of draw results
+        List of draw results sorted by date (newest first)
     """
     if not LOTTO_API_SECRET or LOTTO_API_SECRET == "your_api_key_here":
         raise LottoAPIError(
@@ -100,17 +114,17 @@ async def get_results_by_date_range(
         "secret": LOTTO_API_SECRET
     }
     
-    results = []
+    all_results = []
     
-    # Note: API requires specific draw dates, so this is a simplified version
-    # You may need to iterate through dates or use different endpoints
+    # API uses pagination, fetch all pages
+    # Start from page 1, get 100 results per page
     params = {
         "gameType": "Lotto",
-        "drawDate": date_from.isoformat(),
-        "index": 1,
-        "size": 100,
-        "sort": "drawDate",
-        "order": "DESC"
+        "drawDate": date_from.strftime("%Y-%m-%d"),  # Format: YYYY-MM-DD
+        "index": 1,      # Page number (starts at 1)
+        "size": 100,     # Results per page
+        "sort": "drawDate",  # Sort by draw date
+        "order": "DESC"      # Newest first
     }
     
     try:
@@ -122,13 +136,89 @@ async def get_results_by_date_range(
             elif response.status_code == 404:
                 return []
             elif response.status_code != 200:
-                raise LottoAPIError(f"API request failed with status {response.status_code}")
+                raise LottoAPIError(f"API request failed with status {response.status_code}: {response.text}")
             
             data = response.json()
-            return data if isinstance(data, list) else [data]
+            
+            # API may return single object or list
+            if isinstance(data, list):
+                all_results.extend(data)
+            elif isinstance(data, dict):
+                # Check if it's paginated response with 'items' field
+                if 'items' in data:
+                    all_results.extend(data['items'])
+                else:
+                    all_results.append(data)
+            
+            return all_results
             
     except httpx.RequestError as e:
         raise LottoAPIError(f"Network error: {str(e)}")
+
+
+async def fetch_multiple_draws_by_dates(start_date: datetime, end_date: datetime) -> List[Dict]:
+    """
+    Fetch multiple lottery draws by generating draw dates
+    
+    Lotto draws happen on: Tuesday, Thursday, Saturday at 21:00
+    This function generates all draw dates in the range and fetches them.
+    
+    Args:
+        start_date: Starting date
+        end_date: Ending date
+    
+    Returns:
+        List of all draw results in the date range
+    """
+    if not LOTTO_API_SECRET or LOTTO_API_SECRET == "your_api_key_here":
+        raise LottoAPIError("LOTTO_API_SECRET_KEY not configured")
+    
+    # Draw days: Tuesday=1, Thursday=3, Saturday=5
+    draw_weekdays = {1, 3, 5}
+    
+    all_draws = []
+    current = start_date
+    
+    url = f"{LOTTO_API_BASE_URL}/lotteries/draw-results/by-date-per-game"
+    headers = {
+        "accept": "application/json",
+        "secret": LOTTO_API_SECRET
+    }
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        while current <= end_date:
+            # Check if this day is a draw day
+            if current.weekday() in draw_weekdays:
+                params = {
+                    "gameType": "Lotto",
+                    "drawDate": current.strftime("%Y-%m-%d"),
+                    "index": 1,
+                    "size": 10,
+                    "sort": "drawDate",
+                    "order": "DESC"
+                }
+                
+                try:
+                    response = await client.get(url, headers=headers, params=params)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        if isinstance(data, dict) and 'items' in data:
+                            all_draws.extend(data['items'])
+                        elif isinstance(data, list):
+                            all_draws.extend(data)
+                        elif isinstance(data, dict):
+                            all_draws.append(data)
+                    elif response.status_code != 404:
+                        print(f"Warning: Failed to fetch draw for {current.strftime('%Y-%m-%d')}: {response.status_code}")
+                
+                except httpx.RequestError as e:
+                    print(f"Warning: Network error for {current.strftime('%Y-%m-%d')}: {e}")
+            
+            # Move to next day
+            current += timedelta(days=1)
+    
+    return all_draws
 
 
 def parse_lotto_draw(draw_data: Dict) -> Optional[Dict]:
@@ -146,16 +236,25 @@ def parse_lotto_draw(draw_data: Dict) -> Optional[Dict]:
         }
     """
     try:
+        # Skip if this is not a main Lotto game (e.g., LottoPlus)
+        game_type = draw_data.get("gameType", "")
+        if game_type != "Lotto":
+            return None
+        
         # Extract main numbers from results
         results = draw_data.get("results", [])
         if not results:
             return None
         
-        # Lotto has main numbers (usually first 6)
+        # Get numbers from resultsJson field (API structure)
         numbers = []
         for result in results:
             if isinstance(result, dict):
-                nums = result.get("numbers", [])
+                # Try resultsJson first (new API format)
+                nums = result.get("resultsJson", [])
+                if not nums:
+                    # Fallback to numbers field (old format)
+                    nums = result.get("numbers", [])
                 if nums and len(nums) >= 6:
                     numbers = nums[:6]
                     break
