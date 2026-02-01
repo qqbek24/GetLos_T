@@ -1,0 +1,178 @@
+{
+  "app": {
+    "title": "GetLos_T",
+    "subtitle": "Aplikacja do losowania prognozowanych układów"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "generate": "Generuj",
+    "history": "Historia",
+    "stats": "Statystyki"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "statsCards": {
+      "historicalDraws": "Historia Losowań",
+      "coverage": "Pokrycie",
+      "generatedPicks": "Wygenerowane Typy",
+      "averageSum": "Średnia Suma",
+      "min": "Min",
+      "max": "Max"
+    },
+    "uploadSection": {
+      "title": "Wgraj Historię Losowań",
+      "description": "Prześlij plik CSV z historycznymi losowaniami (każdy wiersz = 6 liczb od 1 do 49) lub JSON backup",
+      "uploadButton": "Wgraj Plik",
+      "uploading": "Przesyłanie..."
+    },
+    "quickActions": {
+      "title": "Szybkie Akcje",
+      "generateNew": "Generuj Nowe Liczby",
+      "viewHistory": "Zobacz Historię",
+      "viewStats": "Statystyki Szczegółowe"
+    },
+    "recentPicks": {
+      "title": "Ostatnie Wygenerowane"
+    },
+    "noData": "Brak danych"
+  },
+  "stats": {
+    "title": "Statystyki",
+    "noData": "Nie udało się pobrać statystyk. Upewnij się, że wgrałeś dane historyczne.",
+    "noHistoricalData": "Brak danych historycznych. Wgraj plik CSV z wynikami losowań w zakładce \"Dashboard\".",
+    "draws": "Losowania",
+    "totalDraws": "Łączna liczba losowań w bazie",
+    "mostCommon": "Najczęstsza",
+    "leastCommon": "Najrzadsza",
+    "occurrences": "Wystąpień",
+    "frequencyTitle": "Częstotliwość Liczb (1-49)",
+    "frequencyDescription": "Im cieplejszy kolor, tym częściej liczba wystąpiła w losowaniach",
+    "hotNumbersTitle": "TOP 10 Najczęstszych Liczb",
+    "hotNumbersDescription": "Te liczby pojawiały się najczęściej w historycznych losowaniach",
+    "coldNumbersTitle": "TOP 10 Najrzadszych Liczb",
+    "coldNumbersDescription": "Te liczby pojawiały się najrzadziej w historycznych losowaniach",
+    "topPairs": "TOP 5 Najczęstszych Par",
+    "topTriples": "TOP 5 Najczęstszych Trójek"
+  },
+  "generate": {
+    "title": "Generuj Nowe Układy",
+    "settingsTitle": "Ustawienia Generowania",
+    "strategy": "Strategia",
+    "count": "Ilość układów do wygenerowania",
+    "generateButton": "Generuj",
+    "generating": "Generowanie...",
+    "generatedTitle": "Wygenerowane Układy",
+    "layout": "Układ",
+    "sum": "Suma",
+    "copyToClipboard": "Kopiuj do Schowka",
+    "clear": "Wyczyść",
+    "errorGenerating": "Błąd podczas generowania",
+    "infoTitle": "Informacje o Strategiach",
+    "uniqueInfo": "Wszystkie wygenerowane układy są unikalne i nie powtarzają się z historią!",
+    "strategies": {
+      "random": {
+        "label": "Random",
+        "description": "Całkowicie losowy wybór liczb",
+        "info": "Całkowicie losowy wybór 6 liczb"
+      },
+      "hot": {
+        "label": "Hot Numbers",
+        "description": "Preferuje liczby często występujące w historii",
+        "info": "Preferuje liczby, które często pojawiały się w historii"
+      },
+      "cold": {
+        "label": "Cold Numbers",
+        "description": "Preferuje liczby rzadko występujące w historii",
+        "info": "Preferuje liczby, które rzadko się pojawiały"
+      },
+      "balanced": {
+        "label": "Balanced",
+        "description": "Mieszanka częstych i rzadkich liczb",
+        "info": "Mieszanka 3 częstych i 3 rzadkich liczb"
+      },
+      "combo_based": {
+        "label": "Combo Based",
+        "description": "Oparte na najczęstszych parach i trójkach",
+        "info": "Oparte na najczęstszych parach i trójkach z historii"
+      },
+      "ai": {
+        "label": "AI",
+        "description": "Predykcja oparta na uczeniu maszynowym",
+        "info": "Predykcja oparta na uczeniu maszynowym i analizie wzorców historycznych"
+      }
+    }
+  },
+  "history": {
+    "title": "Historia",
+    "generatedPicks": "Wygenerowane Układy",
+    "historicalDraws": "Historyczne Losowania",
+    "drawSchedules": "Harmonogramy Losowań",
+    "hits": "Trafienia",
+    "noGeneratedPicks": "Brak wygenerowanych układów. Przejdź do zakładki \"Generuj\" aby utworzyć nowe układy.",
+    "noHistoricalDraws": "Brak historycznych losowań. Wgraj plik CSV z historycznymi wynikami w zakładce \"Dashboard\".",
+    "actions": {
+      "sync": "Synchronizuj z Lotto.pl",
+      "syncing": "Synchronizacja...",
+      "addManually": "Dodaj ręcznie",
+      "addManuallyPick": "Dodaj układ ręcznie",
+      "backup": "Backup",
+      "export": "Eksportuj do CSV",
+      "verifyIntegrity": "Weryfikuj integralność",
+      "fixIntegrity": "Napraw integralność",
+      "checkMissing": "Sprawdź brakujące daty",
+      "checkHits": "Sprawdź trafienia",
+      "deleteSelected": "Usuń zaznaczone",
+      "selectAll": "Zaznacz wszystkie",
+      "deselectAll": "Odznacz wszystkie"
+    },
+    "table": {
+      "numbers": "Liczby",
+      "sum": "Suma",
+      "strategy": "Strategia",
+      "date": "Data",
+      "actions": "Akcje",
+      "copy": "Kopiuj",
+      "delete": "Usuń"
+    },
+    "pagination": {
+      "rowsPerPage": "Wierszy na stronę",
+      "of": "z",
+      "page": "Strona",
+      "jumpTo": "Przejdź do strony"
+    }
+  },
+  "fileUpload": {
+    "dragDrop": "Przeciągnij i upuść pliki tutaj, lub kliknij aby wybrać pliki",
+    "dropHere": "Upuść pliki tutaj...",
+    "supported": "Obsługiwane: CSV (max {{maxSize}}MB każdy, {{maxFiles}} plików)",
+    "uploadedFiles": "Wgrane pliki ({{count}}/{{maxFiles}})",
+    "fileTooLarge": "Plik jest za duży. Maksymalny rozmiar to {{maxSize}}MB",
+    "invalidFileType": "Nieprawidłowy typ pliku. Wgraj tylko CSV pliki.",
+    "maxFilesExceeded": "Maksymalnie {{maxFiles}} plików dozwolone",
+    "uploadError": "Błąd podczas przesyłania pliku. Spróbuj ponownie."
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "close": "Zamknij",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "export": "Eksportuj",
+    "import": "Importuj",
+    "copied": "Skopiowano!",
+    "add": "Dodaj"
+  },
+  "footer": {
+    "copyright": "© 2026 GetLos_T - Lottery Prediction System"
+  },
+  "language": {
+    "select": "Wybierz język",
+    "polish": "Polski",
+    "english": "English"
+  }
+}
