@@ -153,7 +153,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                   ? labels.supported
                       .replace('{{maxSize}}', String(maxSize / 1024 / 1024))
                       .replace('{{maxFiles}}', String(maxFiles))
-                  : `Obsługiwane: CSV, PDF, JPG, PNG (max ${maxSize / 1024 / 1024}MB każdy, ${maxFiles} plików)`
+                  : `Obsługiwane: CSV, JSON (max ${maxSize / 1024 / 1024}MB każdy, ${maxFiles} plików)`
                 }
               </p>
             </div>
