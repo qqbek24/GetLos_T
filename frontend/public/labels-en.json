@@ -1,0 +1,178 @@
+{
+  "app": {
+    "title": "GetLos_T",
+    "subtitle": "Lottery prediction application"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "generate": "Generate",
+    "history": "History",
+    "stats": "Statistics"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "statsCards": {
+      "historicalDraws": "Historical Draws",
+      "coverage": "Coverage",
+      "generatedPicks": "Generated Picks",
+      "averageSum": "Average Sum",
+      "min": "Min",
+      "max": "Max"
+    },
+    "uploadSection": {
+      "title": "Upload Draw History",
+      "description": "Upload a CSV file with historical draws (each row = 6 numbers from 1 to 49) or JSON backup",
+      "uploadButton": "Upload File",
+      "uploading": "Uploading..."
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "generateNew": "Generate New Numbers",
+      "viewHistory": "View History",
+      "viewStats": "Detailed Statistics"
+    },
+    "recentPicks": {
+      "title": "Recently Generated"
+    },
+    "noData": "No data"
+  },
+  "stats": {
+    "title": "Statistics",
+    "noData": "Failed to fetch statistics. Make sure you've uploaded historical data.",
+    "noHistoricalData": "No historical data. Upload a CSV file with draw results in the \"Dashboard\" tab.",
+    "draws": "Draws",
+    "totalDraws": "Total number of draws in database",
+    "mostCommon": "Most Common",
+    "leastCommon": "Least Common",
+    "occurrences": "Occurrences",
+    "frequencyTitle": "Number Frequency (1-49)",
+    "frequencyDescription": "The warmer the color, the more frequently the number appeared in draws",
+    "hotNumbersTitle": "TOP 10 Most Frequent Numbers",
+    "hotNumbersDescription": "These numbers appeared most frequently in historical draws",
+    "coldNumbersTitle": "TOP 10 Least Frequent Numbers",
+    "coldNumbersDescription": "These numbers appeared least frequently in historical draws",
+    "topPairs": "TOP 5 Most Frequent Pairs",
+    "topTriples": "TOP 5 Most Frequent Triples"
+  },
+  "generate": {
+    "title": "Generate New Picks",
+    "settingsTitle": "Generation Settings",
+    "strategy": "Strategy",
+    "count": "Number of picks to generate",
+    "generateButton": "Generate",
+    "generating": "Generating...",
+    "generatedTitle": "Generated Picks",
+    "layout": "Pick",
+    "sum": "Sum",
+    "copyToClipboard": "Copy to Clipboard",
+    "clear": "Clear",
+    "errorGenerating": "Error during generation",
+    "infoTitle": "Strategy Information",
+    "uniqueInfo": "All generated picks are unique and do not repeat from history!",
+    "strategies": {
+      "random": {
+        "label": "Random",
+        "description": "Completely random number selection",
+        "info": "Completely random selection of 6 numbers"
+      },
+      "hot": {
+        "label": "Hot Numbers",
+        "description": "Prefers frequently occurring numbers from history",
+        "info": "Prefers numbers that frequently appeared in history"
+      },
+      "cold": {
+        "label": "Cold Numbers",
+        "description": "Prefers rarely occurring numbers from history",
+        "info": "Prefers numbers that rarely appeared"
+      },
+      "balanced": {
+        "label": "Balanced",
+        "description": "Mix of frequent and rare numbers",
+        "info": "Mix of 3 frequent and 3 rare numbers"
+      },
+      "combo_based": {
+        "label": "Combo Based",
+        "description": "Based on most frequent pairs and triples",
+        "info": "Based on most frequent pairs and triples from history"
+      },
+      "ai": {
+        "label": "AI",
+        "description": "Prediction based on machine learning",
+        "info": "Prediction based on machine learning and historical pattern analysis"
+      }
+    }
+  },
+  "history": {
+    "title": "History",
+    "generatedPicks": "Generated Picks",
+    "historicalDraws": "Historical Draws",
+    "drawSchedules": "Draw Schedules",
+    "hits": "Hits",
+    "noGeneratedPicks": "No generated picks. Go to \"Generate\" tab to create new picks.",
+    "noHistoricalDraws": "No historical draws. Upload a CSV file with historical results in the \"Dashboard\" tab.",
+    "actions": {
+      "sync": "Sync with Lotto.pl",
+      "syncing": "Syncing...",
+      "addManually": "Add manually",
+      "addManuallyPick": "Add pick manually",
+      "backup": "Backup",
+      "export": "Export to CSV",
+      "verifyIntegrity": "Verify integrity",
+      "fixIntegrity": "Fix integrity",
+      "checkMissing": "Check missing dates",
+      "checkHits": "Check hits",
+      "deleteSelected": "Delete selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all"
+    },
+    "table": {
+      "numbers": "Numbers",
+      "sum": "Sum",
+      "strategy": "Strategy",
+      "date": "Date",
+      "actions": "Actions",
+      "copy": "Copy",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "of": "of",
+      "page": "Page",
+      "jumpTo": "Jump to page"
+    }
+  },
+  "fileUpload": {
+    "dragDrop": "Drag and drop files here, or click to select files",
+    "dropHere": "Drop files here...",
+    "supported": "Supported: CSV (max {{maxSize}}MB each, {{maxFiles}} files)",
+    "uploadedFiles": "Uploaded files ({{count}}/{{maxFiles}})",
+    "fileTooLarge": "File is too large. Maximum size is {{maxSize}}MB",
+    "invalidFileType": "Invalid file type. Upload only CSV files.",
+    "maxFilesExceeded": "Maximum {{maxFiles}} files allowed",
+    "uploadError": "Error uploading file. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "copied": "Copied!",
+    "add": "Add"
+  },
+  "footer": {
+    "copyright": "© 2026 GetLos_T - Lottery Prediction System"
+  },
+  "language": {
+    "select": "Select language",
+    "polish": "Polski",
+    "english": "English"
+  }
+}

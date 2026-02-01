@@ -67,7 +67,7 @@ export default function Dashboard() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700}>
-        Dashboard
+        {getLabel('dashboard.title', 'Dashboard')}
       </Typography>
 
       {/* Quick Stats */}
@@ -77,49 +77,52 @@ export default function Dashboard() {
         </Box>
       ) : (
         <Grid container spacing={3} sx={{ mb: 4 }}>
+          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_draws || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Historia Losowań
+                  {getLabel('dashboard.statsCards.historicalDraws', 'Historia Losowań')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Pokrycie: {stats?.coverage_pct.toFixed(8)}%
+                  {getLabel('dashboard.statsCards.coverage', 'Pokrycie')}: {stats?.coverage_pct.toFixed(8)}%
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
 
+          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.total_picks || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Wygenerowane Typy
+                  {getLabel('dashboard.statsCards.generatedPicks', 'Wygenerowane Typy')}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
 
+          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
                 <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {stats?.avg_sum.toFixed(1) || 0}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Średnia Suma
+                  {getLabel('dashboard.statsCards.averageSum', 'Średnia Suma')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Min: {stats?.min_sum} | Max: {stats?.max_sum}
+                  {getLabel('dashboard.statsCards.min', 'Min')}: {stats?.min_sum} | {getLabel('dashboard.statsCards.max', 'Max')}: {stats?.max_sum}
                 </Typography>
               </CardContent>
             </Card>
