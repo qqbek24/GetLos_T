@@ -78,58 +78,49 @@ export default function Dashboard() {
           <CircularProgress />
         </Box>
       ) : (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
-                  {stats?.total_draws || 0}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {getLabel('dashboard.statsCards.historicalDraws', 'Historia Losowań')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {getLabel('dashboard.statsCards.coverage', 'Pokrycie')}: {stats?.coverage_pct.toFixed(8)}%
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+        <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+          <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+              <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
+                {stats?.total_draws || 0}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {getLabel('dashboard.statsCards.historicalDraws', 'Historia Losowań')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {getLabel('dashboard.statsCards.coverage', 'Pokrycie')}: {stats?.coverage_pct.toFixed(8)}%
+              </Typography>
+            </CardContent>
+          </Card>
 
-          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
-                  {stats?.total_picks || 0}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {getLabel('dashboard.statsCards.generatedPicks', 'Wygenerowane Typy')}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <ICONS.Logo sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+              <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
+                {stats?.total_picks || 0}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {getLabel('dashboard.statsCards.generatedPicks', 'Wygenerowane Typy')}
+              </Typography>
+            </CardContent>
+          </Card>
 
-          {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-                <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
-                  {stats?.avg_sum.toFixed(1) || 0}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {getLabel('dashboard.statsCards.averageSum', 'Średnia Suma')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {getLabel('dashboard.statsCards.min', 'Min')}: {stats?.min_sum} | {getLabel('dashboard.statsCards.max', 'Max')}: {stats?.max_sum}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+          <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <ICONS.Stats sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+              <Typography variant="h3" fontWeight={700} sx={{ color: '#ffffff' }}>
+                {stats?.avg_sum.toFixed(1) || 0}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {getLabel('dashboard.statsCards.averageSum', 'Średnia Suma')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {getLabel('dashboard.statsCards.min', 'Min')}: {stats?.min_sum} | {getLabel('dashboard.statsCards.max', 'Max')}: {stats?.max_sum}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
       )}
 
       {/* Upload CSV - admin only */}

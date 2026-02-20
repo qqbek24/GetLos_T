@@ -82,67 +82,58 @@ export default function StatsPage() {
       </Typography>
 
       {/* Overview Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <ICONS.Favorite color="primary" />
-                <Typography variant="h6" fontWeight={600}>
-                  Losowania
-                </Typography>
-              </Box>
-              <Typography variant="h3" fontWeight={700} color="primary">
-                {stats.total_draws}
+      <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+        <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <ICONS.Favorite color="primary" />
+              <Typography variant="h6" fontWeight={600}>
+                Losowania
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Łączna liczba losowań w bazie
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+            <Typography variant="h3" fontWeight={700} color="primary">
+              {stats.total_draws}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Łączna liczba losowań w bazie
+            </Typography>
+          </CardContent>
+        </Card>
 
-        {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <ICONS.Hot color="error" />
-                <Typography variant="h6" fontWeight={600}>
-                  Najczęstsza
-                </Typography>
-              </Box>
-              <Typography variant="h3" fontWeight={700} color="error.main">
-                {mostCommon}
+        <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <ICONS.Hot color="error" />
+              <Typography variant="h6" fontWeight={600}>
+                Najczęstsza
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Wystąpień: {stats.freq[mostCommon - 1] || 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+            <Typography variant="h3" fontWeight={700} color="error.main">
+              {mostCommon}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Wystąpień: {stats.freq[mostCommon - 1] || 0}
+            </Typography>
+          </CardContent>
+        </Card>
 
-        {/* @ts-expect-error - MUI v7 Grid item prop works at runtime */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <ICONS.Cold color="info" />
-                <Typography variant="h6" fontWeight={600}>
-                  Najrzadsza
-                </Typography>
-              </Box>
-              <Typography variant="h3" fontWeight={700} color="info.main">
-                {leastCommon}
+        <Card sx={{ flex: 1, minWidth: { xs: '100%', md: 'calc(33.333% - 11px)' } }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <ICONS.Cold color="info" />
+              <Typography variant="h6" fontWeight={600}>
+                Najrzadsza
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Wystąpień: {stats.freq[leastCommon - 1] || 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+            <Typography variant="h3" fontWeight={700} color="info.main">
+              {leastCommon}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Wystąpień: {stats.freq[leastCommon - 1] || 0}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Frequency Grid */}
       <Card sx={{ mb: 4 }}>
