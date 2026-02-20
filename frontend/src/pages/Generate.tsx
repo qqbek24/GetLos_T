@@ -77,7 +77,7 @@ export default function Generate() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom fontWeight={700}>
+      <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <ICONS.GenerateTitleIcon color="primary" fontSize="large" /> Generuj Nowe Układy
       </Typography>
 
@@ -158,7 +158,7 @@ export default function Generate() {
       {generatedPicks.length > 0 && (
         <Card sx={{ mb: 4 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom fontWeight={600}>
+            <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <ICONS.StarsGeneratedNumbers color="info" fontSize="medium" /> Wygenerowane Układy
             </Typography>
 
@@ -219,7 +219,7 @@ export default function Generate() {
       {/* Info Box */}
       <Card sx={{ bgcolor: 'info.lighter' }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom fontWeight={600}>
+          <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ICONS.InfoIcon fontSize="medium" color="info" /> Informacje o Strategiach
           </Typography>
           <Box component="ul" sx={{ pl: 2 }}>

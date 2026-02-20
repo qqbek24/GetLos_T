@@ -29,7 +29,7 @@ export default function StatsPage() {
   if (isLoading) {
     return (
       <Box>
-        <Typography variant="h4" gutterBottom fontWeight={700}>
+        <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
         </Typography>
         <LinearProgress />
@@ -40,7 +40,7 @@ export default function StatsPage() {
   if (isError || !stats) {
     return (
       <Box>
-        <Typography variant="h4" gutterBottom fontWeight={700}>
+        <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ICONS.Stats_chart color="error" fontSize='large' /> Statystyki
         </Typography>
         <Alert severity="error">
@@ -53,7 +53,7 @@ export default function StatsPage() {
   if (stats.total_draws === 0) {
     return (
       <Box>
-        <Typography variant="h4" gutterBottom fontWeight={700}>
+        <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
         </Typography>
         <Alert severity="info">
@@ -77,7 +77,7 @@ export default function StatsPage() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom fontWeight={700}>
+      <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <ICONS.Stats_chart color="primary" fontSize='large'/> Statystyki
       </Typography>
 
@@ -138,7 +138,7 @@ export default function StatsPage() {
       {/* Frequency Grid */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom fontWeight={600}>
+          <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ICONS.CalculateIcon color="info" fontSize='medium' /> Częstotliwość Liczb (1-49)
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -227,7 +227,7 @@ export default function StatsPage() {
       {pairTripleStats && pairTripleStats.pairs.length > 0 && (
         <Card sx={{ mb: 4 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom fontWeight={600}>
+            <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <ICONS.Top2 color="info" /> TOP 5 Najczęstszych Par
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -266,7 +266,7 @@ export default function StatsPage() {
       {pairTripleStats && pairTripleStats.triples.length > 0 && (
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom fontWeight={600}>
+            <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <ICONS.Top3 color="info" /> TOP 5 Najczęstszych Trójek
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
