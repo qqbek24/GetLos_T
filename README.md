@@ -2,6 +2,8 @@
 
 Intelligent system for predicting and analyzing Lotto results based on historical data.
 
+ for how app looks and work, check address [GetLost_T](https://remarkable-lollipop-803d8b.netlify.app/)
+
 > **[Full Documentation → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)**
 
 ## Technology Stack
@@ -391,10 +393,6 @@ After starting the backend, interactive documentation is available:
 ## 📄 License
 
 MIT License - see LICENSE file for details
-
-## 👨‍💻 Author
-
-Created with ❤️ for lottery enthusiasts
 
 ---
 
