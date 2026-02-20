@@ -249,6 +249,7 @@ export default function History() {
 
   const verifyIntegrityMutation = useMutation({
     mutationFn: () => api.verifyIntegrity(),
+    retry: false,
     onSuccess: (data) => {
       setIntegrityReport(data)
       // Show success message if no issues
@@ -260,9 +261,14 @@ export default function History() {
         setTimeout(() => setSyncResult(null), 3000)
       }
     },
-    onError: () => {
-      // Silent fail - prawdopodobnie dane zostały usunięte podczas sprawdzania
+    onError: (error: any) => {
+      console.error('Error verifying integrity:', error)
       setIntegrityReport(null)
+      setSyncResult({
+        type: 'error',
+        message: 'Błąd sprawdzania integralności. Spróbuj ponownie później lub odśwież stronę.'
+      })
+      setTimeout(() => setSyncResult(null), 5000)
     },
   })
 

@@ -633,6 +633,8 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
     # Invalidate relevant caches after data modification
     cache.invalidate_pattern("stats:")
     cache.invalidate_pattern("draws:")
+    cache.invalidate_pattern("verify_integrity:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return UploadResponse(
         success=True,
@@ -743,6 +745,7 @@ def generate_picks(
     # Invalidate cache for picks and stats
     cache.invalidate_pattern("picks:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     # Refresh to get created_at timestamps
     for pick in results:
@@ -782,6 +785,7 @@ def add_custom_pick(payload: Numbers, db: Session = Depends(get_db)):
     # Invalidate cache
     cache.invalidate_pattern("picks:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return new_pick
 
@@ -879,6 +883,7 @@ def clear_all_picks(db: Session = Depends(get_db)):
     # Invalidate cache
     cache.invalidate_pattern("picks:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "deleted": count}
 
@@ -895,6 +900,8 @@ def clear_all_draws(db: Session = Depends(get_db)):
     # Invalidate cache
     cache.invalidate_pattern("draws:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("verify_integrity:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "deleted": count}
 
@@ -914,6 +921,8 @@ def delete_draws_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     if deleted > 0:
         cache.invalidate_pattern("draws:")
         cache.invalidate_pattern("stats:")
+        cache.invalidate_pattern("verify_integrity:")
+        cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "deleted": deleted}
 
@@ -933,6 +942,8 @@ def delete_draw(draw_id: int, db: Session = Depends(get_db)):
     # Invalidate cache
     cache.invalidate_pattern("draws:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("verify_integrity:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "message": "Draw deleted"}
 
@@ -952,6 +963,7 @@ def delete_picks_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     if deleted > 0:
         cache.invalidate_pattern("picks:")
         cache.invalidate_pattern("stats:")
+        cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "deleted": deleted}
 
@@ -971,6 +983,7 @@ def delete_pick(pick_id: int, db: Session = Depends(get_db)):
     # Invalidate cache
     cache.invalidate_pattern("picks:")
     cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("check_pick_hits:")
     
     return {"success": True, "message": "Pick deleted"}
 
@@ -1150,6 +1163,8 @@ async def sync_lotto_results(db: Session = Depends(get_db)):
         if new_draws_count > 0:
             cache.invalidate_pattern("draws:")
             cache.invalidate_pattern("stats:")
+            cache.invalidate_pattern("verify_integrity:")
+            cache.invalidate_pattern("check_pick_hits:")
         
         message = f"Successfully synced {new_draws_count} new draw(s) from Lotto.pl"
         if new_draws_count == 0:
@@ -1233,6 +1248,8 @@ def add_manual_draw(request: ManualDrawRequest, db: Session = Depends(get_db)):
     if inserted > 0:
         cache.invalidate_pattern("draws:")
         cache.invalidate_pattern("stats:")
+        cache.invalidate_pattern("verify_integrity:")
+        cache.invalidate_pattern("check_pick_hits:")
     
     return UploadResponse(
         success=True,
@@ -1387,6 +1404,7 @@ def get_expected_weekdays_for_date(date_obj: datetime.date, db: Session) -> List
 
 
 @app.get("/verify-integrity", response_model=IntegrityReport)
+@cache_response(ttl_seconds=900, key_prefix="verify_integrity")  # Cache for 15 minutes
 def verify_integrity(db: Session = Depends(get_db)):
     """
     Verify data integrity and report issues
@@ -1396,15 +1414,16 @@ def verify_integrity(db: Session = Depends(get_db)):
     - Missing dates (gaps in Tuesday/Thursday/Saturday draws)
     - Gaps in draw_system_id sequence
     - Broken sequential_id numbering
+    
+    OPTIMIZED: Uses SQL GROUP BY and aggregations instead of Python loops
+    CACHED: 15 minutes (expensive operation)
     """
     issues = []
     
-    # Get all draws ordered by date
-    all_draws = db.query(HistoricalDraw).filter(
+    # Get total count
+    total_draws = db.query(func.count(HistoricalDraw.id)).filter(
         HistoricalDraw.source.isnot(None)
-    ).order_by(HistoricalDraw.source).all()
-    
-    total_draws = len(all_draws)
+    ).scalar()
     
     if total_draws == 0:
         return IntegrityReport(
@@ -1415,43 +1434,64 @@ def verify_integrity(db: Session = Depends(get_db)):
             summary="No draws to verify"
         )
     
-    # 1. Check for duplicates by key
-    seen_keys = {}
-    duplicate_count = 0
-    for draw in all_draws:
-        if draw.key in seen_keys:
-            duplicate_count += 1
-            issues.append(IntegrityIssue(
-                type="duplicate",
-                severity="error",
-                description=f"Duplicate draw found: {draw.numbers} (date: {draw.source})",
-                details={"id": draw.id, "duplicate_of": seen_keys[draw.key], "key": draw.key}
-            ))
-        else:
-            seen_keys[draw.key] = draw.id
+    # 1. Check for duplicates by key using SQL GROUP BY
+    duplicate_keys = db.query(
+        HistoricalDraw.key,
+        func.count(HistoricalDraw.id).label('count'),
+        func.group_concat(HistoricalDraw.id).label('ids')
+    ).filter(
+        HistoricalDraw.source.isnot(None)
+    ).group_by(
+        HistoricalDraw.key
+    ).having(
+        func.count(HistoricalDraw.id) > 1
+    ).all()
     
-    # 2. Check for duplicates by draw_system_id
-    draws_with_api_id = [d for d in all_draws if d.draw_system_id is not None]
-    if draws_with_api_id:
-        seen_api_ids = {}
-        for draw in draws_with_api_id:
-            if draw.draw_system_id in seen_api_ids:
-                duplicate_count += 1
-                issues.append(IntegrityIssue(
-                    type="duplicate",
-                    severity="error",
-                    description=f"Duplicate draw_system_id: {draw.draw_system_id}",
-                    details={"id": draw.id, "duplicate_of": seen_api_ids[draw.draw_system_id]}
-                ))
-            else:
-                seen_api_ids[draw.draw_system_id] = draw.id
+    for key, count, ids_str in duplicate_keys:
+        ids = [int(x) for x in ids_str.split(',')]
+        # Get one draw to show numbers
+        draw = db.query(HistoricalDraw).filter(HistoricalDraw.id == ids[0]).first()
+        issues.append(IntegrityIssue(
+            type="duplicate",
+            severity="error",
+            description=f"Duplicate draw found: {draw.numbers} ({count} times)",
+            details={"key": key, "ids": ids, "count": count}
+        ))
     
-    # 3. Check for gaps in draw_system_id
-    if draws_with_api_id and len(draws_with_api_id) > 1:
-        api_ids = sorted([d.draw_system_id for d in draws_with_api_id])
-        min_id, max_id = api_ids[0], api_ids[-1]
+    # 2. Check for duplicates by draw_system_id using SQL GROUP BY
+    duplicate_api_ids = db.query(
+        HistoricalDraw.draw_system_id,
+        func.count(HistoricalDraw.id).label('count'),
+        func.group_concat(HistoricalDraw.id).label('ids')
+    ).filter(
+        HistoricalDraw.draw_system_id.isnot(None)
+    ).group_by(
+        HistoricalDraw.draw_system_id
+    ).having(
+        func.count(HistoricalDraw.id) > 1
+    ).all()
+    
+    for api_id, count, ids_str in duplicate_api_ids:
+        ids = [int(x) for x in ids_str.split(',')]
+        issues.append(IntegrityIssue(
+            type="duplicate",
+            severity="error",
+            description=f"Duplicate draw_system_id: {api_id} ({count} times)",
+            details={"draw_system_id": api_id, "ids": ids, "count": count}
+        ))
+    
+    # 3. Check for gaps in draw_system_id using SQL MIN/MAX
+    api_id_stats = db.query(
+        func.min(HistoricalDraw.draw_system_id).label('min_id'),
+        func.max(HistoricalDraw.draw_system_id).label('max_id'),
+        func.count(func.distinct(HistoricalDraw.draw_system_id)).label('count')
+    ).filter(
+        HistoricalDraw.draw_system_id.isnot(None)
+    ).first()
+    
+    if api_id_stats and api_id_stats.min_id and api_id_stats.max_id:
+        min_id, max_id, actual_count = api_id_stats
         expected_count = max_id - min_id + 1
-        actual_count = len(set(api_ids))
         
         if actual_count < expected_count:
             missing_count = expected_count - actual_count
@@ -1462,58 +1502,88 @@ def verify_integrity(db: Session = Depends(get_db)):
                 details={"min_id": min_id, "max_id": max_id, "missing_count": missing_count}
             ))
     
-    # 4. Check for missing dates (gaps in draw schedule)
+    # 4. Check for missing dates (OPTIMIZED)
     # Only check from 2007 onwards (when API has reliable data)
-    # Uses configured draw schedules to determine expected days
     API_RELIABLE_START_DATE_CHECK = datetime(2007, 1, 1).date()
     
-    draws_with_dates = db.query(HistoricalDraw).filter(
-        HistoricalDraw.source.isnot(None)
-    ).order_by(HistoricalDraw.source).all()
+    # Get only dates from DB (not full objects)
+    date_results = db.query(HistoricalDraw.source).filter(
+        HistoricalDraw.source.isnot(None),
+        func.length(HistoricalDraw.source) == 10
+    ).all()
     
-    if len(draws_with_dates) > 1:
+    if len(date_results) > 1:
         try:
-            dates = [datetime.fromisoformat(d.source).date() for d in draws_with_dates if d.source and len(d.source) == 10]
+            dates = [datetime.fromisoformat(d.source).date() for d in date_results]
             if dates:
-                # Use API reliable start date or actual min date, whichever is later
                 min_date = max(min(dates), API_RELIABLE_START_DATE_CHECK)
                 max_date = max(dates)
                 
-                # Generate expected dates using dynamic schedules
+                # Load all schedules once
+                all_schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
+                
+                # Build a mapping of date ranges to weekdays for faster lookup
+                schedule_map = {}
+                for schedule in all_schedules:
+                    from_date = schedule.date_from.isoformat() if isinstance(schedule.date_from, datetime) else str(schedule.date_from)
+                    to_date = schedule.date_to.isoformat() if isinstance(schedule.date_to, datetime) else str(schedule.date_to)
+                    schedule_map[(from_date, to_date)] = schedule.weekdays
+                
+                # Generate expected dates (optimized)
                 expected_dates = []
                 current = min_date
-                while current <= max_date:
-                    expected_weekdays = get_expected_weekdays_for_date(current, db)
-                    if current.weekday() in expected_weekdays:
-                        expected_dates.append(current)
-                    current += timedelta(days=1)
+                delta_days = (max_date - min_date).days + 1
                 
-                actual_dates = set(dates)
-                missing_dates = [d for d in expected_dates if d not in actual_dates]
+                # Process in batches of 100 days to avoid nested query for each day
+                for i in range(0, delta_days, 100):
+                    batch_start = min_date + timedelta(days=i)
+                    batch_end = min(batch_start + timedelta(days=99), max_date)
+                    
+                    # Get schedule for this batch
+                    current = batch_start
+                    while current <= batch_end:
+                        # Find applicable schedule
+                        current_str = current.isoformat()
+                        applicable_weekdays = None
+                        
+                        for (from_date, to_date), weekdays in schedule_map.items():
+                            if from_date <= current_str <= to_date:
+                                applicable_weekdays = weekdays
+                                break
+                        
+                        # Fallback to first or last schedule
+                        if applicable_weekdays is None and all_schedules:
+                            if current_str < all_schedules[0].date_from.isoformat():
+                                applicable_weekdays = all_schedules[0].weekdays
+                            else:
+                                applicable_weekdays = all_schedules[-1].weekdays
+                        
+                        if applicable_weekdays and current.weekday() in applicable_weekdays:
+                            expected_dates.append(current)
+                        
+                        current += timedelta(days=1)
+                
+                # Find missing dates
+                actual_dates_set = set(dates)
+                missing_dates = [d for d in expected_dates if d not in actual_dates_set]
                 
                 if missing_dates:
-                    # Include full list of missing dates for detailed view
-                    missing_dates_str = [str(d) for d in missing_dates]
-
-                    # Add harmonogram context for missing dates
-                    # Group missing dates by applicable harmonogram
+                    missing_dates_str = [str(d) for d in missing_dates[:100]]  # Limit to first 100
+                    
+                    # Get unique schedule contexts (limit queries)
                     schedule_contexts = []
-                    for missing_date in missing_dates:
-                        schedule = db.query(DrawSchedule).filter(
-                            DrawSchedule.date_from <= missing_date,
-                            DrawSchedule.date_to >= missing_date
-                        ).first()
-
-                        if schedule:
-                            weekdays_names = []
-                            for wd in sorted(schedule.weekdays):
-                                wd_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][wd]
-                                weekdays_names.append(wd_name[:3])
-
-                            context = f"Period {schedule.date_from}-{schedule.date_to}: scheduled {', '.join(weekdays_names)}"
-                            if context not in schedule_contexts:
-                                schedule_contexts.append(context)
-
+                    seen_contexts = set()
+                    for missing_date in missing_dates[:20]:  # Sample first 20 missing dates
+                        missing_str = missing_date.isoformat()
+                        for (from_date, to_date), weekdays in schedule_map.items():
+                            if from_date <= missing_str <= to_date:
+                                weekdays_names = [["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][wd] for wd in sorted(weekdays)]
+                                context = f"Period {from_date}-{to_date}: {', '.join(weekdays_names)}"
+                                if context not in seen_contexts:
+                                    schedule_contexts.append(context)
+                                    seen_contexts.add(context)
+                                break
+                    
                     issues.append(IntegrityIssue(
                         type="missing_date",
                         severity="warning",
@@ -1529,18 +1599,25 @@ def verify_integrity(db: Session = Depends(get_db)):
         except ValueError:
             pass  # Skip if dates are invalid
     
-    # 5. Check sequential_id integrity
-    draws_with_seq = [d for d in all_draws if d.sequential_id is not None]
-    if draws_with_seq:
-        seq_ids = [d.sequential_id for d in draws_with_seq]
-        expected_seq = list(range(1, len(draws_with_seq) + 1))
+    # 5. Check sequential_id integrity using SQL
+    seq_stats = db.query(
+        func.min(HistoricalDraw.sequential_id).label('min_seq'),
+        func.max(HistoricalDraw.sequential_id).label('max_seq'),
+        func.count(func.distinct(HistoricalDraw.sequential_id)).label('count')
+    ).filter(
+        HistoricalDraw.sequential_id.isnot(None)
+    ).first()
+    
+    if seq_stats and seq_stats.min_seq and seq_stats.max_seq:
+        min_seq, max_seq, actual_count = seq_stats
         
-        if sorted(seq_ids) != expected_seq:
+        # Check if sequences start from 1 and are continuous
+        if min_seq != 1 or actual_count != max_seq:
             issues.append(IntegrityIssue(
                 type="broken_sequential_id",
                 severity="warning",
-                description="Sequential IDs are not continuous 1,2,3...",
-                details={"expected_max": len(draws_with_seq), "actual_ids": len(set(seq_ids))}
+                description=f"Sequential IDs are not continuous 1,2,3... (min: {min_seq}, max: {max_seq}, unique: {actual_count})",
+                details={"min": min_seq, "max": max_seq, "unique_count": actual_count}
             ))
     
     # Generate summary
@@ -1552,32 +1629,36 @@ def verify_integrity(db: Session = Depends(get_db)):
     else:
         summary = "No integrity issues found"
     
-    # Calculate reference metadata
+    # Calculate reference metadata using SQL queries
     API_RELIABLE_START_DATE = datetime(2007, 1, 1).date()
     lottery_start_date = None
     lottery_start_sequential_id = None
     api_reliable_start_sequential_id = None
     historical_era_draws_count = None
     
-    if all_draws:
-        # Find oldest draw
-        oldest_draw = all_draws[0]
+    # Find oldest draw (single query)
+    oldest_draw = db.query(HistoricalDraw)\
+        .filter(HistoricalDraw.source.isnot(None))\
+        .order_by(HistoricalDraw.source)\
+        .first()
+    
+    if oldest_draw:
         lottery_start_date = oldest_draw.source
         lottery_start_sequential_id = oldest_draw.sequential_id
         
-        # Find first draw from API reliable era
-        for draw in all_draws:
-            try:
-                draw_date = datetime.fromisoformat(draw.source).date()
-                if draw_date >= API_RELIABLE_START_DATE:
-                    api_reliable_start_sequential_id = draw.sequential_id
-                    break
-            except (ValueError, AttributeError):
-                continue
+        # Find first draw from API reliable era (single query)
+        api_reliable_draw = db.query(HistoricalDraw)\
+            .filter(HistoricalDraw.source >= '2007-01-01')\
+            .order_by(HistoricalDraw.source)\
+            .first()
         
-        # Count draws in historical era (before 2007)
-        historical_era_draws_count = sum(1 for d in all_draws 
-            if d.source and datetime.fromisoformat(d.source).date() < API_RELIABLE_START_DATE)
+        if api_reliable_draw:
+            api_reliable_start_sequential_id = api_reliable_draw.sequential_id
+        
+        # Count draws in historical era before 2007 (single query)
+        historical_era_draws_count = db.query(func.count(HistoricalDraw.id))\
+            .filter(HistoricalDraw.source < '2007-01-01')\
+            .scalar()
     
     # Save to config.yaml
     try:
@@ -1932,10 +2013,13 @@ def initialize_default_schedules(db: Session = Depends(get_db)):
 
 
 @app.post("/check-pick-hits")
+@cache_response(ttl_seconds=600, key_prefix="check_pick_hits")  # Cache for 10 minutes
 def check_pick_hits(db: Session = Depends(get_db)):
     """
     Check all picks against historical draws to see if any numbers matched.
     Returns list of picks with their best matches in history.
+    
+    CACHED: 10 minutes (expensive nested loop operation)
     """
     from collections import defaultdict
     
