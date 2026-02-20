@@ -1373,14 +1373,16 @@ def import_draws_from_json(draws_data: dict, db: Session = Depends(get_db)):
         )
 
 
-def get_expected_weekdays_for_date(date_obj: datetime.date, db: Session) -> List[int]:
+def get_expected_weekdays_for_date(date_obj: datetime.date, schedules: List) -> List[int]:
     """
     Get expected weekdays for draws based on date and configured schedules
     Returns list of weekday numbers (0=Mon, 1=Tue, ..., 6=Sun)
     If no schedule found, returns default [1, 3, 5] (Tue, Thu, Sat)
-    """
-    schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
     
+    Args:
+        date_obj: Date to check
+        schedules: Pre-loaded list of DrawSchedule objects (ordered by date_from)
+    """
     if not schedules:
         # Default: Tue, Thu, Sat
         return [1, 3, 5]
@@ -1822,11 +1824,14 @@ async def fix_integrity(db: Session = Depends(get_db)):
                     min_date = max(min(dates), API_RELIABLE_START_DATE)
                     max_date = max(dates)
                     
-                    # Generate missing dates using dynamic schedules
+                    # Pre-load schedules once (instead of 7000+ queries in loop)
+                    all_schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
+                    
+                    # Generate missing dates using pre-loaded schedules
                     expected_dates = []
                     current = min_date
                     while current <= max_date:
-                        expected_weekdays = get_expected_weekdays_for_date(current, db)
+                        expected_weekdays = get_expected_weekdays_for_date(current, all_schedules)
                         if current.weekday() in expected_weekdays:
                             expected_dates.append(current)
                         current += timedelta(days=1)
