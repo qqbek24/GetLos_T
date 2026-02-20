@@ -354,7 +354,7 @@ export default function History() {
     if (numbersArray.length !== 6) {
       setSyncResult({
         type: 'error',
-        message: 'Wprowadź dokładnie 6 liczb od 1 do 49',
+        message: getLabel('history.validation.enterExactly6Numbers', 'Wprowadź dokładnie 6 liczb od 1 do 49'),
       })
       setTimeout(() => setSyncResult(null), 3000)
       return
@@ -363,7 +363,7 @@ export default function History() {
     if (new Set(numbersArray).size !== 6) {
       setSyncResult({
         type: 'error',
-        message: 'Wszystkie liczby muszą być unikalne',
+        message: getLabel('history.validation.uniqueNumbers', 'Wszystkie liczby muszą być unikalne'),
       })
       setTimeout(() => setSyncResult(null), 3000)
       return
@@ -390,7 +390,7 @@ export default function History() {
     if (numbersArray.length !== 6) {
       setSyncResult({
         type: 'error',
-        message: 'Wprowadź dokładnie 6 liczb od 1 do 49',
+        message: getLabel('history.validation.enterExactly6Numbers', 'Wprowadź dokładnie 6 liczb od 1 do 49'),
       })
       setTimeout(() => setSyncResult(null), 3000)
       return
@@ -399,7 +399,7 @@ export default function History() {
     if (new Set(numbersArray).size !== 6) {
       setSyncResult({
         type: 'error',
-        message: 'Wszystkie liczby muszą być unikalne',
+        message: getLabel('history.validation.uniqueNumbers', 'Wszystkie liczby muszą być unikalne'),
       })
       setTimeout(() => setSyncResult(null), 3000)
       return
@@ -546,7 +546,7 @@ export default function History() {
     }
 
     if (scheduleWeekdays.length === 0) {
-      setSyncResult({ type: 'error', message: 'Wybierz przynajmniej jeden dzień tygodnia' })
+      setSyncResult({ type: 'error', message: getLabel('history.validation.selectAtLeastOneDay', 'Wybierz przynajmniej jeden dzień tygodnia') })
       setTimeout(() => setSyncResult(null), 3000)
       return
     }
@@ -581,7 +581,7 @@ export default function History() {
     if (picks.length === 0) {
       return (
         <Alert severity="info">
-          Brak wygenerowanych układów. Przejdź do zakładki "Generuj" aby utworzyć nowe układy.
+          {getLabel('history.noGeneratedPicks', 'Brak wygenerowanych układów. Przejdź do zakładki "Generuj" aby utworzyć nowe układy.')}
         </Alert>
       )
     }
@@ -598,7 +598,7 @@ export default function History() {
             onChange={handleSelectAll}
           />
           <Typography variant="body2" color="text.secondary">
-            {selectedItems.length > 0 ? `Zaznaczono: ${selectedItems.length}` : 'Zaznacz wszystkie'}
+            {selectedItems.length > 0 ? `${getLabel('history.selected', 'Zaznaczono')}: ${selectedItems.length}` : getLabel('history.actions.selectAll', 'Zaznacz wszystkie')}
           </Typography>
         </Box>
 
@@ -670,8 +670,8 @@ export default function History() {
       return (
         <Alert severity="info">
           {draws.length === 0 
-            ? 'Brak historycznych losowań. Wgraj plik CSV z historycznymi wynikami w zakładce "Dashboard".'
-            : `Brak losowań w wybranym okresie. ${dateFilterFrom ? `Od: ${dateFilterFrom}` : ''} ${dateFilterTo ? `Do: ${dateFilterTo}` : ''}`}
+            ? getLabel('history.noHistoricalDraws', 'Brak historycznych losowań. Wgraj plik CSV z historycznymi wynikami w zakładce "Dashboard".')
+            : `${getLabel('history.noDrawsInPeriod', 'Brak losowań w wybranym okresie')}. ${dateFilterFrom ? `Od: ${dateFilterFrom}` : ''} ${dateFilterTo ? `Do: ${dateFilterTo}` : ''}`}
         </Alert>
       )
     }
@@ -688,11 +688,11 @@ export default function History() {
             onChange={handleSelectAll}
           />
           <Typography variant="body2" color="text.secondary">
-            {selectedItems.length > 0 ? `Zaznaczono: ${selectedItems.length}` : 'Zaznacz wszystkie'}
+            {selectedItems.length > 0 ? `${getLabel('history.selected', 'Zaznaczono')}: ${selectedItems.length}` : getLabel('history.actions.selectAll', 'Zaznacz wszystkie')}
           </Typography>
           {(dateFilterFrom || dateFilterTo) && (
             <Typography variant="caption" color="primary" sx={{ ml: 'auto' }}>
-              Filtr aktywny: {filteredDraws.length} z {draws.length}
+              {getLabel('history.messages.filterActive', 'Filtr aktywny: {{filtered}} z {{total}}').replace('{{filtered}}', filteredDraws.length.toString()).replace('{{total}}', draws.length.toString())}
             </Typography>
           )}
         </Box>
@@ -774,7 +774,7 @@ export default function History() {
           {currentCount > 0 && (
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" color="text.secondary">
-                Łącznie: {currentCount} {currentLabel}
+                {getLabel('history.totalCount', 'Łącznie')}: {currentCount} {currentLabel}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {selectedItems.length > 0 && (
@@ -786,7 +786,7 @@ export default function History() {
                     onClick={handleDeleteSelected}
                     disabled={deleteSelectedMutation.isPending}
                   >
-                    {deleteSelectedMutation.isPending ? 'Usuwanie...' : `Usuń zaznaczone (${selectedItems.length})`}
+                    {deleteSelectedMutation.isPending ? getLabel('history.actions.deleting', 'Usuwanie...') : `${getLabel('history.actions.deleteSelected', 'Usuń zaznaczone')} (${selectedItems.length})`}
                   </Button>
                 )}
                 {tab === 'picks' && (
@@ -851,7 +851,7 @@ export default function History() {
                   onClick={() => clearAllMutation.mutate()}
                   disabled={clearAllMutation.isPending}
                 >
-                  Usuń Wszystkie
+                  {getLabel('history.actions.deleteAll', 'Usuń Wszystkie')}
                 </Button>
               </Box>
             </Box>
@@ -886,7 +886,7 @@ export default function History() {
                   }}
                   sx={{ mt: '16px' }}
                 >
-                  Wyczyść filtr
+                  {getLabel('history.actions.clearFilter', 'Wyczyść filtr')}
                 </Button>
               )}
             </Box>
@@ -995,7 +995,7 @@ export default function History() {
                 </Box>
               ) : schedules.length === 0 ? (
                 <Alert severity="info">
-                  Brak harmonogramów. Dodaj pierwszy harmonogram aby określić dni losowań dla różnych okresów.
+                  {getLabel('history.noSchedules', 'Brak harmonogramów. Dodaj pierwszy harmonogram aby określić dni losowań dla różnych okresów.')}
                 </Alert>
               ) : (
                 <TableContainer component={Paper}>
@@ -1041,7 +1041,7 @@ export default function History() {
                               <IconButton
                                 size="small"
                                 onClick={() => {
-                                  if (confirm('Czy na pewno chcesz usunąć ten harmonogram?')) {
+                                  if (confirm(getLabel('history.dialogs.confirmDeleteSchedule', 'Czy na pewno chcesz usunąć ten harmonogram?'))) {
                                     deleteScheduleMutation.mutate(schedule.id)
                                   }
                                 }}
@@ -1082,7 +1082,7 @@ export default function History() {
                   disabled={isCheckingHits}
                   startIcon={isCheckingHits ? <CircularProgress size={20} /> : <ICONS.Search />}
                 >
-                  {isCheckingHits ? 'Sprawdzam...' : 'Sprawdź trafienia'}
+                  {isCheckingHits ? getLabel('history.actions.checking', 'Sprawdzam...') : getLabel('history.actions.checkHits', 'Sprawdź trafienia')}
                 </Button>
               </Box>
 
@@ -1155,7 +1155,7 @@ export default function History() {
 
                   {hitsData.results.filter((r: any) => r.best_hit_count >= 3).length === 0 && (
                     <Alert severity="info">
-                      Brak układów z 3+ trafieniami
+                      {getLabel('history.noHits', 'Brak układów z 3+ trafieniami')}
                     </Alert>
                   )}
                 </>
@@ -1185,12 +1185,12 @@ export default function History() {
                   </Select>
                 </FormControl>
                 <Typography variant="body2" color="text.secondary">
-                  Strona {page + 1} z {currentTotalPages} {isFetching && <CircularProgress size={12} sx={{ ml: 1 }} />}
+                  {getLabel('history.pagination.page', 'Strona')} {page + 1} {getLabel('history.pagination.of', 'z')} {currentTotalPages} {isFetching && <CircularProgress size={12} sx={{ ml: 1 }} />}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <TextField
                     size="small"
-                    label="Strona"
+                    label={getLabel('history.pagination.page', 'Strona')}
                     type="number"
                     value={jumpToPage}
                     onChange={(e) => setJumpToPage(e.target.value)}
@@ -1247,66 +1247,66 @@ export default function History() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Potwierdzenie usunięcia</DialogTitle>
+        <DialogTitle>{getLabel('history.dialogs.confirmDelete', 'Potwierdzenie usunięcia')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Czy na pewno chcesz usunąć ten {tab === 'picks' ? 'układ' : 'wynik losowania'}?
+            {getLabel('history.dialogs.confirmDeleteSingle', 'Czy na pewno chcesz usunąć ten {{type}}?').replace('{{type}}', getLabel(tab === 'picks' ? 'history.types.pick' : 'history.types.draw', tab === 'picks' ? 'układ' : 'wynik losowania'))}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Anuluj</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{getLabel('common.cancel', 'Anuluj')}</Button>
           <Button
             onClick={confirmDelete}
             color="error"
             variant="contained"
             disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isPending ? 'Usuwanie...' : 'Usuń'}
+            {deleteMutation.isPending ? getLabel('history.actions.deleting', 'Usuwanie...') : getLabel('common.delete', 'Usuń')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Batch Delete Confirmation Dialog */}
       <Dialog open={batchDeleteDialogOpen} onClose={() => setBatchDeleteDialogOpen(false)}>
-        <DialogTitle>Potwierdzenie usunięcia</DialogTitle>
+        <DialogTitle>{getLabel('history.dialogs.confirmDelete', 'Potwierdzenie usunięcia')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Czy na pewno chcesz usunąć {selectedItems.length} {tab === 'picks' ? 'układów' : 'wyników losowań'}?
+            {getLabel('history.dialogs.confirmDeleteBatch', 'Czy na pewno chcesz usunąć {{count}} {{type}}?').replace('{{count}}', selectedItems.length.toString()).replace('{{type}}', getLabel(tab === 'picks' ? 'history.types.picks' : 'history.types.draws', tab === 'picks' ? 'układów' : 'wyników losowań'))}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBatchDeleteDialogOpen(false)}>Anuluj</Button>
+          <Button onClick={() => setBatchDeleteDialogOpen(false)}>{getLabel('common.cancel', 'Anuluj')}</Button>
           <Button
             onClick={confirmBatchDelete}
             color="error"
             variant="contained"
             disabled={deleteSelectedMutation.isPending}
           >
-            {deleteSelectedMutation.isPending ? 'Usuwanie...' : 'Usuń'}
+            {deleteSelectedMutation.isPending ? getLabel('history.actions.deleting', 'Usuwanie...') : getLabel('common.delete', 'Usuń')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Manual Draw Dialog */}
       <Dialog open={manualDialogOpen} onClose={() => setManualDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Dodaj losowanie ręcznie</DialogTitle>
+        <DialogTitle>{getLabel('history.dialogs.addDrawManually', 'Dodaj losowanie ręcznie')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Alert severity="info" sx={{ mb: 1 }}>
-              Użyj tej opcji gdy synchronizacja z API nie działa lub chcesz dodać starsze wyniki.
+              {getLabel('history.dialogs.useThisOptionInfo', 'Użyj tej opcji gdy synchronizacja z API nie działa lub chcesz dodać starsze wyniki.')}
             </Alert>
             
             <TextField
               fullWidth
-              label="Liczby (6 liczb od 1 do 49)"
-              placeholder="np. 5, 12, 23, 34, 39, 45, 49"
+              label={getLabel('history.dialogs.numbersLabel', 'Liczby (6 liczb od 1 do 49)')}
+              placeholder={getLabel('history.dialogs.numbersPlaceholder', 'np. 5, 12, 23, 34, 39, 45, 49')}
               value={manualNumbers}
               onChange={(e) => setManualNumbers(e.target.value)}
-              helperText="Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami"
+              helperText={getLabel('history.validation.enter6NumbersHelper', 'Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami')}
             />
             
             <MuiDatePickerField
-              label="Data losowania (opcjonalnie)"
+              label={getLabel('history.dialogs.drawDateLabel', 'Data losowania (opcjonalnie)')}
               value={manualDate}
               onChange={(v) => setManualDate(v || '')}
               format="dd.MM.yyyy"
@@ -1314,7 +1314,7 @@ export default function History() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setManualDialogOpen(false)}>Anuluj</Button>
+          <Button onClick={() => setManualDialogOpen(false)}>{getLabel('common.cancel', 'Anuluj')}</Button>
           <Button
             onClick={handleManualAdd}
             color="primary"
@@ -1413,7 +1413,7 @@ export default function History() {
                             disabled={isCheckingDates}
                             startIcon={isCheckingDates ? <CircularProgress size={16} /> : null}
                           >
-                            {isCheckingDates ? 'Sprawdzam...' : 'Sprawdź w API Lotto.pl'}
+                            {isCheckingDates ? getLabel('history.actions.checking', 'Sprawdzam...') : getLabel('history.actions.checkInAPI', 'Sprawdź w API Lotto.pl')}
                           </Button>
                         </Box>
                       )}
@@ -1531,20 +1531,20 @@ export default function History() {
         maxWidth="sm" 
         fullWidth
       >
-        <DialogTitle>Dodaj układ ręcznie</DialogTitle>
+        <DialogTitle>{getLabel('history.dialogs.addPickManually', 'Dodaj układ ręcznie')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Alert severity="info">
-              Wprowadź 6 liczb od 1 do 49. System sprawdzi czy układ nie istnieje w historii losowań ani wygenerowanych układach.
+              {getLabel('history.validation.enter6NumbersDescription', 'Wprowadź 6 liczb od 1 do 49. System sprawdzi czy układ nie istnieje w historii losowań ani wygenerowanych układach.')}
             </Alert>
             
             <TextField
               fullWidth
-              label="Liczby (6 liczb od 1 do 49)"
+              label={getLabel('history.dialogs.numbersLabel', 'Liczby (6 liczb od 1 do 49)')}
               placeholder="np. 5, 12, 23, 34, 39, 45"
               value={manualPickNumbers}
               onChange={(e) => setManualPickNumbers(e.target.value)}
-              helperText="Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami"
+              helperText={getLabel('history.validation.enter6NumbersHelper', 'Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami')}
             />
             
             {validationResult && (
@@ -1558,20 +1558,20 @@ export default function History() {
                 }
               >
                 {validationResult.exists_in_history && (
-                  <Typography variant="body2">Ten układ już istnieje w historii losowań</Typography>
+                  <Typography variant="body2">{getLabel('history.validation.existsInHistory', 'Ten układ już istnieje w historii losowań')}</Typography>
                 )}
                 {validationResult.exists_in_picks && (
-                  <Typography variant="body2">Ten układ już istnieje w wygenerowanych</Typography>
+                  <Typography variant="body2">{getLabel('history.validation.existsInPicks', 'Ten układ już istnieje w wygenerowanych')}</Typography>
                 )}
                 {validationResult.is_unique && (
-                  <Typography variant="body2">Układ jest unikalny - możesz go dodać</Typography>
+                  <Typography variant="body2">{getLabel('history.validation.isUnique', 'Układ jest unikalny - możesz go dodać')}</Typography>
                 )}
               </Alert>
             )}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setManualPickDialogOpen(false)}>Anuluj</Button>
+          <Button onClick={() => setManualPickDialogOpen(false)}>{getLabel('common.cancel', 'Anuluj')}</Button>
           <Button
             onClick={handleManualPickValidate}
             color="secondary"

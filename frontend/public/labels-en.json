@@ -110,6 +110,11 @@
     "hits": "Hits",
     "noGeneratedPicks": "No generated picks. Go to \"Generate\" tab to create new picks.",
     "noHistoricalDraws": "No historical draws. Upload a CSV file with historical results in the \"Dashboard\" tab.",
+    "noDrawsInPeriod": "No draws in selected period",
+    "noSchedules": "No schedules. Add the first schedule to define draw days for different periods.",
+    "noHits": "No picks with 3+ hits",
+    "totalCount": "Total",
+    "selected": "Selected",
     "actions": {
       "sync": "Sync with Lotto.pl",
       "syncing": "Syncing...",
@@ -117,13 +122,18 @@
       "addManuallyPick": "Add pick manually",
       "backup": "Backup",
       "export": "Export to CSV",
-      "verifyIntegrity": "Verify integrity",
+      "verifyIntegrity": "Check Integrity",
       "fixIntegrity": "Fix integrity",
       "checkMissing": "Check missing dates",
       "checkHits": "Check hits",
+      "checking": "Checking...",
+      "checkInAPI": "Check in Lotto.pl API",
       "deleteSelected": "Delete selected",
+      "deleteAll": "Delete All",
       "selectAll": "Select all",
-      "deselectAll": "Deselect all"
+      "deselectAll": "Deselect all",
+      "clearFilter": "Clear filter",
+      "deleting": "Deleting..."
     },
     "table": {
       "numbers": "Numbers",
@@ -139,6 +149,37 @@
       "of": "of",
       "page": "Page",
       "jumpTo": "Jump to page"
+    },
+    "dialogs": {
+      "confirmDelete": "Confirm Deletion",
+      "confirmDeleteSingle": "Are you sure you want to delete this {{type}}?",
+      "confirmDeleteBatch": "Are you sure you want to delete {{count}} {{type}}?",
+      "confirmDeleteSchedule": "Are you sure you want to delete this schedule?",
+      "addDrawManually": "Add draw manually",
+      "addPickManually": "Add pick manually",
+      "useThisOptionInfo": "Use this option when API sync doesn't work or you want to add older results.",
+      "numbersLabel": "Numbers (6 numbers from 1 to 49)",
+      "numbersPlaceholder": "e.g. 5, 12, 23, 34, 39, 45, 49",
+      "drawDateLabel": "Draw date (optional)"
+    },
+    "validation": {
+      "enterExactly6Numbers": "Enter exactly 6 numbers from 1 to 49",
+      "enter6NumbersHelper": "Enter 6 numbers separated by spaces, commas or semicolons",
+      "enter6NumbersDescription": "Enter 6 numbers from 1 to 49. The system will check if the pick doesn't exist in draw history or generated picks.",
+      "selectAtLeastOneDay": "Select at least one day of the week",
+      "uniqueNumbers": "All numbers must be unique",
+      "existsInHistory": "This pick already exists in draw history",
+      "existsInPicks": "This pick already exists in generated picks",
+      "isUnique": "The pick is unique - you can add it"
+    },
+    "messages": {
+      "filterActive": "Filter active: {{filtered}} of {{total}}"
+    },
+    "types": {
+      "pick": "pick",
+      "picks": "picks",
+      "draw": "draw",
+      "draws": "draws"
     }
   },
   "fileUpload": {
