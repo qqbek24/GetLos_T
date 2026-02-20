@@ -19,8 +19,10 @@ import { ICONS, STRATEGY_CONFIG } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import type { Strategy, Pick } from '../types'
+import useLabels from '../hooks/useLabels'
 
 export default function Generate() {
+  const { getLabel } = useLabels()
   const [strategy, setStrategy] = useState<Strategy>('balanced')
   const [count, setCount] = useState(1)
   const [generatedPicks, setGeneratedPicks] = useState<Pick[]>([])
@@ -78,21 +80,21 @@ export default function Generate() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ICONS.GenerateTitleIcon color="primary" fontSize="large" /> Generuj Nowe Układy
+        <ICONS.GenerateTitleIcon color="primary" fontSize="large" /> {getLabel('generate.title', 'Generuj Nowe Układy')}
       </Typography>
 
       {/* Settings Card */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600}>
-            Ustawienia Generowania
+            {getLabel('generate.settingsTitle', 'Ustawienia Generowania')}
           </Typography>
 
           <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>Strategia</InputLabel>
+            <InputLabel>{getLabel('generate.strategy', 'Strategia')}</InputLabel>
             <Select
               value={strategy}
-              label="Strategia"
+              label={getLabel('generate.strategy', 'Strategia')}
               onChange={(e) => setStrategy(e.target.value as Strategy)}
               renderValue={(value) => {
                 const selected = strategies.find(s => s.value === value)
@@ -128,7 +130,7 @@ export default function Generate() {
           <TextField
             fullWidth
             type="number"
-            label="Ilość układów do wygenerowania"
+            label={getLabel('generate.count', 'Ilość układów do wygenerowania')}
             value={count}
             onChange={(e) => setCount(Math.max(1, Math.min(10, Number(e.target.value))))}
             inputProps={{ min: 1, max: 10 }}
@@ -143,12 +145,12 @@ export default function Generate() {
             onClick={handleGenerate}
             disabled={generateMutation.isPending}
           >
-            {generateMutation.isPending ? 'Generowanie...' : 'Generuj'}
+            {generateMutation.isPending ? getLabel('generate.generating', 'Generowanie...') : getLabel('generate.generateButton', 'Generuj')}
           </Button>
 
           {generateMutation.isError && (
             <Alert severity="error" sx={{ mt: 2 }}>
-              {(generateMutation.error as any)?.response?.data?.detail || 'Błąd podczas generowania'}
+              {(generateMutation.error as any)?.response?.data?.detail || getLabel('generate.errorGenerating', 'Błąd podczas generowania')}
             </Alert>
           )}
         </CardContent>
@@ -159,7 +161,7 @@ export default function Generate() {
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <ICONS.StarsGeneratedNumbers color="info" fontSize="medium" /> Wygenerowane Układy
+              <ICONS.StarsGeneratedNumbers color="info" fontSize="medium" /> {getLabel('generate.generatedTitle', 'Wygenerowane Układy')}
             </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
@@ -176,7 +178,7 @@ export default function Generate() {
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="subtitle1" fontWeight={600} color="primary">
-                      Układ #{index + 1}
+                      {getLabel('generate.layout', 'Układ')} #{index + 1}
                     </Typography>
                     <Chip label={pick.strategy} color="primary" size="small" />
                   </Box>
@@ -185,7 +187,7 @@ export default function Generate() {
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                     <Typography variant="body2" color="text.secondary">
-                      Suma: {getSum(pick.numbers)}
+                      {getLabel('generate.sum', 'Suma')}: {getSum(pick.numbers)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {new Date(pick.created_at).toLocaleString('pl-PL')}
@@ -201,7 +203,7 @@ export default function Generate() {
                 startIcon={<ContentCopy />}
                 onClick={handleCopyToClipboard}
               >
-                Kopiuj do Schowka
+                {getLabel('generate.copyToClipboard', 'Kopiuj do Schowka')}
               </Button>
               <Button
                 variant="outlined"
@@ -209,7 +211,7 @@ export default function Generate() {
                 startIcon={<Delete />}
                 onClick={() => setGeneratedPicks([])}
               >
-                Wyczyść
+                {getLabel('generate.clear', 'Wyczyść')}
               </Button>
             </Box>
           </CardContent>
@@ -220,30 +222,30 @@ export default function Generate() {
       <Card sx={{ bgcolor: 'info.lighter' }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ICONS.InfoIcon fontSize="medium" color="info" /> Informacje o Strategiach
+            <ICONS.InfoIcon fontSize="medium" color="info" /> {getLabel('generate.infoTitle', 'Informacje o Strategiach')}
           </Typography>
           <Box component="ul" sx={{ pl: 2 }}>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>Random:</strong> Całkowicie losowy wybór 6 liczb
+              <strong>{getLabel('generate.strategies.random.label', 'Random')}:</strong> {getLabel('generate.strategies.random.info', 'Całkowicie losowy wybór 6 liczb')}
             </Typography>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>Hot:</strong> Preferuje liczby, które często pojawiały się w historii
+              <strong>{getLabel('generate.strategies.hot.label', 'Hot')}:</strong> {getLabel('generate.strategies.hot.info', 'Preferuje liczby, które często pojawiały się w historii')}
             </Typography>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>Cold:</strong> Preferuje liczby, które rzadko się pojawiały
+              <strong>{getLabel('generate.strategies.cold.label', 'Cold')}:</strong> {getLabel('generate.strategies.cold.info', 'Preferuje liczby, które rzadko się pojawiały')}
             </Typography>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>Balanced:</strong> Mieszanka 3 częstych i 3 rzadkich liczb
+              <strong>{getLabel('generate.strategies.balanced.label', 'Balanced')}:</strong> {getLabel('generate.strategies.balanced.info', 'Mieszanka 3 częstych i 3 rzadkich liczb')}
             </Typography>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>Combo Based:</strong> Oparte na najczęstszych parach i trójkach z historii
+              <strong>{getLabel('generate.strategies.combo_based.label', 'Combo Based')}:</strong> {getLabel('generate.strategies.combo_based.info', 'Oparte na najczęstszych parach i trójkach z historii')}
             </Typography>
             <Typography component="li" variant="body2" sx={{ mb: 1 }}>
-              <strong>AI:</strong> Predykcja oparta na uczeniu maszynowym i analizie wzorców historycznych
+              <strong>{getLabel('generate.strategies.ai.label', 'AI')}:</strong> {getLabel('generate.strategies.ai.info', 'Predykcja oparta na uczeniu maszynowym i analizie wzorców historycznych')}
             </Typography>
           </Box>
           <Alert severity="info" sx={{ mt: 2 }}>
-            Wszystkie wygenerowane układy są unikalne i nie powtarzają się z historią!
+            {getLabel('generate.uniqueInfo', 'Wszystkie wygenerowane układy są unikalne i nie powtarzają się z historią!')}
           </Alert>
         </CardContent>
       </Card>

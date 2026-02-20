@@ -13,8 +13,10 @@ import { ICONS } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import type { Stats, PairTripleStats } from '../types'
+import useLabels from '../hooks/useLabels'
 
 export default function StatsPage() {
+  const { getLabel } = useLabels()
   const { data: stats, isLoading, isError } = useQuery<Stats>({
     queryKey: ['stats'],
     queryFn: api.getStats,
@@ -30,7 +32,7 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
+          <ICONS.Stats_chart color="primary" fontSize='large' /> {getLabel('stats.title', 'Statystyki')}
         </Typography>
         <LinearProgress />
       </Box>
@@ -41,10 +43,10 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ICONS.Stats_chart color="error" fontSize='large' /> Statystyki
+          <ICONS.Stats_chart color="error" fontSize='large' /> {getLabel('stats.title', 'Statystyki')}
         </Typography>
         <Alert severity="error">
-          Nie udało się pobrać statystyk. Upewnij się, że wgrałeś dane historyczne.
+          {getLabel('stats.noData', 'Nie udało się pobrać statystyk. Upewnij się, że wgrałeś dane historyczne.')}
         </Alert>
       </Box>
     )
@@ -54,10 +56,10 @@ export default function StatsPage() {
     return (
       <Box>
         <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ICONS.Stats_chart color="primary" fontSize='large' /> Statystyki
+          <ICONS.Stats_chart color="primary" fontSize='large' /> {getLabel('stats.title', 'Statystyki')}
         </Typography>
         <Alert severity="info">
-          Brak danych historycznych. Wgraj plik CSV z wynikami losowań w zakładce "Dashboard".
+          {getLabel('stats.noHistoricalData', 'Brak danych historycznych. Wgraj plik CSV z wynikami losowań w zakładce "Dashboard".')}
         </Alert>
       </Box>
     )
@@ -78,7 +80,7 @@ export default function StatsPage() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ICONS.Stats_chart color="primary" fontSize='large'/> Statystyki
+        <ICONS.Stats_chart color="primary" fontSize='large'/> {getLabel('stats.title', 'Statystyki')}
       </Typography>
 
       {/* Overview Stats */}
@@ -88,14 +90,14 @@ export default function StatsPage() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <ICONS.Favorite color="primary" />
               <Typography variant="h6" fontWeight={600}>
-                Losowania
+                {getLabel('stats.draws', 'Losowania')}
               </Typography>
             </Box>
             <Typography variant="h3" fontWeight={700} color="primary">
               {stats.total_draws}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Łączna liczba losowań w bazie
+              {getLabel('stats.totalDraws', 'Łączna liczba losowań w bazie')}
             </Typography>
           </CardContent>
         </Card>
@@ -105,14 +107,14 @@ export default function StatsPage() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <ICONS.Hot color="error" />
               <Typography variant="h6" fontWeight={600}>
-                Najczęstsza
+                {getLabel('stats.mostCommon', 'Najczęstsza')}
               </Typography>
             </Box>
             <Typography variant="h3" fontWeight={700} color="error.main">
               {mostCommon}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Wystąpień: {stats.freq[mostCommon - 1] || 0}
+              {getLabel('stats.occurrences', 'Wystąpień')}: {stats.freq[mostCommon - 1] || 0}
             </Typography>
           </CardContent>
         </Card>
@@ -122,14 +124,14 @@ export default function StatsPage() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <ICONS.Cold color="info" />
               <Typography variant="h6" fontWeight={600}>
-                Najrzadsza
+                {getLabel('stats.leastCommon', 'Najrzadsza')}
               </Typography>
             </Box>
             <Typography variant="h3" fontWeight={700} color="info.main">
               {leastCommon}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Wystąpień: {stats.freq[leastCommon - 1] || 0}
+              {getLabel('stats.occurrences', 'Wystąpień')}: {stats.freq[leastCommon - 1] || 0}
             </Typography>
           </CardContent>
         </Card>
@@ -139,10 +141,10 @@ export default function StatsPage() {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ICONS.CalculateIcon color="info" fontSize='medium' /> Częstotliwość Liczb (1-49)
+            <ICONS.CalculateIcon color="info" fontSize='medium' /> {getLabel('stats.frequencyTitle', 'Częstotliwość Liczb (1-49)')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Im cieplejszy kolor, tym częściej liczba wystąpiła w losowaniach
+            {getLabel('stats.frequencyDescription', 'Im cieplejszy kolor, tym częściej liczba wystąpiła w losowaniach')}
           </Typography>
 
           <Grid container spacing={1}>
@@ -197,12 +199,12 @@ export default function StatsPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <ICONS.Hot color="error" />
             <Typography variant="h6" fontWeight={600}>
-              TOP 10 Najczęstszych Liczb
+              {getLabel('stats.hotNumbersTitle', 'TOP 10 Najczęstszych Liczb')}
             </Typography>
           </Box>
           <NumbersBall numbers={hotNumbers} gradient="hot" />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Te liczby pojawiały się najczęściej w historycznych losowaniach
+            {getLabel('stats.hotNumbersDescription', 'Te liczby pojawiały się najczęściej w historycznych losowaniach')}
           </Typography>
         </CardContent>
       </Card>
@@ -213,12 +215,12 @@ export default function StatsPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <ICONS.Cold color="info" />
             <Typography variant="h6" fontWeight={600}>
-              TOP 10 Najrzadszych Liczb
+              {getLabel('stats.coldNumbersTitle', 'TOP 10 Najrzadszych Liczb')}
             </Typography>
           </Box>
           <NumbersBall numbers={coldNumbers} gradient="cold" />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Te liczby pojawiały się najrzadziej w historycznych losowaniach
+            {getLabel('stats.coldNumbersDescription', 'Te liczby pojawiały się najrzadziej w historycznych losowaniach')}
           </Typography>
         </CardContent>
       </Card>
@@ -228,7 +230,7 @@ export default function StatsPage() {
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <ICONS.Top2 color="info" /> TOP 5 Najczęstszych Par
+              <ICONS.Top2 color="info" /> {getLabel('stats.topPairs', 'TOP 5 Najczęstszych Par')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {pairTripleStats.pairs.slice(0, 5).map((pair, index) => (
@@ -267,7 +269,7 @@ export default function StatsPage() {
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <ICONS.Top3 color="info" /> TOP 5 Najczęstszych Trójek
+              <ICONS.Top3 color="info" /> {getLabel('stats.topTriples', 'TOP 5 Najczęstszych Trójek')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {pairTripleStats.triples.slice(0, 5).map((triple, index) => (

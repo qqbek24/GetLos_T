@@ -38,8 +38,10 @@ import NumbersBall from '../components/NumbersBall'
 import MuiDatePickerField from '../components/MuiDatePickerField'
 import type { Pick, Draw, IntegrityReport, ValidateResponse, DrawSchedule, DrawScheduleCreate } from '../types'
 import useAdmin from '../hooks/useAdmin'
+import useLabels from '../hooks/useLabels'
 
 export default function History() {
+  const { getLabel } = useLabels()
   const [tab, setTab] = useState<'picks' | 'draws' | 'schedules' | 'hits'>('picks')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [batchDeleteDialogOpen, setBatchDeleteDialogOpen] = useState(false)
@@ -755,17 +757,17 @@ export default function History() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ICONS.LibraryBooks color="primary" fontSize="large" /> Historia
+        <ICONS.LibraryBooks color="primary" fontSize="large" /> {getLabel('history.title', 'Historia')}
       </Typography>
 
       <Card>
         <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
             <Tabs value={tab} onChange={handleTabChange}>
-              <Tab label={`Wygenerowane Układy (${picksTotal})`} value="picks" />
-              <Tab label={`Historyczne Losowania (${drawsTotal})`} value="draws" />
-              <Tab label={`Harmonogramy (${schedules.length})`} value="schedules" />
-              <Tab label="Sprawdź Trafienia" value="hits" icon={<ICONS.Search />} iconPosition="start" />
+              <Tab label={`${getLabel('history.generatedPicks', 'Wygenerowane Układy')} (${picksTotal})`} value="picks" />
+              <Tab label={`${getLabel('history.historicalDraws', 'Historyczne Losowania')} (${drawsTotal})`} value="draws" />
+              <Tab label={`${getLabel('history.drawSchedules', 'Harmonogramy')} (${schedules.length})`} value="schedules" />
+              <Tab label={getLabel('history.hits', 'Trafienia')} value="hits" icon={<ICONS.Search />} iconPosition="start" />
             </Tabs>
           </Box>
 
@@ -808,7 +810,7 @@ export default function History() {
                       onClick={() => syncLottoMutation.mutate()}
                       disabled={syncLottoMutation.isPending}
                     >
-                      {syncLottoMutation.isPending ? 'Synchronizacja...' : 'Synchronizuj z Lotto.pl'}
+                      {syncLottoMutation.isPending ? getLabel('history.actions.syncing', 'Synchronizacja...') : getLabel('history.actions.sync', 'Synchronizuj z Lotto.pl')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -817,7 +819,7 @@ export default function History() {
                       startIcon={<ICONS.Add />}
                       onClick={() => setManualDialogOpen(true)}
                     >
-                      Dodaj ręcznie
+                      {getLabel('history.actions.addManually', 'Dodaj ręcznie')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -827,7 +829,7 @@ export default function History() {
                       onClick={() => exportMutation.mutate()}
                       disabled={exportMutation.isPending}
                     >
-                      Backup
+                      {getLabel('history.actions.backup', 'Backup')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -837,7 +839,7 @@ export default function History() {
                       onClick={() => verifyIntegrityMutation.mutate()}
                       disabled={verifyIntegrityMutation.isPending}
                     >
-                      Sprawdź Integralność
+                      {getLabel('history.actions.verifyIntegrity', 'Sprawdź Integralność')}
                     </Button>
                   </>
                 )}
