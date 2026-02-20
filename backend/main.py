@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, case
 from datetime import datetime, timedelta
 import csv, io, random, math, os, json
 import yaml
@@ -709,7 +709,8 @@ def list_draws(
     """
     total = db.query(HistoricalDraw).count()
     draws = db.query(HistoricalDraw).order_by(
-        HistoricalDraw.source.desc().nullslast(),
+        case((HistoricalDraw.source.is_(None), 1), else_=0),
+        HistoricalDraw.source.desc(),
         HistoricalDraw.created_at.desc()
     ).offset(offset).limit(limit).all()
     page = (offset // limit) + 1 if limit > 0 else 1
