@@ -37,6 +37,7 @@ import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import MuiDatePickerField from '../components/MuiDatePickerField'
 import type { Pick, Draw, IntegrityReport, ValidateResponse, DrawSchedule, DrawScheduleCreate } from '../types'
+import useAdmin from '../hooks/useAdmin'
 
 export default function History() {
   const [tab, setTab] = useState<'picks' | 'draws' | 'schedules' | 'hits'>('picks')
@@ -70,6 +71,7 @@ export default function History() {
   const [jumpToPage, setJumpToPage] = useState<string>('')
   const [integrityChecked, setIntegrityChecked] = useState(false)
   const queryClient = useQueryClient()
+  const isAdmin = useAdmin()
 
   const { data: picksData, isLoading: picksLoading, isFetching: picksFetching } = useQuery({
     queryKey: ['picks', page, rowsPerPage],
@@ -631,9 +633,11 @@ export default function History() {
               <IconButton size="small" onClick={() => handleCopyNumbers(pick.numbers)} color="primary">
                 <ICONS.Copy fontSize="small" />
               </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(pick.id)} color="error">
-                <ICONS.Delete fontSize="small" />
-              </IconButton>
+              {isAdmin && (
+                <IconButton size="small" onClick={() => handleDelete(pick.id)} color="error">
+                  <ICONS.Delete fontSize="small" />
+                </IconButton>
+              )}
             </Box>
           </Box>
         ))}
@@ -730,9 +734,11 @@ export default function History() {
                 <IconButton size="small" onClick={() => handleCopyNumbers(draw.numbers)} color="primary">
                   <ICONS.Copy fontSize="small" />
                 </IconButton>
-                <IconButton size="small" onClick={() => handleDelete(draw.id)} color="error">
-                  <ICONS.Delete fontSize="small" />
-                </IconButton>
+                {isAdmin && (
+                  <IconButton size="small" onClick={() => handleDelete(draw.id)} color="error">
+                    <ICONS.Delete fontSize="small" />
+                  </IconButton>
+                )}
               </Box>
             </Box>
           )
@@ -875,7 +881,7 @@ export default function History() {
           )}
 
           {/* Action buttons always visible for picks tab */}
-          {tab === 'picks' && currentCount === 0 && (
+          {tab === 'picks' && isAdmin && currentCount === 0 && (
             <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
               <Button
                 variant="outlined"

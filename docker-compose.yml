@@ -17,6 +17,7 @@ services:
       - ./backend/data:/app/data
     environment:
       DATABASE_URL: sqlite:///./data/app.db
+      ADMIN_MODE: "true"
     networks:
       - getlos_network
     command: uvicorn main:app --host 0.0.0.0 --port 8000
@@ -35,6 +36,7 @@ services:
       - /app/node_modules
     environment:
       VITE_API_URL: http://localhost:8001
+      VITE_ADMIN_MODE: "true"
     networks:
       - getlos_network
     depends_on:

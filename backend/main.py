@@ -38,6 +38,20 @@ from lotto_api import (
 # Load environment variables
 load_dotenv()
 
+# Admin mode: True  → all endpoints enabled (local dev, trusted users)
+#             False → destructive/write endpoints return HTTP 403 (public/portfolio)
+ADMIN_MODE = os.getenv("ADMIN_MODE", "false").lower() == "true"
+
+
+def require_admin():
+    """FastAPI dependency – raises HTTP 403 when ADMIN_MODE is off."""
+    if not ADMIN_MODE:
+        raise HTTPException(
+            status_code=403,
+            detail="Operacja niedostępna w trybie publicznym."
+        )
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title="GetLos_T - Lotto Predictor",
@@ -413,7 +427,7 @@ def root():
     }
 
 
-@app.post("/upload-csv", response_model=UploadResponse)
+@app.post("/upload-csv", response_model=UploadResponse, dependencies=[Depends(require_admin)])
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
     Upload CSV or JSON file with historical lottery draws
@@ -712,7 +726,7 @@ def list_draws(
 
 # ========== DELETE Endpoints - /all MUST come before /{id} ==========
 
-@app.delete("/picks/all")
+@app.delete("/picks/all", dependencies=[Depends(require_admin)])
 def clear_all_picks(db: Session = Depends(get_db)):
     """
     Clear all generated picks
@@ -724,7 +738,7 @@ def clear_all_picks(db: Session = Depends(get_db)):
     return {"success": True, "deleted": count}
 
 
-@app.delete("/draws/all")
+@app.delete("/draws/all", dependencies=[Depends(require_admin)])
 def clear_all_draws(db: Session = Depends(get_db)):
     """
     Clear all historical draws (use with caution!)
@@ -736,7 +750,7 @@ def clear_all_draws(db: Session = Depends(get_db)):
     return {"success": True, "deleted": count}
 
 
-@app.delete("/draws/batch")
+@app.delete("/draws/batch", dependencies=[Depends(require_admin)])
 def delete_draws_batch(request: BatchDeleteRequest, db: Session = Depends(get_db)):
     """
     Delete multiple historical draws at once
@@ -750,7 +764,7 @@ def delete_draws_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     return {"success": True, "deleted": deleted}
 
 
-@app.delete("/draws/{draw_id}")
+@app.delete("/draws/{draw_id}", dependencies=[Depends(require_admin)])
 def delete_draw(draw_id: int, db: Session = Depends(get_db)):
     """
     Delete a specific historical draw
@@ -765,7 +779,7 @@ def delete_draw(draw_id: int, db: Session = Depends(get_db)):
     return {"success": True, "message": "Draw deleted"}
 
 
-@app.delete("/picks/batch")
+@app.delete("/picks/batch", dependencies=[Depends(require_admin)])
 def delete_picks_batch(request: BatchDeleteRequest, db: Session = Depends(get_db)):
     """
     Delete multiple picks at once
@@ -779,7 +793,7 @@ def delete_picks_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     return {"success": True, "deleted": deleted}
 
 
-@app.delete("/picks/{pick_id}")
+@app.delete("/picks/{pick_id}", dependencies=[Depends(require_admin)])
 def delete_pick(pick_id: int, db: Session = Depends(get_db)):
     """
     Delete a specific pick
@@ -842,7 +856,7 @@ def pairtriple_stats(limit: int = 20, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/sync-lotto", response_model=SyncLottoResponse)
+@app.post("/sync-lotto", response_model=SyncLottoResponse, dependencies=[Depends(require_admin)])
 async def sync_lotto_results(db: Session = Depends(get_db)):
     """
     Synchronize lottery results with Lotto.pl official API
@@ -992,7 +1006,7 @@ async def sync_lotto_results(db: Session = Depends(get_db)):
         )
 
 
-@app.post("/manual-draw", response_model=UploadResponse)
+@app.post("/manual-draw", response_model=UploadResponse, dependencies=[Depends(require_admin)])
 def add_manual_draw(request: ManualDrawRequest, db: Session = Depends(get_db)):
     """
     Manually add one or more lottery draws
@@ -1077,7 +1091,7 @@ def export_draws_to_json(db: Session = Depends(get_db)):
     }
 
 
-@app.post("/import-draws", response_model=BackupResponse)
+@app.post("/import-draws", response_model=BackupResponse, dependencies=[Depends(require_admin)])
 def import_draws_from_json(draws_data: dict, db: Session = Depends(get_db)):
     """
     Import draws from JSON backup
@@ -1481,7 +1495,7 @@ async def check_missing_dates(dates: List[str], db: Session = Depends(get_db)):
     }
 
 
-@app.post("/fix-integrity", response_model=IntegrityFixResponse)
+@app.post("/fix-integrity", response_model=IntegrityFixResponse, dependencies=[Depends(require_admin)])
 async def fix_integrity(db: Session = Depends(get_db)):
     """
     Automatically fix data integrity issues
@@ -1642,7 +1656,7 @@ def list_draw_schedules(db: Session = Depends(get_db)):
     return schedules
 
 
-@app.post("/draw-schedules", response_model=DrawScheduleResponse)
+@app.post("/draw-schedules", response_model=DrawScheduleResponse, dependencies=[Depends(require_admin)])
 def create_draw_schedule(schedule: DrawScheduleCreate, db: Session = Depends(get_db)):
     """Create new draw schedule period"""
     new_schedule = DrawSchedule(
@@ -1657,7 +1671,7 @@ def create_draw_schedule(schedule: DrawScheduleCreate, db: Session = Depends(get
     return new_schedule
 
 
-@app.put("/draw-schedules/{schedule_id}", response_model=DrawScheduleResponse)
+@app.put("/draw-schedules/{schedule_id}", response_model=DrawScheduleResponse, dependencies=[Depends(require_admin)])
 def update_draw_schedule(schedule_id: int, schedule: DrawScheduleCreate, db: Session = Depends(get_db)):
     """Update existing draw schedule"""
     existing = db.query(DrawSchedule).filter_by(id=schedule_id).first()
@@ -1673,7 +1687,7 @@ def update_draw_schedule(schedule_id: int, schedule: DrawScheduleCreate, db: Ses
     return existing
 
 
-@app.delete("/draw-schedules/{schedule_id}")
+@app.delete("/draw-schedules/{schedule_id}", dependencies=[Depends(require_admin)])
 def delete_draw_schedule(schedule_id: int, db: Session = Depends(get_db)):
     """Delete draw schedule"""
     schedule = db.query(DrawSchedule).filter_by(id=schedule_id).first()
@@ -1685,7 +1699,7 @@ def delete_draw_schedule(schedule_id: int, db: Session = Depends(get_db)):
     return {"success": True, "message": f"Schedule {schedule_id} deleted"}
 
 
-@app.post("/draw-schedules/initialize")
+@app.post("/draw-schedules/initialize", dependencies=[Depends(require_admin)])
 def initialize_default_schedules(db: Session = Depends(get_db)):
     """Initialize with default Lotto schedule (current: Tue, Thu, Sat)"""
     # Check if any schedules exist

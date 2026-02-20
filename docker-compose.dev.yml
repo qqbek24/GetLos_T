@@ -14,6 +14,7 @@ services:
       - "8001:8000"
     environment:
       DATABASE_URL: sqlite:///./data/app.db
+      ADMIN_MODE: "true"
     volumes:
       - ./backend:/app
       - ./backend/data:/app/data
@@ -32,6 +33,7 @@ services:
       - "5174:5173"
     environment:
       VITE_API_URL: http://localhost:8001
+      VITE_ADMIN_MODE: "true"
     volumes:
       - ./frontend:/app
       - /app/node_modules

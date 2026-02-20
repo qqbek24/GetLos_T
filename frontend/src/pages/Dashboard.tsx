@@ -16,11 +16,13 @@ import { ICONS } from '@/config/icons'
 import { api } from '../services/api'
 import NumbersBall from '../components/NumbersBall'
 import FileUpload, { type UploadedFile } from '../components/FileUpload'
+import useAdmin from '../hooks/useAdmin'
 import useLabels from '../hooks/useLabels'
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const { labels, getLabel } = useLabels()
+  const isAdmin = useAdmin()
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -130,7 +132,8 @@ export default function Dashboard() {
         </Grid>
       )}
 
-      {/* Upload CSV */}
+      {/* Upload CSV - admin only */}
+      {isAdmin && (
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -169,6 +172,7 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Quick Actions */}
       <Card sx={{ mb: 4 }}>
