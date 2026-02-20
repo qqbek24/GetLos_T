@@ -107,12 +107,10 @@
     "generatedPicks": "Generated Picks",
     "historicalDraws": "Historical Draws",
     "drawSchedules": "Draw Schedules",
-    "hits": "Hits",
     "noGeneratedPicks": "No generated picks. Go to \"Generate\" tab to create new picks.",
     "noHistoricalDraws": "No historical draws. Upload a CSV file with historical results in the \"Dashboard\" tab.",
     "noDrawsInPeriod": "No draws in selected period",
-    "noSchedules": "No schedules. Add the first schedule to define draw days for different periods.",
-    "noHits": "No picks with 3+ hits",
+    "noSchedules": "No schedules. Add the first schedule to define draw days for different periods",
     "totalCount": "Total",
     "selected": "Selected",
     "actions": {
@@ -180,6 +178,48 @@
       "picks": "picks",
       "draw": "draw",
       "draws": "draws"
+    },
+    "weekdays": {
+      "short": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    },
+    "dateFilter": {
+      "from": "From date",
+      "to": "To date"
+    },
+    "schedules": {
+      "manageDescription": "Manage draw schedules (weekdays for different periods)",
+      "tableHeaders": {
+        "fromDate": "From date",
+        "toDate": "To date",
+        "weekdays": "Weekdays",
+        "description": "Description",
+        "actions": "Actions"
+      },
+      "currently": "currently",
+      "addSchedule": "Add schedule",
+      "editSchedule": "Edit schedule",
+      "fromDateLabel": "Start date",
+      "toDateLabel": "End date (empty = current)",
+      "weekdaysLabel": "Draw weekdays",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "e.g. Holiday period, Changed schedule",
+      "toDateHelper": "Leave empty if schedule is valid until today"
+    },
+    "hits": {
+      "tabTitle": "Hits",
+      "noHits": "No picks with 3+ hits",
+      "description": "Check if generated numbers hit in historical draws. The system will compare each generated pick with each draw and show picks with at least 3 hits.",
+      "checked": "Checked: {{picks}} picks against {{draws}} draws",
+      "found": "Found hits (3+): {{count}} picks",
+      "best": "Best: {{count}} hits",
+      "hitCount": "{{count}} hits",
+      "moreHits": "...and {{count}} other hits"
+    },
+    "sync": {
+      "newDraws": "new draws"
+    },
+    "export": {
+      "success": "Exported {{count}} draws"
     }
   },
   "fileUpload": {
