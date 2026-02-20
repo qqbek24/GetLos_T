@@ -182,7 +182,7 @@ export default function History() {
       if (data.success) {
         setSyncResult({
           type: 'success',
-          message: data.message + (data.new_draws > 0 ? ` (${data.new_draws} nowych losowań)` : ''),
+          message: data.message + (data.new_draws > 0 ? ` (${data.new_draws} ${getLabel('history.sync.newDraws')})` : ''),
         })
         queryClient.invalidateQueries({ queryKey: ['draws'] })
         queryClient.invalidateQueries({ queryKey: ['stats'] })
@@ -241,7 +241,7 @@ export default function History() {
       
       setSyncResult({
         type: 'success',
-        message: `Wyeksportowano ${data.count} losowań`,
+        message: getLabel('history.export.success').replace('{{count}}', data.count.toString()),
       })
       setTimeout(() => setSyncResult(null), 3000)
     },
@@ -758,7 +758,7 @@ export default function History() {
   const currentCount = tab === 'picks' ? picksTotal : drawsTotal
   const currentTotalPages = tab === 'picks' ? picksTotalPages : drawsTotalPages
   const isFetching = tab === 'picks' ? picksFetching : drawsFetching
-  const currentLabel = tab === 'picks' ? 'układów' : 'losowań'
+  const currentLabel = tab === 'picks' ? getLabel('history.types.picks') : getLabel('history.types.draws')
 
   return (
     <Box>
@@ -773,7 +773,7 @@ export default function History() {
               <Tab label={`${getLabel('history.generatedPicks', 'Wygenerowane Układy')} (${picksTotal})`} value="picks" />
               <Tab label={`${getLabel('history.historicalDraws', 'Historyczne Losowania')} (${drawsTotal})`} value="draws" />
               <Tab label={`${getLabel('history.drawSchedules', 'Harmonogramy')} (${schedules.length})`} value="schedules" />
-              <Tab label={getLabel('history.hits', 'Trafienia')} value="hits" icon={<ICONS.Search />} iconPosition="start" />
+              <Tab label={getLabel('history.hits.tabTitle', 'Trafienia')} value="hits" icon={<ICONS.Search />} iconPosition="start" />
             </Tabs>
           </Box>
 
@@ -867,7 +867,7 @@ export default function History() {
           {tab === 'draws' && (
             <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <MuiDatePickerField
-                label="Od daty"
+                label={getLabel('history.dateFilter.from')}
                 value={dateFilterFrom}
                 onChange={setDateFilterFrom}
                 size="small"
@@ -875,7 +875,7 @@ export default function History() {
                 width={180}
               />
               <MuiDatePickerField
-                label="Do daty"
+                label={getLabel('history.dateFilter.to')}
                 value={dateFilterTo}
                 onChange={setDateFilterTo}
                 size="small"
@@ -971,7 +971,7 @@ export default function History() {
             <Box>
               <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  Zarządzaj harmonogramami losowań (dni tygodnia dla różnych okresów)
+                  {getLabel('history.schedules.manageDescription')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {schedules.length === 0 && (
@@ -990,7 +990,7 @@ export default function History() {
                     startIcon={<ICONS.Add />}
                     onClick={() => handleOpenScheduleDialog()}
                   >
-                    Dodaj harmonogram
+                    {getLabel('history.schedules.addSchedule')}
                   </Button>
                 </Box>
               </Box>
@@ -1008,16 +1008,16 @@ export default function History() {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell><strong>Od daty</strong></TableCell>
-                        <TableCell><strong>Do daty</strong></TableCell>
-                        <TableCell><strong>Dni tygodnia</strong></TableCell>
-                        <TableCell><strong>Opis</strong></TableCell>
-                        <TableCell align="right"><strong>Akcje</strong></TableCell>
+                        <TableCell><strong>{getLabel('history.schedules.tableHeaders.fromDate')}</strong></TableCell>
+                        <TableCell><strong>{getLabel('history.schedules.tableHeaders.toDate')}</strong></TableCell>
+                        <TableCell><strong>{getLabel('history.schedules.tableHeaders.weekdays')}</strong></TableCell>
+                        <TableCell><strong>{getLabel('history.schedules.tableHeaders.description')}</strong></TableCell>
+                        <TableCell align="right"><strong>{getLabel('history.schedules.tableHeaders.actions')}</strong></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {schedules.map((schedule) => {
-                        const weekdayNames = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
+                        const weekdayNames = getLabel('history.weekdays.short')
                         
                         return (
                           <TableRow key={schedule.id}>
@@ -1025,7 +1025,7 @@ export default function History() {
                             <TableCell>
                               {schedule.date_to 
                                 ? new Date(schedule.date_to).toLocaleDateString('pl-PL')
-                                : <em>obecnie</em>
+                                : <em>{getLabel('history.schedules.currently')}</em>
                               }
                             </TableCell>
                             <TableCell>
@@ -1070,7 +1070,7 @@ export default function History() {
             <Box>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Sprawdź czy wygenerowane liczby kiedykolwiek padły w historycznych losowaniach (min. 3 trafienia)
+                  {getLabel('history.hits.description')}
                 </Typography>
                 <Button
                   variant="contained"
@@ -1095,9 +1095,9 @@ export default function History() {
               {hitsData && (
                 <>
                   <Alert severity="info" sx={{ mb: 2 }}>
-                    <strong>Sprawdzono:</strong> {hitsData.total_picks} układów przeciwko {hitsData.total_draws} losowaniom
+                    <strong>{getLabel('history.hits.checked').replace('{{picks}}', hitsData.total_picks.toString()).replace('{{draws}}', hitsData.total_draws.toString())}</strong>
                     <br />
-                    <strong>Znaleziono trafień (3+):</strong> {hitsData.picks_with_hits} układów
+                    <strong>{getLabel('history.hits.found').replace('{{count}}', hitsData.picks_with_hits.toString())}</strong>
                   </Alert>
 
                   {hitsData.results.filter((r: any) => r.best_hit_count >= 3).map((result: any, idx: number) => (
@@ -1106,7 +1106,7 @@ export default function History() {
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'space-between' }}>
                           <NumbersBall numbers={result.pick_numbers} />
                           <Chip 
-                            label={`Najlepsze: ${result.best_hit_count} trafień`}
+                            label={getLabel('history.hits.best').replace('{{count}}', result.best_hit_count.toString())}
                             color={result.best_hit_count === 6 ? 'error' : result.best_hit_count === 5 ? 'warning' : 'default'}
                           />
                         </Box>
@@ -1118,7 +1118,7 @@ export default function History() {
                           <Box key={midx} sx={{ mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <Chip 
-                                label={`${match.hit_count} trafień`}
+                                label={getLabel('history.hits.hitCount').replace('{{count}}', match.hit_count.toString())}
                                 size="small"
                                 color={match.hit_count === 6 ? 'error' : match.hit_count === 5 ? 'warning' : match.hit_count === 4 ? 'info' : 'default'}
                               />
@@ -1152,7 +1152,7 @@ export default function History() {
                         ))}
                         {result.matches.length > 5 && (
                           <Typography variant="caption" color="text.secondary">
-                            ...i {result.matches.length - 5} innych trafień
+                            {getLabel('history.hits.moreHits').replace('{{count}}', (result.matches.length - 5).toString())}
                           </Typography>
                         )}
                       </CardContent>
@@ -1161,7 +1161,7 @@ export default function History() {
 
                   {hitsData.results.filter((r: any) => r.best_hit_count >= 3).length === 0 && (
                     <Alert severity="info">
-                      {getLabel('history.noHits', 'Brak układów z 3+ trafieniami')}
+                      {getLabel('history.hits.noHits', 'Brak układów z 3+ trafieniami')}
                     </Alert>
                   )}
                 </>
@@ -1174,10 +1174,10 @@ export default function History() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, pt: 2, borderTop: 1, borderColor: 'divider', flexWrap: 'wrap', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                 <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Na stronę</InputLabel>
+                  <InputLabel>{getLabel('history.pagination.rowsPerPage')}</InputLabel>
                   <Select
                     value={rowsPerPage}
-                    label="Na stronę"
+                    label={getLabel('history.pagination.rowsPerPage')}
                     onChange={(e) => {
                       setRowsPerPage(Number(e.target.value))
                       setPage(0)
@@ -1229,7 +1229,7 @@ export default function History() {
                     }}
                     disabled={!jumpToPage || parseInt(jumpToPage) < 1 || parseInt(jumpToPage) > currentTotalPages}
                   >
-                    Idź
+                    {getLabel('history.pagination.jumpTo')}
                   </Button>
                 </Box>
               </Box>
@@ -1599,7 +1599,7 @@ export default function History() {
 
       {/* Schedule Dialog */}
       <Dialog open={scheduleDialogOpen} onClose={() => setScheduleDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingSchedule ? 'Edytuj harmonogram' : 'Dodaj harmonogram'}</DialogTitle>
+        <DialogTitle>{editingSchedule ? getLabel('history.schedules.editSchedule') : getLabel('history.schedules.addSchedule')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Alert severity="info" sx={{ mb: 1 }}>
@@ -1616,11 +1616,11 @@ export default function History() {
             />
             
             <MuiDatePickerField
-              label="Data końcowa (puste = obecnie)"
+              label={getLabel('history.schedules.toDateLabel')}
               value={scheduleDateTo}
               onChange={(v) => setScheduleDateTo(v || '')}
               format="dd.MM.yyyy"
-              helperText="Pozostaw puste jeśli harmonogram obowiązuje do dziś"
+              helperText={getLabel('history.schedules.toDateHelper')}
             />
             
             <Box>

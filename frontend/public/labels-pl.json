@@ -107,12 +107,10 @@
     "generatedPicks": "Wygenerowane Układy",
     "historicalDraws": "Historyczne Losowania",
     "drawSchedules": "Harmonogramy Losowań",
-    "hits": "Trafienia",
     "noGeneratedPicks": "Brak wygenerowanych układów. Przejdź do zakładki \"Generuj\" aby utworzyć nowe układy.",
     "noHistoricalDraws": "Brak historycznych losowań. Wgraj plik CSV z historycznymi wynikami w zakładce \"Dashboard\".",
     "noDrawsInPeriod": "Brak losowań w wybranym okresie",
-    "noSchedules": "Brak harmonogramów. Dodaj pierwszy harmonogram aby określić dni losowań dla różnych okresów.",
-    "noHits": "Brak układów z 3+ trafieniami",
+    "noSchedules": "Brak harmonogramów. Dodaj pierwszy harmonogram aby określić dni losowań dla różnych okresów",
     "totalCount": "Łącznie",
     "selected": "Zaznaczono",
     "actions": {
@@ -180,6 +178,48 @@
       "picks": "układów",
       "draw": "wynik losowania",
       "draws": "wyników losowań"
+    },
+    "weekdays": {
+      "short": ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"]
+    },
+    "dateFilter": {
+      "from": "Od daty",
+      "to": "Do daty"
+    },
+    "schedules": {
+      "manageDescription": "Zarządzaj harmonogramami losowań (dni tygodnia dla różnych okresów)",
+      "tableHeaders": {
+        "fromDate": "Od daty",
+        "toDate": "Do daty",
+        "weekdays": "Dni tygodnia",
+        "description": "Opis",
+        "actions": "Akcje"
+      },
+      "currently": "obecnie",
+      "addSchedule": "Dodaj harmonogram",
+      "editSchedule": "Edytuj harmonogram",
+      "fromDateLabel": "Data początkowa",
+      "toDateLabel": "Data końcowa (puste = obecnie)",
+      "weekdaysLabel": "Dni tygodnia losowań",
+      "descriptionLabel": "Opis (opcjonalnie)",
+      "descriptionPlaceholder": "np. Okres świąteczny, Zmieniony harmonogram",
+      "toDateHelper": "Pozostaw puste jeśli harmonogram obowiązuje do dziś"
+    },
+    "hits": {
+      "tabTitle": "Trafienia",
+      "noHits": "Brak układów z 3+ trafieniami",
+      "description": "Sprawdź czy wygenerowane liczby trafiły w historycznych losowaniach. System porówna każdy wygenerowany układ z każdym losowaniem i pokaże układy z minimum 3 trafieniami.",
+      "checked": "Sprawdzono: {{picks}} układów przeciwko {{draws}} losowaniom",
+      "found": "Znaleziono trafień (3+): {{count}} układów",
+      "best": "Najlepsze: {{count}} trafień",
+      "hitCount": "{{count}} trafień",
+      "moreHits": "...i {{count}} innych trafień"
+    },
+    "sync": {
+      "newDraws": "nowych losowań"
+    },
+    "export": {
+      "success": "Wyeksportowano {{count}} losowań"
     }
   },
   "fileUpload": {
