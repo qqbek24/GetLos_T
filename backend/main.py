@@ -17,6 +17,8 @@ from itertools import combinations
 from dotenv import load_dotenv
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from functools import wraps
+import time
 
 from db import get_db, init_db
 from models import HistoricalDraw, Pick, DrawSchedule, norm_key
@@ -41,6 +43,78 @@ load_dotenv()
 # Admin mode: True  → all endpoints enabled (local dev, trusted users)
 #             False → destructive/write endpoints return HTTP 403 (public/portfolio)
 ADMIN_MODE = os.getenv("ADMIN_MODE", "false").lower() == "true"
+
+
+# ===== IN-MEMORY CACHE =====
+# Simple TTL-based cache to reduce database queries
+class SimpleCache:
+    """In-memory cache with TTL (time-to-live) support"""
+    def __init__(self):
+        self._cache = {}
+        self._timestamps = {}
+    
+    def get(self, key: str, ttl_seconds: int = 300):
+        """Get cached value if not expired (default TTL: 5 minutes)"""
+        if key in self._cache:
+            age = time.time() - self._timestamps.get(key, 0)
+            if age < ttl_seconds:
+                return self._cache[key]
+            else:
+                # Expired - remove
+                self.delete(key)
+        return None
+    
+    def set(self, key: str, value):
+        """Store value in cache with current timestamp"""
+        self._cache[key] = value
+        self._timestamps[key] = time.time()
+    
+    def delete(self, key: str):
+        """Remove item from cache"""
+        self._cache.pop(key, None)
+        self._timestamps.pop(key, None)
+    
+    def clear(self):
+        """Clear entire cache"""
+        self._cache.clear()
+        self._timestamps.clear()
+    
+    def invalidate_pattern(self, pattern: str):
+        """Remove all keys containing pattern"""
+        keys_to_delete = [k for k in self._cache.keys() if pattern in k]
+        for key in keys_to_delete:
+            self.delete(key)
+
+# Global cache instance
+cache = SimpleCache()
+
+
+def cache_response(ttl_seconds: int = 300, key_prefix: str = ""):
+    """
+    Decorator to cache endpoint responses
+    TTL default: 5 minutes
+    Use key_prefix to namespace different endpoints
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Build cache key from function name and arguments
+            cache_key = f"{key_prefix}:{func.__name__}:{str(kwargs)}"
+            
+            # Try to get from cache
+            cached_result = cache.get(cache_key, ttl_seconds)
+            if cached_result is not None:
+                return cached_result
+            
+            # Not in cache - execute function
+            result = func(*args, **kwargs)
+            
+            # Store in cache
+            cache.set(cache_key, result)
+            
+            return result
+        return wrapper
+    return decorator
 
 
 def require_admin():
@@ -458,9 +532,13 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
             if not draws:
                 raise HTTPException(400, "No draws found in JSON backup")
             
+            # OPTIMIZATION: Get all existing keys in ONE query instead of query per row
+            all_keys_in_db = {row.key for row in db.query(HistoricalDraw.key).all()}
+            
             inserted = 0
             duplicates = 0
             keys_seen = set()
+            new_draws_to_add = []
             
             for draw in draws:
                 nums = draw.get("numbers")
@@ -472,27 +550,29 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
                 nums_sorted = tuple(sorted(nums))
                 k = norm_key(nums_sorted)
                 
+                # Skip duplicates within this upload
                 if k in keys_seen:
                     duplicates += 1
                     continue
                 
                 keys_seen.add(k)
                 
-                # Check if already exists in database
-                existing = db.query(HistoricalDraw).filter_by(key=k).first()
-                if not existing:
-                    draw_data = {
-                        "numbers": list(nums_sorted),
-                        "key": k,
-                        "source": date_str if date_str else "json_backup",
-                        "draw_system_id": None
-                    }
-                    db.add(HistoricalDraw(**draw_data))
-                    inserted += 1
-                else:
+                # Check if already exists in database (in-memory check - no SQL query!)
+                if k in all_keys_in_db:
                     duplicates += 1
+                else:
+                    new_draws_to_add.append(HistoricalDraw(
+                        numbers=list(nums_sorted),
+                        key=k,
+                        source=date_str if date_str else "json_backup",
+                        draw_system_id=None
+                    ))
+                    inserted += 1
             
-            db.commit()
+            # Bulk insert all new draws in ONE transaction
+            if new_draws_to_add:
+                db.bulk_save_objects(new_draws_to_add)
+                db.commit()
             
             return UploadResponse(
                 success=True,
@@ -515,33 +595,44 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
     if not rows:
         raise HTTPException(400, "No valid 6-number rows found in CSV")
     
+    # OPTIMIZATION: Get all existing keys in ONE query instead of query per row
+    all_keys_in_db = {row.key for row in db.query(HistoricalDraw.key).all()}
+    
     inserted = 0
     duplicates = 0
     keys_seen = set()
+    new_draws_to_add = []
     
     for nums, date_str in rows:
         k = norm_key(nums)
+        
+        # Skip duplicates within this upload
         if k in keys_seen:
             duplicates += 1
             continue
         
         keys_seen.add(k)
         
-        # Check if already exists in database
-        existing = db.query(HistoricalDraw).filter_by(key=k).first()
-        if not existing:
-            draw_data = {
-                "numbers": nums,
-                "key": k,
-                "source": date_str if date_str else "csv_upload",
-                "draw_system_id": None  # CSV uploads don't have draw system ID
-            }
-            db.add(HistoricalDraw(**draw_data))
-            inserted += 1
-        else:
+        # Check if already exists in database (in-memory check - no SQL query!)
+        if k in all_keys_in_db:
             duplicates += 1
+        else:
+            new_draws_to_add.append(HistoricalDraw(
+                numbers=nums,
+                key=k,
+                source=date_str if date_str else "csv_upload",
+                draw_system_id=None
+            ))
+            inserted += 1
     
-    db.commit()
+    # Bulk insert all new draws in ONE transaction
+    if new_draws_to_add:
+        db.bulk_save_objects(new_draws_to_add)
+        db.commit()
+    
+    # Invalidate relevant caches after data modification
+    cache.invalidate_pattern("stats:")
+    cache.invalidate_pattern("draws:")
     
     return UploadResponse(
         success=True,
@@ -556,13 +647,22 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
 def get_stats(db: Session = Depends(get_db)):
     """
     Get statistics about historical draws
+    CACHED: 5 minutes TTL to reduce database load
     """
+    cache_key = "stats:global"
+    
+    # Try to get from cache (5 min TTL)
+    cached_stats = cache.get(cache_key, ttl_seconds=300)
+    if cached_stats is not None:
+        return cached_stats
+    
+    # Not in cache - compute from database
     all_draws = db.query(HistoricalDraw).all()
     all_picks = db.query(Pick).all()
     all_rows = [draw.numbers for draw in all_draws]
     
     if not all_rows:
-        return Stats(
+        result = Stats(
             total_draws=0,
             total_picks=len(all_picks),
             coverage_pct=0.0,
@@ -573,6 +673,8 @@ def get_stats(db: Session = Depends(get_db)):
             most_frequent=[],
             least_frequent=[]
         )
+        cache.set(cache_key, result)
+        return result
     
     freq = histogram_1_49(all_rows)
     total_combinations = math.comb(49, 6)
@@ -582,7 +684,7 @@ def get_stats(db: Session = Depends(get_db)):
     most_freq = sorted(freq_with_nums, key=lambda x: x[1], reverse=True)[:10]
     least_freq = sorted(freq_with_nums, key=lambda x: x[1])[:10]
     
-    return Stats(
+    result = Stats(
         total_draws=len(all_rows),
         total_picks=len(all_picks),
         coverage_pct=round(100.0 * len(all_rows) / total_combinations, 10),
@@ -593,6 +695,10 @@ def get_stats(db: Session = Depends(get_db)):
         most_frequent=most_freq,
         least_frequent=least_freq
     )
+    
+    # Store in cache
+    cache.set(cache_key, result)
+    return result
 
 
 @app.post("/generate", response_model=List[PickResponse])
@@ -634,6 +740,10 @@ def generate_picks(
     
     db.commit()
     
+    # Invalidate cache for picks and stats
+    cache.invalidate_pattern("picks:")
+    cache.invalidate_pattern("stats:")
+    
     # Refresh to get created_at timestamps
     for pick in results:
         db.refresh(pick)
@@ -669,6 +779,10 @@ def add_custom_pick(payload: Numbers, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_pick)
     
+    # Invalidate cache
+    cache.invalidate_pattern("picks:")
+    cache.invalidate_pattern("stats:")
+    
     return new_pick
 
 
@@ -681,19 +795,32 @@ def list_picks(
     """
     List generated picks with pagination (most recent first)
     Returns paginated response with total count
+    CACHED: 2 minutes TTL to reduce database load
     """
+    cache_key = f"picks:list:limit={limit}:offset={offset}"
+    
+    # Try to get from cache (2 min TTL)
+    cached_result = cache.get(cache_key, ttl_seconds=120)
+    if cached_result is not None:
+        return cached_result
+    
+    # Not in cache - query database
     total = db.query(Pick).count()
     picks = db.query(Pick).order_by(Pick.created_at.desc()).offset(offset).limit(limit).all()
     page = (offset // limit) + 1 if limit > 0 else 1
     total_pages = (total + limit - 1) // limit if limit > 0 else 1
     
-    return {
+    result = {
         "items": picks,
         "total": total,
         "page": page,
         "per_page": limit,
         "total_pages": total_pages
     }
+    
+    # Store in cache
+    cache.set(cache_key, result)
+    return result
 
 
 @app.get("/draws")
@@ -706,7 +833,16 @@ def list_draws(
     List historical draws with pagination (most recent draws first)
     Sorts by source field (YYYY-MM-DD date) if available, otherwise by created_at
     Returns paginated response with total count
+    CACHED: 2 minutes TTL to reduce database load
     """
+    cache_key = f"draws:list:limit={limit}:offset={offset}"
+    
+    # Try to get from cache (2 min TTL)
+    cached_result = cache.get(cache_key, ttl_seconds=120)
+    if cached_result is not None:
+        return cached_result
+    
+    # Not in cache - query database
     total = db.query(HistoricalDraw).count()
     draws = db.query(HistoricalDraw).order_by(
         case((HistoricalDraw.source.is_(None), 1), else_=0),
@@ -716,13 +852,17 @@ def list_draws(
     page = (offset // limit) + 1 if limit > 0 else 1
     total_pages = (total + limit - 1) // limit if limit > 0 else 1
     
-    return {
+    result = {
         "items": draws,
         "total": total,
         "page": page,
         "per_page": limit,
         "total_pages": total_pages
     }
+    
+    # Store in cache
+    cache.set(cache_key, result)
+    return result
 
 
 # ========== DELETE Endpoints - /all MUST come before /{id} ==========
@@ -736,6 +876,10 @@ def clear_all_picks(db: Session = Depends(get_db)):
     db.query(Pick).delete()
     db.commit()
     
+    # Invalidate cache
+    cache.invalidate_pattern("picks:")
+    cache.invalidate_pattern("stats:")
+    
     return {"success": True, "deleted": count}
 
 
@@ -747,6 +891,10 @@ def clear_all_draws(db: Session = Depends(get_db)):
     count = db.query(HistoricalDraw).count()
     db.query(HistoricalDraw).delete()
     db.commit()
+    
+    # Invalidate cache
+    cache.invalidate_pattern("draws:")
+    cache.invalidate_pattern("stats:")
     
     return {"success": True, "deleted": count}
 
@@ -761,6 +909,11 @@ def delete_draws_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     
     deleted = db.query(HistoricalDraw).filter(HistoricalDraw.id.in_(request.ids)).delete(synchronize_session=False)
     db.commit()
+    
+    # Invalidate cache if we deleted any draws
+    if deleted > 0:
+        cache.invalidate_pattern("draws:")
+        cache.invalidate_pattern("stats:")
     
     return {"success": True, "deleted": deleted}
 
@@ -777,6 +930,10 @@ def delete_draw(draw_id: int, db: Session = Depends(get_db)):
     db.delete(draw)
     db.commit()
     
+    # Invalidate cache
+    cache.invalidate_pattern("draws:")
+    cache.invalidate_pattern("stats:")
+    
     return {"success": True, "message": "Draw deleted"}
 
 
@@ -790,6 +947,11 @@ def delete_picks_batch(request: BatchDeleteRequest, db: Session = Depends(get_db
     
     deleted = db.query(Pick).filter(Pick.id.in_(request.ids)).delete(synchronize_session=False)
     db.commit()
+    
+    # Invalidate cache if we deleted any picks
+    if deleted > 0:
+        cache.invalidate_pattern("picks:")
+        cache.invalidate_pattern("stats:")
     
     return {"success": True, "deleted": deleted}
 
@@ -805,6 +967,10 @@ def delete_pick(pick_id: int, db: Session = Depends(get_db)):
     
     db.delete(pick)
     db.commit()
+    
+    # Invalidate cache
+    cache.invalidate_pattern("picks:")
+    cache.invalidate_pattern("stats:")
     
     return {"success": True, "message": "Pick deleted"}
 
@@ -980,6 +1146,11 @@ async def sync_lotto_results(db: Session = Depends(get_db)):
         
         db.commit()
         
+        # Invalidate cache if we added new draws
+        if new_draws_count > 0:
+            cache.invalidate_pattern("draws:")
+            cache.invalidate_pattern("stats:")
+        
         message = f"Successfully synced {new_draws_count} new draw(s) from Lotto.pl"
         if new_draws_count == 0:
             message = "Database is up to date. No new draws found."
@@ -1057,6 +1228,11 @@ def add_manual_draw(request: ManualDrawRequest, db: Session = Depends(get_db)):
         inserted += 1
     
     db.commit()
+    
+    # Invalidate cache if we added new draws
+    if inserted > 0:
+        cache.invalidate_pattern("draws:")
+        cache.invalidate_pattern("stats:")
     
     return UploadResponse(
         success=True,
@@ -1159,6 +1335,11 @@ def import_draws_from_json(draws_data: dict, db: Session = Depends(get_db)):
             inserted += 1
         
         db.commit()
+        
+        # Invalidate cache if we added new draws
+        if inserted > 0:
+            cache.invalidate_pattern("draws:")
+            cache.invalidate_pattern("stats:")
         
         return BackupResponse(
             success=True,
@@ -1652,8 +1833,22 @@ async def fix_integrity(db: Session = Depends(get_db)):
 
 @app.get("/draw-schedules", response_model=List[DrawScheduleResponse])
 def list_draw_schedules(db: Session = Depends(get_db)):
-    """Get all configured draw schedules ordered by date_from"""
+    """
+    Get all configured draw schedules ordered by date_from
+    CACHED: 10 minutes TTL (schedules rarely change)
+    """
+    cache_key = "schedules:list"
+    
+    # Try to get from cache (10 min TTL)
+    cached_result = cache.get(cache_key, ttl_seconds=600)
+    if cached_result is not None:
+        return cached_result
+    
+    # Not in cache - query database
     schedules = db.query(DrawSchedule).order_by(DrawSchedule.date_from).all()
+    
+    # Store in cache
+    cache.set(cache_key, schedules)
     return schedules
 
 
@@ -1669,6 +1864,10 @@ def create_draw_schedule(schedule: DrawScheduleCreate, db: Session = Depends(get
     db.add(new_schedule)
     db.commit()
     db.refresh(new_schedule)
+    
+    # Invalidate schedules cache
+    cache.invalidate_pattern("schedules:")
+    
     return new_schedule
 
 
@@ -1685,6 +1884,10 @@ def update_draw_schedule(schedule_id: int, schedule: DrawScheduleCreate, db: Ses
     existing.description = schedule.description
     db.commit()
     db.refresh(existing)
+    
+    # Invalidate schedules cache
+    cache.invalidate_pattern("schedules:")
+    
     return existing
 
 
@@ -1697,6 +1900,10 @@ def delete_draw_schedule(schedule_id: int, db: Session = Depends(get_db)):
     
     db.delete(schedule)
     db.commit()
+    
+    # Invalidate schedules cache
+    cache.invalidate_pattern("schedules:")
+    
     return {"success": True, "message": f"Schedule {schedule_id} deleted"}
 
 
@@ -1717,6 +1924,9 @@ def initialize_default_schedules(db: Session = Depends(get_db)):
     )
     db.add(default_schedule)
     db.commit()
+    
+    # Invalidate schedules cache
+    cache.invalidate_pattern("schedules:")
     
     return {"success": True, "message": "Default schedule created", "count": 1}
 
