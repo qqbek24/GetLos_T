@@ -69,7 +69,6 @@ export default function History() {
   const [dateFilterFrom, setDateFilterFrom] = useState<string>('')
   const [dateFilterTo, setDateFilterTo] = useState<string>('')
   const [jumpToPage, setJumpToPage] = useState<string>('')
-  const [integrityChecked, setIntegrityChecked] = useState(false)
   const queryClient = useQueryClient()
   const isAdmin = useAdmin()
 
@@ -289,16 +288,17 @@ export default function History() {
   })
 
   // Auto-verify integrity when tab is "draws" (only once)
-  useEffect(() => {
-    if (tab === 'draws' && drawsTotal > 0 && !integrityChecked) {
-      verifyIntegrityMutation.mutate()
-      setIntegrityChecked(true)
-    }
-    // Reset flag when leaving draws tab
-    if (tab !== 'draws') {
-      setIntegrityChecked(false)
-    }
-  }, [tab, drawsTotal, integrityChecked])
+  // DISABLED to save DB queries - use manual button instead
+  // useEffect(() => {
+  //   if (tab === 'draws' && drawsTotal > 0 && !integrityChecked) {
+  //     verifyIntegrityMutation.mutate()
+  //     setIntegrityChecked(true)
+  //   }
+  //   // Reset flag when leaving draws tab
+  //   if (tab !== 'draws') {
+  //     setIntegrityChecked(false)
+  //   }
+  // }, [tab, drawsTotal, integrityChecked])
 
   const handleDelete = (id: number) => {
     setItemToDelete(id)
@@ -828,6 +828,16 @@ export default function History() {
                       disabled={exportMutation.isPending}
                     >
                       Backup
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="info"
+                      size="small"
+                      startIcon={verifyIntegrityMutation.isPending ? <CircularProgress size={16} color="inherit" /> : <ICONS.Search />}
+                      onClick={() => verifyIntegrityMutation.mutate()}
+                      disabled={verifyIntegrityMutation.isPending}
+                    >
+                      Sprawdź Integralność
                     </Button>
                   </>
                 )}
