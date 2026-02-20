@@ -6,9 +6,15 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
 # Get database URL from environment or use default
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/app.db")
+_raw_url = os.getenv("DATABASE_URL", "sqlite:///./data/app.db")
 
-# Create engine with proper SQLite configuration
+# Heroku provides mysql:// — SQLAlchemy requires mysql+pymysql://
+if _raw_url.startswith("mysql://"):
+    DATABASE_URL = _raw_url.replace("mysql://", "mysql+pymysql://", 1)
+else:
+    DATABASE_URL = _raw_url
+
+# Create engine with proper configuration per dialect
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},

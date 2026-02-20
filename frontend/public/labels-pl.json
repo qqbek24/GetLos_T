@@ -110,6 +110,11 @@
     "hits": "Trafienia",
     "noGeneratedPicks": "Brak wygenerowanych układów. Przejdź do zakładki \"Generuj\" aby utworzyć nowe układy.",
     "noHistoricalDraws": "Brak historycznych losowań. Wgraj plik CSV z historycznymi wynikami w zakładce \"Dashboard\".",
+    "noDrawsInPeriod": "Brak losowań w wybranym okresie",
+    "noSchedules": "Brak harmonogramów. Dodaj pierwszy harmonogram aby określić dni losowań dla różnych okresów.",
+    "noHits": "Brak układów z 3+ trafieniami",
+    "totalCount": "Łącznie",
+    "selected": "Zaznaczono",
     "actions": {
       "sync": "Synchronizuj z Lotto.pl",
       "syncing": "Synchronizacja...",
@@ -117,13 +122,18 @@
       "addManuallyPick": "Dodaj układ ręcznie",
       "backup": "Backup",
       "export": "Eksportuj do CSV",
-      "verifyIntegrity": "Weryfikuj integralność",
+      "verifyIntegrity": "Sprawdź Integralność",
       "fixIntegrity": "Napraw integralność",
       "checkMissing": "Sprawdź brakujące daty",
       "checkHits": "Sprawdź trafienia",
+      "checking": "Sprawdzam...",
+      "checkInAPI": "Sprawdź w API Lotto.pl",
       "deleteSelected": "Usuń zaznaczone",
+      "deleteAll": "Usuń Wszystkie",
       "selectAll": "Zaznacz wszystkie",
-      "deselectAll": "Odznacz wszystkie"
+      "deselectAll": "Odznacz wszystkie",
+      "clearFilter": "Wyczyść filtr",
+      "deleting": "Usuwanie..."
     },
     "table": {
       "numbers": "Liczby",
@@ -139,6 +149,37 @@
       "of": "z",
       "page": "Strona",
       "jumpTo": "Przejdź do strony"
+    },
+    "dialogs": {
+      "confirmDelete": "Potwierdzenie usunięcia",
+      "confirmDeleteSingle": "Czy na pewno chcesz usunąć ten {{type}}?",
+      "confirmDeleteBatch": "Czy na pewno chcesz usunąć {{count}} {{type}}?",
+      "confirmDeleteSchedule": "Czy na pewno chcesz usunąć ten harmonogram?",
+      "addDrawManually": "Dodaj losowanie ręcznie",
+      "addPickManually": "Dodaj układ ręcznie",
+      "useThisOptionInfo": "Użyj tej opcji gdy synchronizacja z API nie działa lub chcesz dodać starsze wyniki.",
+      "numbersLabel": "Liczby (6 liczb od 1 do 49)",
+      "numbersPlaceholder": "np. 5, 12, 23, 34, 39, 45, 49",
+      "drawDateLabel": "Data losowania (opcjonalnie)"
+    },
+    "validation": {
+      "enterExactly6Numbers": "Wprowadź dokładnie 6 liczb od 1 do 49",
+      "enter6NumbersHelper": "Wprowadź 6 liczb oddzielonych spacjami, przecinkami lub średnikami",
+      "enter6NumbersDescription": "Wprowadź 6 liczb od 1 do 49. System sprawdzi czy układ nie istnieje w historii losowań ani wygenerowanych układach.",
+      "selectAtLeastOneDay": "Wybierz przynajmniej jeden dzień tygodnia",
+      "uniqueNumbers": "Wszystkie liczby muszą być unikalne",
+      "existsInHistory": "Ten układ już istnieje w historii losowań",
+      "existsInPicks": "Ten układ już istnieje w wygenerowanych",
+      "isUnique": "Układ jest unikalny - możesz go dodać"
+    },
+    "messages": {
+      "filterActive": "Filtr aktywny: {{filtered}} z {{total}}"
+    },
+    "types": {
+      "pick": "układ",
+      "picks": "układów",
+      "draw": "wynik losowania",
+      "draws": "wyników losowań"
     }
   },
   "fileUpload": {

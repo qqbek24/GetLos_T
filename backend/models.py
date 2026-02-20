@@ -25,9 +25,9 @@ class HistoricalDraw(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     numbers = Column(JSON, nullable=False)  # 6 numbers as JSON array
-    key = Column(String, unique=True, index=True, nullable=False)  # normalized key for uniqueness
+    key = Column(String(20), unique=True, index=True, nullable=False)  # normalized key for uniqueness e.g. "05-12-23-34-45-49"
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    source = Column(String, nullable=True)  # source of data (e.g., "manual_upload", "api", "csv", or draw date YYYY-MM-DD)
+    source = Column(String(255), nullable=True)  # source of data (e.g., "manual_upload", "api", "csv", or draw date YYYY-MM-DD)
     draw_system_id = Column(Integer, nullable=True, index=True)  # Lotto.pl API draw system ID (e.g., 7299)
     sequential_id = Column(Integer, nullable=True, index=True)  # Sequential number starting from 1 for oldest draw (1957-01-27)
     
@@ -44,8 +44,8 @@ class Pick(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     numbers = Column(JSON, nullable=False)  # 6 numbers as JSON array
-    key = Column(String, unique=True, index=True, nullable=False)  # normalized key for uniqueness
-    strategy = Column(String, nullable=False)  # strategy used: random, hot, cold, balanced, combo_based
+    key = Column(String(20), unique=True, index=True, nullable=False)  # normalized key for uniqueness
+    strategy = Column(String(50), nullable=False)  # strategy used: random, hot, cold, balanced, combo_based
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     __table_args__ = (
@@ -65,10 +65,10 @@ class DrawSchedule(Base):
     __tablename__ = "draw_schedules"
     
     id = Column(Integer, primary_key=True, index=True)
-    date_from = Column(String, nullable=False)  # Start date YYYY-MM-DD
-    date_to = Column(String, nullable=True)  # End date YYYY-MM-DD (null = ongoing)
+    date_from = Column(String(10), nullable=False)  # Start date YYYY-MM-DD
+    date_to = Column(String(10), nullable=True)  # End date YYYY-MM-DD (null = ongoing)
     weekdays = Column(JSON, nullable=False)  # List of weekday numbers: 0=Monday, 1=Tuesday, ..., 6=Sunday
-    description = Column(String, nullable=True)  # Optional description like "Modern era", "Historical period"
+    description = Column(String(255), nullable=True)  # Optional description like "Modern era", "Historical period"
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     def __repr__(self):
