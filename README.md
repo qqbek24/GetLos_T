@@ -52,9 +52,9 @@ The application has integration with the official Totalizator Sportowy API:
 - Backup/Restore to JSON
 - Full integration documentation
 
--**[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
--**[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
--**[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
+- **[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
+- **[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
+- **[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
 
 ## Quick Start
 
@@ -81,7 +81,7 @@ Quick_start_dev\restart-all.bat
 Quick_start_dev\logs.bat
 ```
 
-> 💡 All management scripts are located in [`Quick_start_dev/`](Quick_start_dev/) folder
+> All management scripts are located in [`Quick_start_dev/`](Quick_start_dev/) folder
 
 #### Production Mode
 ```bash
@@ -90,8 +90,8 @@ Quick_start_dev\start-prod.bat
 
 ### Method 2: Manual (without Docker)
 
-📖 **[Backend Documentation → backend/docs/README.md](backend/docs/README.md)**
-📖 **[Frontend Documentation → frontend/docs/README.md](frontend/docs/README.md)**
+- **[Backend Documentation → backend/docs/README.md](backend/docs/README.md)**
+- **[Frontend Documentation → frontend/docs/README.md](frontend/docs/README.md)**
 
 #### Backend
 ```bash
@@ -119,7 +119,7 @@ npm run dev
 ```
 GetLos_T/
 ├── backend/                 # FastAPI Backend
-│   ├── docs/               # 📖 Backend Documentation
+│   ├── docs/               # Backend Documentation
 │   │   └── README.md       # API docs, endpoints, models
 │   ├── main.py             # Main FastAPI application
 │   ├── models.py           # SQLAlchemy models
@@ -128,7 +128,7 @@ GetLos_T/
 │   ├── requirements.txt    # Python dependencies
 │   └── Dockerfile          # Backend Dockerfile
 ├── frontend/               # React Frontend
-│   ├── docs/               # 📖 Frontend Documentation
+│   ├── docs/               # Frontend Documentation
 │   │   └── README.md       # Components, pages, architecture
 │   ├── src/
 │   │   ├── components/    # React components
@@ -149,7 +149,7 @@ GetLos_T/
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── Dockerfile
-├── Quick_start_dev/        # 🚀 Quick Start Scripts & Docs
+├── Quick_start_dev/        # Quick Start Scripts & Docs
 │   ├── start-dev.bat      # Start development
 │   ├── start-prod.bat     # Start production
 │   ├── start-backend.bat  # Start backend only
@@ -175,9 +175,9 @@ GetLos_T/
 └── README.md              # This file
 ```
 
-## 🛠️ Management Files
+## Management Files
 
-📂 **All management files are located in [`Quick_start_dev/`](Quick_start_dev/)**
+**All management files are located in [`Quick_start_dev/`](Quick_start_dev/)**
 
 ### Start
 - `start-dev.bat` - Start development mode (hot reload)
@@ -196,11 +196,11 @@ GetLos_T/
 - `logs-backend.bat` - Backend logs
 - `logs-frontend.bat` - Frontend logs
 
-📖 **[Full instructions → Quick_start_dev/QUICK_START.md](Quick_start_dev/QUICK_START.md)**
+**[Full instructions → Quick_start_dev/QUICK_START.md](Quick_start_dev/QUICK_START.md)**
 
-## 📊 API Endpoints
+## API Endpoints
 
-📖 **[Detailed API documentation → backend/docs/README.md](backend/docs/README.md)**
+**[Detailed API documentation → backend/docs/README.md](backend/docs/README.md)**
 
 ### Draws (Historical Lottery Draws)
 - `POST /draws/upload-csv` - Upload CSV file with history
@@ -220,9 +220,9 @@ GetLos_T/
 - `GET /stats/` - Get full statistics
 - `POST /validate` - Validate number set
 
-## 🎨 Frontend - React Components
+## Frontend - React Components
 
-📖 **[Szczegółowa dokumentacja Frontend → frontend/docs/README.md](frontend/docs/README.md)**
+**[Szczegółowa dokumentacja Frontend → frontend/docs/README.md](frontend/docs/README.md)**
 
 ### Pages
 - **Dashboard**: Stats cards, CSV upload, quick actions, recent picks
@@ -238,7 +238,7 @@ GetLos_T/
 - **api.ts**: Axios client with 10 typed API methods
 - **types/index.ts**: TypeScript interfaces for all data models
 
-## 🔧 Development
+## Development
 
 ### Backend Development
 ```bash
@@ -266,7 +266,7 @@ docker-compose -f docker-compose.dev.yml down
 docker-compose -f docker-compose.dev.yml logs -f
 ```
 
-## 📝 CSV Format for Import
+## CSV Format for Import
 
 ```csv
 Data Losowania,Liczba 1,Liczba 2,Liczba 3,Liczba 4,Liczba 5,Liczba 6
@@ -280,7 +280,7 @@ Data Losowania,Liczba 1,Liczba 2,Liczba 3,Liczba 4,Liczba 5,Liczba 6
 - Date in YYYY-MM-DD format
 - 6 unique numbers in each row
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Docker Issues
 ```bash
@@ -323,13 +323,13 @@ docker-compose -f docker-compose.dev.yml down -v
 docker-compose -f docker-compose.dev.yml up
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 After starting the backend, interactive documentation is available:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 🎓 How to Use
+## How to Use
 
 ### 1. Upload Historical Data
 1. Go to Dashboard
@@ -355,7 +355,7 @@ After starting the backend, interactive documentation is available:
 3. Browse historical draws
 4. Delete unnecessary entries
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
@@ -363,34 +363,34 @@ After starting the backend, interactive documentation is available:
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-## 📖 Documentation
+## Documentation
 
-> 📖 **[🔍 Full Documentation Index → docs/INDEX.md](docs/INDEX.md)**
+> **[Full Documentation Index → docs/INDEX.md](docs/INDEX.md)**
 
-### 🚀 Quick Start & Scripts
+### Quick Start & Scripts
 - **[Quick_start_dev/](Quick_start_dev/)** - All management scripts and quick start guides
   - [FIRST_RUN.md](Quick_start_dev/FIRST_RUN.md) - First launch
   - [QUICK_START.md](Quick_start_dev/QUICK_START.md) - Quick start in 5 minutes
   - [LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md) - API configuration in 6 steps
 
-### 🔄 Integrations and Features
+### Integrations and Features
 - **[docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)** - Full Lotto.pl API synchronization documentation
 - **[docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)** - Data management, backup, restore, persistence
 - **[docs/AI_STRATEGY.md](docs/AI_STRATEGY.md)** - AI Prediction strategy - machine learning documentation
 - **[docs/INSTALLATION_GUIDE.md](docs/INSTALLATION_GUIDE.md)** - Detailed installation guide
 - **[docs/VISUALIZATION.md](docs/VISUALIZATION.md)** - Architecture and flow diagrams
 
-### 💻 Technical Documentation
+### Technical Documentation
 - **[backend/docs/](backend/docs/)** - Backend Documentation
   - API endpoints, models, strategies, configuration
 - **[frontend/docs/](frontend/docs/)** - Frontend Documentation
   - React components, pages, architecture, Material UI
 
-### 📦 Deployment
+### Deployment
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 
-## 📄 License
+## License
 
 MIT License - see LICENSE file for details
 
