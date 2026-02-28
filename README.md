@@ -4,7 +4,7 @@ Intelligent system for predicting and analyzing Lotto results based on historica
 
  for how app looks and work, check address [GetLost_T](https://remarkable-lollipop-803d8b.netlify.app/)
 
-> **[Full Documentation → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)**
+> **[Full Documentation → docs/INDEX.md](docs/INDEX.md)** | [Quick Start](Quick_start_dev/) | [Backend](backend/docs/) | [Frontend](frontend/docs/)** <
 
 ## Technology Stack
 
