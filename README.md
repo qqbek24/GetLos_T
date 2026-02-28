@@ -52,9 +52,9 @@ The application has integration with the official Totalizator Sportowy API:
 - Backup/Restore to JSON
 - Full integration documentation
 
-**[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
-**[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
-**[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
+-**[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
+-**[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
+-**[Quick Start → Quick_start_dev/LOTTO_SYNC_QUICKSTART.md](Quick_start_dev/LOTTO_SYNC_QUICKSTART.md)**
 
 ## Quick Start
 
