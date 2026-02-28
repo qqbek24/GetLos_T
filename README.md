@@ -34,7 +34,7 @@ Intelligent system for predicting and analyzing Lotto results based on historica
 3. **Cold Numbers** - Prefers rarely occurring numbers
 4. **Balanced** - Mix of frequent and rare numbers
 5. **Combo Based** - Based on most common pairs and triples from history
-6. **AI Prediction** 🧠 ✨ **NEW!** - Machine learning prediction using RandomForest
+6. **AI Prediction** **NEW!** - Machine learning prediction using RandomForest
    - Analyzes historical patterns and sequences
    - Extracts 10 features per draw (sum, even count, range, frequency, gaps)
    - Trains 49 binary classifiers (one per number)
@@ -51,6 +51,8 @@ The application has integration with the official Totalizator Sportowy API:
 - Manual draw addition (fallback)
 - Backup/Restore to JSON
 - Full integration documentation
+
+
 
 - **[API Configuration Guide → docs/LOTTO_API_SYNC.md](docs/LOTTO_API_SYNC.md)**
 - **[Data Management → docs/DATA_MANAGEMENT.md](docs/DATA_MANAGEMENT.md)**
